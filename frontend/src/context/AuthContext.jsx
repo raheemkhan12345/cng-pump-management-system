@@ -1,9 +1,10 @@
 import { createContext, useContext, useState } from 'react';
 
-const AuthContext = createContext(null);
+// Export AuthContext for direct useContext(AuthContext) usage
+export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  // Mock logged-in user state. LocalStorage integration included.
+  // LocalStorage integration with initial state
   const [user, setUser] = useState(() => {
     try {
       const savedUser = localStorage.getItem('cng_user');
@@ -14,22 +15,27 @@ export const AuthProvider = ({ children }) => {
   });
 
   const login = (email, password) => {
-    // Role simulation based on credentials
     let role = 'ADMIN';
-    let name = 'Station Admin';
+    let name = 'Muhammad Bilal';
+    let pumpName = 'CNG Pump 01';
+    let pumpAddress = 'Mingora, Swat';
 
-    // Mock credential check
+    // Mock credential check for Super Admin
     if (email.includes('super') || email === 'superadmin@cnghub.com' || password === 'superadmin') {
       role = 'SUPER_ADMIN';
       name = 'Super Admin';
+      pumpName = '';
+      pumpAddress = '';
     }
 
     const userData = {
-      id: '1',
+      id: role === 'SUPER_ADMIN' ? 'super_1' : 'admin_1',
       email,
       name,
       role, // 'SUPER_ADMIN' or 'ADMIN'
-      avatar: 'https://i.pravatar.cc/150?img=12'
+      pumpName,
+      pumpAddress,
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150'
     };
 
     setUser(userData);
@@ -42,13 +48,24 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('cng_user');
   };
 
+  // Helper function to update user data dynamically (e.g., Profile Page update)
+  const updateUser = (updatedFields) => {
+    setUser((prevUser) => {
+      if (!prevUser) return null;
+      const newUser = { ...prevUser, ...updatedFields };
+      localStorage.setItem('cng_user', JSON.stringify(newUser));
+      return newUser;
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
+// Custom Hook
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);

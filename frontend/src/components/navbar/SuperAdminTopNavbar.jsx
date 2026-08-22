@@ -1,8 +1,8 @@
 import { Bell, Menu } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import './TopNavbar.css';
+import './SuperAdminTopNavbar.css';
 
-const TopNavbar = ({ onToggleSidebar }) => {
+const SuperAdminTopNavbar = ({ onToggleSidebar }) => {
   const { user } = useAuth();
 
   return (
@@ -37,4 +37,4 @@ const TopNavbar = ({ onToggleSidebar }) => {
   );
 };
 
-export default TopNavbar;
+export default SuperAdminTopNavbar;

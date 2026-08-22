@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import SuperAdminSidebar from '../components/sidebar/SuperAdminSidebar';
-import TopNavbar from '../components/navbar/SuperAdminTopNavbar.jsx';
-import './SuperAdminLayout.css';
+import AdminSidebar from '../components/sidebar/AdminSidebar';
+import AdminTopNavbar from '../components/navbar/AdminTopNavbar';
+import './AdminLayout.css';
 
-const SuperAdminLayout = () => {
+const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -22,13 +22,14 @@ const SuperAdminLayout = () => {
         <div className="sidebar-overlay" onClick={closeSidebar}></div>
       )}
 
-      {/* Sidebar with active class state */}
+      {/* Sidebar Container */}
       <div className={`sidebar-container ${isSidebarOpen ? 'open' : ''}`}>
-        <SuperAdminSidebar closeSidebar={closeSidebar} />
+        <AdminSidebar closeSidebar={closeSidebar} />
       </div>
 
+      {/* Main Area */}
       <div className="layout-main">
-        <TopNavbar onToggleSidebar={toggleSidebar} />
+        <AdminTopNavbar onToggleSidebar={toggleSidebar} />
         <main className="layout-content">
           <div className="content-container">
             <Outlet />
@@ -39,4 +40,4 @@ const SuperAdminLayout = () => {
   );
 };
 
-export default SuperAdminLayout;
+export default AdminLayout;
