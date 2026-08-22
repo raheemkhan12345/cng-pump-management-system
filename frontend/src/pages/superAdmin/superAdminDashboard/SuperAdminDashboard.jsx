@@ -1,19 +1,34 @@
+import React, { useState } from 'react';
 import { Plus, Search, Filter, Fuel, Wrench } from 'lucide-react';
+import AddPumpModal from '../../../components/addNewPumpForm/AddPumpForm';
 import './SuperAdminDashboard.css';
 
 const SuperAdminDashboard = () => {
-  const admins = [
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [admins] = useState([
     { id: 1, name: 'Khan', lastLogin: 'Today', pump: 'Station North', status: 'Active', avatar: 'K' },
     { id: 2, name: 'Adil Khan', lastLogin: 'Yesterday', pump: 'Station South', status: 'Active', avatar: 'AK' },
     { id: 3, name: 'Anwar Ali', lastLogin: '1w ago', pump: 'Unassigned', status: 'Inactive', avatar: 'A' },
-  ];
+  ]);
 
-  const pumps = [
+  const [pumps, setPumps] = useState([
     { id: '01', name: 'Station North-01', admin: 'S. Jenkins', location: 'North District', status: 'Active' },
     { id: '02', name: 'Station North-02', admin: 'S. Jenkins', location: 'North District', status: 'Active' },
     { id: '03', name: 'Station East-02', admin: 'Unassigned', location: 'East District', status: 'Inactive' },
     { id: '04', name: 'Station South-01', admin: 'M. Ross', location: 'South District', status: 'Active' },
-  ];
+  ]);
+
+  const handleAddPump = (newPumpData) => {
+    const newPump = {
+      id: String(pumps.length + 1).padStart(2, '0'),
+      name: newPumpData.pumpName,
+      admin: newPumpData.adminName,
+      location: newPumpData.pumpAddress,
+      status: 'Active',
+    };
+    setPumps([...pumps, newPump]);
+  };
 
   return (
     <div className="dashboard-page">
@@ -32,11 +47,15 @@ const SuperAdminDashboard = () => {
             <span>Total CNG Pumps</span>
             <Fuel size={18} className="stat-icon" />
           </div>
-          <div className="stat-value">6</div>
+          <div className="stat-value">{pumps.length}</div>
         </div>
 
         <div className="action-card">
-          <button className="add-pump-btn" type="button">
+          <button
+            className="add-pump-btn"
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+          >
             <Plus size={18} />
             <span>Add CNG Pump</span>
           </button>
@@ -141,6 +160,13 @@ const SuperAdminDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Add New Pump Modal */}
+      <AddPumpModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAddPump={handleAddPump}
+      />
     </div>
   );
 };

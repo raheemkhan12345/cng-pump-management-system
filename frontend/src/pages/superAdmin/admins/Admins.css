@@ -1,0 +1,322 @@
+.admins-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.page-header {
+    margin-bottom: 4px;
+}
+
+.page-title {
+    font-size: clamp(20px, 4vw, 28px);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+    font-size: clamp(12px, 2.5vw, 14px);
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.admins-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Controls Header */
+.table-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 320px;
+    flex: 1 1 240px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.search-input {
+    width: 100%;
+    height: 38px;
+    padding: 0 14px 0 38px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.search-input:focus {
+    border-color: var(--border-focus);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.control-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    white-space: nowrap;
+}
+
+.control-btn:hover {
+    background: var(--bg-surface-secondary);
+}
+
+/* Table Design & Responsive Wrapper */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.admins-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    min-width: 650px;
+    /* Enforces clean horizontal scrolling on small mobile screens */
+}
+
+.admins-table th {
+    background-color: var(--bg-surface);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
+    white-space: nowrap;
+}
+
+.admins-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.admins-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* User Cell Layout */
+.user-profile-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-initials {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background-color: var(--accent-light);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.user-email {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.pump-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.pump-name.unassigned {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge.active {
+    background-color: var(--accent-light);
+    color: var(--accent);
+}
+
+.status-badge.inactive {
+    background-color: var(--bg-surface-secondary);
+    color: var(--text-muted);
+}
+
+.table-text-muted {
+    color: var(--text-muted);
+}
+
+.no-data {
+    text-align: center;
+    color: var(--text-light);
+    padding: 30px;
+}
+
+/* Table Footer */
+.table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border-light);
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.entries-count {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.pagination-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.pagination-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.pagination-btn:not(:disabled):hover {
+    background-color: var(--bg-surface-secondary);
+    color: var(--text-primary);
+}
+
+.pagination-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+
+/* Tablets & Small Desktops (max-width: 768px) */
+@media (max-width: 768px) {
+    .table-controls {
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .search-input-wrapper {
+        max-width: 100%;
+    }
+
+    .action-buttons {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .action-buttons .control-btn {
+        flex: 1;
+    }
+
+    .admins-table th,
+    .admins-table td {
+        padding: 12px 14px;
+    }
+
+    .table-footer {
+        padding: 12px 16px;
+    }
+}
+
+/* Mobile Devices (max-width: 480px) */
+@media (max-width: 480px) {
+    .table-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .table-footer {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        text-align: center;
+    }
+}

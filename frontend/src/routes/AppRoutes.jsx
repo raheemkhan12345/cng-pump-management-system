@@ -1,9 +1,12 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../pages/auth/Login';
-import SuperAdminDashboard from '../pages/superAdmin/SuperAdminDashboard';
+import SuperAdminDashboard from '../pages/superAdmin/superAdminDashboard/SuperAdminDashboard';
 import SuperAdminLayout from '../layouts/SuperAdminLayout';
 import ProtectedRoute from './ProtectedRoute';
 import RoleRoute from './RoleRoute';
+import Admins from '../pages/superAdmin/admins/Admins';
+import CngPumps from '../pages/superAdmin/managePumps/cngPumps';
+import Settings from '../pages/superAdmin/settings/Settings';
 
 const AppRoutes = () => {
   return (
@@ -16,39 +19,9 @@ const AppRoutes = () => {
         <Route element={<RoleRoute allowedRoles={['SUPER_ADMIN']} />}>
           <Route element={<SuperAdminLayout />}>
             <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
-            <Route
-              path="/super-admin/admins"
-              element={
-                <div className="dashboard-page">
-                  <div className="page-header">
-                    <h1 className="page-title">Admins Management</h1>
-                    <p className="page-subtitle">Manage and assign CNG station administrators.</p>
-                  </div>
-                </div>
-              }
-            />
-            <Route
-              path="/super-admin/pumps"
-              element={
-                <div className="dashboard-page">
-                  <div className="page-header">
-                    <h1 className="page-title">CNG Pumps Management</h1>
-                    <p className="page-subtitle">Configure, monitor, and manage CNG pump stations.</p>
-                  </div>
-                </div>
-              }
-            />
-            <Route
-              path="/super-admin/settings"
-              element={
-                <div className="dashboard-page">
-                  <div className="page-header">
-                    <h1 className="page-title">System Settings</h1>
-                    <p className="page-subtitle">Configure global platform preferences and security controls.</p>
-                  </div>
-                </div>
-              }
-            />
+            <Route path="/super-admin/admins" element={<Admins />} />
+            <Route path="/super-admin/pumps" element={ <CngPumps />} />
+            <Route path="/super-admin/settings" element={<Settings />} />
           </Route>
         </Route>
       </Route>
