@@ -1,38 +1,37 @@
 import React, { useState } from 'react';
 import { Plus, Search, Filter, Fuel, Wrench } from 'lucide-react';
 import AddPumpModal from '../../../components/addNewPumpForm/AddPumpForm';
+import { usePumps } from '../../../context/PumpContext';
 import './SuperAdminDashboard.css';
 
 const SuperAdminDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [adminSearch, setAdminSearch] = useState('');
 
-  const [admins] = useState([
-    { id: 1, name: 'Khan', lastLogin: 'Today', pump: 'Station North', status: 'Active', avatar: 'K' },
-    { id: 2, name: 'Adil Khan', lastLogin: 'Yesterday', pump: 'Station South', status: 'Active', avatar: 'AK' },
-    { id: 3, name: 'Anwar Ali', lastLogin: '1w ago', pump: 'Unassigned', status: 'Inactive', avatar: 'A' },
-  ]);
+  const { pumps, addNewPump } = usePumps();
 
-  const [pumps, setPumps] = useState([
-    { id: '01', name: 'Station North-01', admin: 'S. Jenkins', location: 'North District', status: 'Active' },
-    { id: '02', name: 'Station North-02', admin: 'S. Jenkins', location: 'North District', status: 'Active' },
-    { id: '03', name: 'Station East-02', admin: 'Unassigned', location: 'East District', status: 'Inactive' },
-    { id: '04', name: 'Station South-01', admin: 'M. Ross', location: 'South District', status: 'Active' },
-  ]);
+  // Extract Admins dynamically
+  const admins = pumps
+    .filter((p) => p.admin && (p.admin.assigned || p.admin.name))
+    .map((p) => ({
+      id: p.id,
+      name: p.admin.name || 'Unassigned',
+      lastLogin: p.admin.lastLogin || 'Never',
+      pump: p.name,
+      status: p.status,
+      avatar: p.admin.initials || 'U',
+    }));
 
-  const handleAddPump = (newPumpData) => {
-    const newPump = {
-      id: String(pumps.length + 1).padStart(2, '0'),
-      name: newPumpData.pumpName,
-      admin: newPumpData.adminName,
-      location: newPumpData.pumpAddress,
-      status: 'Active',
-    };
-    setPumps([...pumps, newPump]);
+  const filteredAdmins = admins.filter((a) =>
+    a.name.toLowerCase().includes(adminSearch.toLowerCase())
+  );
+
+  const handleAddPump = (formData) => {
+    addNewPump(formData);
   };
 
   return (
     <div className="dashboard-page">
-      {/* Page Heading */}
       <div className="page-header">
         <h1 className="page-title">Super Admin Dashboard</h1>
         <p className="page-subtitle">
@@ -40,7 +39,6 @@ const SuperAdminDashboard = () => {
         </p>
       </div>
 
-      {/* Action Stats Cards */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-header">
@@ -62,7 +60,6 @@ const SuperAdminDashboard = () => {
         </div>
       </div>
 
-      {/* Tables Section */}
       <div className="dashboard-tables-grid">
         {/* Admin Overview */}
         <div className="table-card">
@@ -70,7 +67,13 @@ const SuperAdminDashboard = () => {
             <h3 className="card-title">Admin Overview</h3>
             <div className="search-box">
               <Search size={16} />
-              <input type="text" placeholder="Search admins..." aria-label="Search admins" />
+              <input
+                type="text"
+                placeholder="Search admins..."
+                value={adminSearch}
+                onChange={(e) => setAdminSearch(e.target.value)}
+                aria-label="Search admins"
+              />
             </div>
           </div>
 
@@ -85,30 +88,38 @@ const SuperAdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {admins.map((admin) => (
-                  <tr key={admin.id}>
-                    <td>
-                      <div className="user-cell">
-                        <div className="avatar-circle">{admin.avatar}</div>
-                        <div>
-                          <div className="cell-title">{admin.name}</div>
-                          <div className="cell-sub">Last Login: {admin.lastLogin}</div>
+                {filteredAdmins.length > 0 ? (
+                  filteredAdmins.map((admin) => (
+                    <tr key={admin.id}>
+                      <td>
+                        <div className="user-cell">
+                          <div className="avatar-circle">{admin.avatar}</div>
+                          <div>
+                            <div className="cell-title">{admin.name}</div>
+                            <div className="cell-sub">Last Login: {admin.lastLogin}</div>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="cell-text">{admin.pump}</td>
-                    <td>
-                      <span className={`badge ${admin.status.toLowerCase()}`}>
-                        • {admin.status}
-                      </span>
-                    </td>
-                    <td>
-                      <button className="icon-btn" title="Manage" aria-label={`Manage ${admin.name}`} type="button">
-                        <Wrench size={16} />
-                      </button>
+                      </td>
+                      <td className="cell-text">{admin.pump}</td>
+                      <td>
+                        <span className={`badge ${admin.status.toLowerCase()}`}>
+                          • {admin.status}
+                        </span>
+                      </td>
+                      <td>
+                        <button className="icon-btn" title="Manage" aria-label={`Manage ${admin.name}`} type="button">
+                          <Wrench size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="cell-text" style={{ textAlign: 'center', padding: '16px' }}>
+                      No admins found.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
@@ -139,7 +150,7 @@ const SuperAdminDashboard = () => {
                     <td>
                       <div className="cell-title">{pump.name}</div>
                       <div className="cell-sub">
-                        Admin: <span className={pump.admin === 'Unassigned' ? 'text-red' : ''}>{pump.admin}</span>
+                        Admin: <span className={!pump.admin?.assigned ? 'text-red' : ''}>{pump.admin?.name || 'Unassigned'}</span>
                       </div>
                     </td>
                     <td className="cell-text">{pump.location}</td>
@@ -161,7 +172,6 @@ const SuperAdminDashboard = () => {
         </div>
       </div>
 
-      {/* Add New Pump Modal */}
       <AddPumpModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

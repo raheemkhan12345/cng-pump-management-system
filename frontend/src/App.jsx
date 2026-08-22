@@ -1,12 +1,16 @@
+import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import AppRoutes from './routes/AppRoutes';
+import { PumpProvider } from './context/PumpContext';
+import AppRoutes from './routes/AppRoutes'; // Ya jahan bhi aapka AppRoutes component hai
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <PumpProvider>
+          <AppRoutes />
+        </PumpProvider>
       </AuthProvider>
     </BrowserRouter>
   );
