@@ -1,12 +1,16 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   // Mock logged-in user state. LocalStorage integration included.
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('cng_user');
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      const savedUser = localStorage.getItem('cng_user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
   });
 
   const login = (email, password) => {
@@ -14,7 +18,8 @@ export const AuthProvider = ({ children }) => {
     let role = 'ADMIN';
     let name = 'Station Admin';
 
-    if (email.includes('super') || email === 'superadmin@cnghub.com') {
+    // Mock credential check
+    if (email.includes('super') || email === 'superadmin@cnghub.com' || password === 'superadmin') {
       role = 'SUPER_ADMIN';
       name = 'Super Admin';
     }
@@ -44,4 +49,11 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

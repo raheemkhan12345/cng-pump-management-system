@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
     FaThLarge,
@@ -35,7 +34,12 @@ const SuperAdminSidebar = ({ closeSidebar }) => {
                     <span className="brand-title">CNG Hub</span>
                     <span className="brand-subtitle">Super Admin</span>
                 </div>
-                <button className="sidebar-close-btn" onClick={closeSidebar}>
+                <button
+                    className="sidebar-close-btn"
+                    onClick={closeSidebar}
+                    aria-label="Close sidebar"
+                    type="button"
+                >
                     <FaTimes size={18} />
                 </button>
             </div>
@@ -79,7 +83,7 @@ const SuperAdminSidebar = ({ closeSidebar }) => {
             </nav>
 
             <div className="sidebar-footer">
-                <button onClick={handleLogout} className="logout-btn">
+                <button onClick={handleLogout} className="logout-btn" type="button">
                     <FaSignOutAlt size={18} className="menu-icon" />
                     <span>Logout</span>
                 </button>

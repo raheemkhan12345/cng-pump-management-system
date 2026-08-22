@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import SuperAdminSidebar from '../components/sidebar/SuperAdminSidebar';
 import TopNavbar from '../components/navbar/TopNavbar.jsx';

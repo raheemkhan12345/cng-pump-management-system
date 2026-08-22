@@ -1,4 +1,3 @@
-import React from 'react';
 import { Plus, Search, Filter, Fuel, Wrench } from 'lucide-react';
 import './SuperAdminDashboard.css';
 
@@ -37,7 +36,7 @@ const SuperAdminDashboard = () => {
         </div>
 
         <div className="action-card">
-          <button className="add-pump-btn">
+          <button className="add-pump-btn" type="button">
             <Plus size={18} />
             <span>Add CNG Pump</span>
           </button>
@@ -52,7 +51,7 @@ const SuperAdminDashboard = () => {
             <h3 className="card-title">Admin Overview</h3>
             <div className="search-box">
               <Search size={16} />
-              <input type="text" placeholder="Search admins..." />
+              <input type="text" placeholder="Search admins..." aria-label="Search admins" />
             </div>
           </div>
 
@@ -85,7 +84,9 @@ const SuperAdminDashboard = () => {
                       </span>
                     </td>
                     <td>
-                      <button className="icon-btn" title="Manage"><Wrench size={16} /></button>
+                      <button className="icon-btn" title="Manage" aria-label={`Manage ${admin.name}`} type="button">
+                        <Wrench size={16} />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -98,7 +99,7 @@ const SuperAdminDashboard = () => {
         <div className="table-card">
           <div className="table-card-header">
             <h3 className="card-title">Pump Overview</h3>
-            <button className="filter-btn">
+            <button className="filter-btn" type="button">
               <Filter size={14} /> Filter
             </button>
           </div>
@@ -129,7 +130,9 @@ const SuperAdminDashboard = () => {
                       </span>
                     </td>
                     <td>
-                      <button className="icon-btn" title="Manage"><Wrench size={16} /></button>
+                      <button className="icon-btn" title="Manage" aria-label={`Manage ${pump.name}`} type="button">
+                        <Wrench size={16} />
+                      </button>
                     </td>
                   </tr>
                 ))}

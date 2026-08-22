@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Eye, EyeOff, User, Lock } from 'lucide-react';
@@ -42,36 +42,41 @@ const Login = () => {
 
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
-                        <label className="form-label">Email</label>
+                        <label className="form-label" htmlFor="email-input">Email or Username</label>
                         <div className="input-container">
                             <User className="input-icon" size={18} />
                             <input
+                                id="email-input"
                                 type="text"
                                 className="form-input"
-                                placeholder="e.g. admin_alpha"
+                                placeholder="e.g. superadmin@cnghub.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                autoComplete="username"
                                 required
                             />
                         </div>
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label">Password</label>
+                        <label className="form-label" htmlFor="password-input">Password</label>
                         <div className="input-container">
                             <Lock className="input-icon" size={18} />
                             <input
+                                id="password-input"
                                 type={showPassword ? 'text' : 'password'}
                                 className="form-input"
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                autoComplete="current-password"
                                 required
                             />
                             <button
                                 type="button"
                                 className="toggle-password-btn"
                                 onClick={() => setShowPassword(!showPassword)}
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
                             >
                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>

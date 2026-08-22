@@ -1,4 +1,3 @@
-import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../pages/auth/Login';
 import SuperAdminDashboard from '../pages/superAdmin/SuperAdminDashboard';
@@ -17,9 +16,39 @@ const AppRoutes = () => {
         <Route element={<RoleRoute allowedRoles={['SUPER_ADMIN']} />}>
           <Route element={<SuperAdminLayout />}>
             <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
-            <Route path="/super-admin/admins" element={<div style={{padding: 24}}>Admins Page</div>} />
-            <Route path="/super-admin/pumps" element={<div style={{padding: 24}}>CNG Pumps Page</div>} />
-            <Route path="/super-admin/settings" element={<div style={{padding: 24}}>Settings Page</div>} />
+            <Route
+              path="/super-admin/admins"
+              element={
+                <div className="dashboard-page">
+                  <div className="page-header">
+                    <h1 className="page-title">Admins Management</h1>
+                    <p className="page-subtitle">Manage and assign CNG station administrators.</p>
+                  </div>
+                </div>
+              }
+            />
+            <Route
+              path="/super-admin/pumps"
+              element={
+                <div className="dashboard-page">
+                  <div className="page-header">
+                    <h1 className="page-title">CNG Pumps Management</h1>
+                    <p className="page-subtitle">Configure, monitor, and manage CNG pump stations.</p>
+                  </div>
+                </div>
+              }
+            />
+            <Route
+              path="/super-admin/settings"
+              element={
+                <div className="dashboard-page">
+                  <div className="page-header">
+                    <h1 className="page-title">System Settings</h1>
+                    <p className="page-subtitle">Configure global platform preferences and security controls.</p>
+                  </div>
+                </div>
+              }
+            />
           </Route>
         </Route>
       </Route>

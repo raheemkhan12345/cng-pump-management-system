@@ -1,0 +1,136 @@
+.top-navbar {
+  height: 76px;
+  /* Height 64px se barha kar 76px kar di hai */
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 clamp(16px, 3vw, 32px);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.sidebar-toggle-btn {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  padding: 8px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: var(--bg-surface-secondary);
+  color: var(--text-primary);
+}
+
+.navbar-title {
+  font-size: clamp(16px, 2vw, 20px);
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2vw, 24px);
+  flex-shrink: 0;
+}
+
+.notification-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.notification-btn:hover {
+  background-color: var(--bg-surface-secondary);
+  color: var(--text-primary);
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.user-profile:hover {
+  background-color: var(--bg-surface-secondary);
+}
+
+.user-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.profile-avatar {
+  width: 42px;
+  /* Height ke mutabiq avatar size thoda bada kiya */
+  height: 42px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 2px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .top-navbar {
+    height: 68px;
+  }
+
+  .sidebar-toggle-btn {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-navbar {
+    height: 60px;
+  }
+
+  .user-name {
+    display: none;
+    /* Mobile par clean look ke liye name hide rahega */
+  }
+
+  .navbar-title {
+    font-size: 15px;
+  }
+
+  .profile-avatar {
+    width: 36px;
+    height: 36px;
+  }
+}
