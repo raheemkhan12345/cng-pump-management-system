@@ -1,0 +1,257 @@
+/* ==========================================
+   Stats Grid
+========================================== */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+/* ==========================================
+   Stat Card
+========================================== */
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    min-height: 110px;
+    padding: 18px;
+
+    border-radius: 10px;
+    border: 1px solid transparent;
+
+    box-sizing: border-box;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+/* ==========================================
+   Card Backgrounds
+========================================== */
+
+.green-card {
+    background-color: #a7f3d0;
+}
+
+.pink-card {
+    background-color: #fca5a5;
+}
+
+.teal-card {
+    background-color: #6ee7b7;
+}
+
+.white-card {
+    background-color: #ffffff;
+}
+
+/* ==========================================
+   Borders
+========================================== */
+
+.border-red {
+    border: 1.5px solid #ef4444;
+}
+
+.border-pink {
+    border: 1.5px solid #fca5a5;
+}
+
+/* ==========================================
+   Wide Card
+========================================== */
+
+.span-two-cols {
+    grid-column: span 1;
+}
+
+/* ==========================================
+   Card Header
+========================================== */
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 12px;
+}
+
+/* ==========================================
+   Card Label
+========================================== */
+
+.card-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+
+    color: #334155;
+}
+
+/* ==========================================
+   React Icon
+========================================== */
+
+.card-icon {
+    flex-shrink: 0;
+
+    width: 20px;
+    height: 20px;
+
+    color: #334155;
+}
+
+/* ==========================================
+   Card Amount
+========================================== */
+
+.card-amount {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    margin: 8px 0 2px;
+
+    color: #0f172a;
+}
+
+/* ==========================================
+   Card Subtext
+========================================== */
+
+.card-subtext {
+    font-size: 12px;
+    line-height: 1.4;
+
+    color: #475569;
+
+    margin: 0;
+}
+
+/* ==========================================
+   Text Variants
+========================================== */
+
+.text-red {
+    color: #dc2626 !important;
+}
+
+.text-orange {
+    color: #ea580c !important;
+}
+
+/* ==========================================
+   Diesel Card
+========================================== */
+
+.diesel-val-container {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.diesel-liters {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+
+    color: #0f172a;
+
+    white-space: nowrap;
+}
+
+/* ==========================================
+   Tablet
+========================================== */
+
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .card-amount {
+        font-size: 22px;
+    }
+}
+
+/* ==========================================
+   Mobile
+========================================== */
+
+@media (max-width: 640px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .stat-card {
+        min-height: 105px;
+        padding: 16px;
+        border-radius: 8px;
+    }
+
+    .card-label {
+        font-size: 10px;
+    }
+
+    .card-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .card-amount {
+        font-size: 21px;
+    }
+
+    .card-subtext {
+        font-size: 11px;
+    }
+
+    .diesel-liters {
+        font-size: 16px;
+    }
+}
+
+/* ==========================================
+   Small Mobile
+========================================== */
+
+@media (max-width: 400px) {
+    .stat-card {
+        min-height: 100px;
+        padding: 14px;
+    }
+
+    .card-amount {
+        font-size: 20px;
+    }
+
+    .diesel-val-container {
+        gap: 8px;
+    }
+
+    .diesel-liters {
+        font-size: 14px;
+    }
+}

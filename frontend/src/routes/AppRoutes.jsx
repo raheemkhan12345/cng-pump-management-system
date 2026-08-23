@@ -15,10 +15,12 @@ import SuperAdminDashboard from '../pages/superAdmin/superAdminDashboard/SuperAd
 import Admins from '../pages/superAdmin/admins/Admins';
 import CngPumps from '../pages/superAdmin/managePumps/cngPumps';
 import Settings from '../pages/superAdmin/settings/Settings';
+import AdminDashboard from '../pages/admin/adminDashboard/AdminDashboard';
+import CngSales from '../pages/admin/cngSales/CngSales';
+import SalesReport from '../pages/admin/cngSales/SalesReport';
 
 // Admin Pages (Agar abhi files nahi bani toh yeh fallback render karega)
-const AdminDashboard = () => <div>Admin Dashboard Content</div>;
-const CngSales = () => <div>CNG Sales Content</div>;
+
 const CashBank = () => <div>Cash & Bank Content</div>;
 const Expenses = () => <div>Expenses Content</div>;
 const Loans = () => <div>Loans Content</div>;
@@ -50,6 +52,7 @@ const AppRoutes = () => {
           <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/sales" element={<CngSales />} />
+            <Route path="/admin/sales-report" element={<SalesReport />} />
             <Route path="/admin/cash-bank" element={<CashBank />} />
             <Route path="/admin/expenses" element={<Expenses />} />
             <Route path="/admin/loans" element={<Loans />} />

@@ -1,0 +1,759 @@
+/* =========================================================
+   Sales Report Container
+========================================================= */
+
+.sr-page-container {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    color: #0f172a;
+}
+
+
+/* =========================================================
+   Back Button
+========================================================= */
+
+.sr-back-btn {
+    width: fit-content;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 13px;
+
+    background-color: #0e1726;
+    color: #ffffff;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.sr-back-btn svg {
+    font-size: 12px;
+}
+
+.sr-back-btn:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+
+    transform: translateX(-2px);
+
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+}
+
+.sr-back-btn:active {
+    transform: translateX(-1px);
+}
+
+.sr-back-btn:focus-visible {
+    outline: 2px solid #065f46;
+    outline-offset: 2px;
+}
+
+
+/* =========================================================
+   Header
+========================================================= */
+
+.sr-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sr-page-title {
+    font-size: 28px;
+    font-weight: 700;
+
+    margin: 0 0 4px 0;
+
+    color: #0f172a;
+}
+
+.sr-page-subtitle {
+    font-size: 14px;
+    color: #64748b;
+
+    margin: 0;
+}
+
+
+/* =========================================================
+   Export Button
+========================================================= */
+
+.sr-btn-export {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    background-color: #0e1726;
+    color: #ffffff;
+
+    border: none;
+
+    padding: 10px 18px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.sr-btn-export:hover {
+    background-color: #1e293b;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 4px 10px rgba(15, 23, 42, 0.12);
+}
+
+.sr-btn-export:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   Tabs
+========================================================= */
+
+.sr-filter-tabs-container {
+    display: inline-flex;
+
+    width: fit-content;
+
+    background-color: #e2e8f0;
+
+    padding: 4px;
+
+    border-radius: 8px;
+}
+
+.sr-tab-btn {
+    background: transparent;
+    border: none;
+
+    padding: 8px 24px;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    color: #475569;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.sr-tab-btn:hover {
+    color: #0f172a;
+}
+
+.sr-tab-btn.active {
+    background-color: #ffffff;
+    color: #0f172a;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+
+/* =========================================================
+   Overview Cards
+========================================================= */
+
+.sr-stats-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px;
+}
+
+.sr-stat-card {
+    background-color: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+
+    padding: 24px;
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: flex-start;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.sr-stat-card:hover {
+    border-color: #cbd5e1;
+
+    box-shadow:
+        0 4px 12px rgba(15, 23, 42, 0.06);
+
+    transform: translateY(-1px);
+}
+
+.sr-card-label {
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+
+    color: #64748b;
+
+    line-height: 1.4;
+}
+
+.sr-card-amount {
+    font-size: 32px;
+
+    font-weight: 800;
+
+    margin: 16px 0 0 0;
+
+    color: #0f172a;
+}
+
+.sr-unit {
+    font-size: 18px;
+
+    font-weight: 700;
+}
+
+.sr-currency {
+    font-size: 20px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   Card Icons
+========================================================= */
+
+.sr-card-icon-wrapper {
+    width: 44px;
+    height: 44px;
+
+    padding: 12px;
+
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+}
+
+.icon-bg-blue {
+    background-color: #e0f2fe;
+}
+
+.sr-icon-blue {
+    color: #0284c7;
+}
+
+.icon-bg-green {
+    background-color: #d1fae5;
+}
+
+.sr-icon-green {
+    color: #059669;
+}
+
+
+/* =========================================================
+   Table Section
+========================================================= */
+
+.sr-table-card {
+    background-color: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.02);
+}
+
+.sr-table-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 20px 24px;
+}
+
+.sr-table-title {
+    font-size: 18px;
+
+    font-weight: 700;
+
+    margin: 0;
+
+    color: #0f172a;
+}
+
+
+/* =========================================================
+   Filter Button
+========================================================= */
+
+.sr-btn-filter {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+
+    padding: 8px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    color: #64748b;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.sr-btn-filter:hover {
+    background-color: #f1f5f9;
+
+    color: #0f172a;
+
+    border-color: #cbd5e1;
+}
+
+
+/* =========================================================
+   Table
+========================================================= */
+
+.sr-table-wrapper {
+    overflow-x: auto;
+}
+
+.sr-data-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    text-align: left;
+
+    min-width: 700px;
+}
+
+.sr-data-table th {
+    background-color: #1e293b;
+
+    color: #94a3b8;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    padding: 14px 24px;
+
+    letter-spacing: 0.5px;
+
+    white-space: nowrap;
+}
+
+.sr-data-table td {
+    padding: 16px 24px;
+
+    border-bottom: 1px solid #f1f5f9;
+
+    font-size: 14px;
+
+    white-space: nowrap;
+}
+
+.sr-data-table tbody tr {
+    transition:
+        background-color 0.15s ease;
+}
+
+.sr-data-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.sr-data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.sr-font-semibold {
+    font-weight: 600;
+
+    color: #0f172a;
+}
+
+.sr-font-bold {
+    font-weight: 700;
+
+    color: #0f172a;
+}
+
+.sr-text-muted {
+    color: #64748b;
+}
+
+
+/* =========================================================
+   Status Badge
+========================================================= */
+
+.sr-badge-completed {
+    display: inline-flex;
+
+    align-items: center;
+
+    background-color: #d1fae5;
+
+    color: #065f46;
+
+    padding: 4px 10px;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   Empty State
+========================================================= */
+
+.sr-empty-state {
+    text-align: center !important;
+
+    padding: 40px 24px !important;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   Pagination
+========================================================= */
+
+.sr-pagination-footer {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 16px 24px;
+
+    background-color: #f8fafc;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+.sr-pagination-info {
+    font-size: 13px;
+
+    color: #64748b;
+}
+
+.sr-pagination-info b {
+    color: #334155;
+
+    font-weight: 700;
+}
+
+.sr-pagination-controls {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+.sr-page-num,
+.sr-page-arrow {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #cbd5e1;
+
+    background-color: #ffffff;
+
+    color: #475569;
+
+    border-radius: 6px;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.sr-page-num:hover,
+.sr-page-arrow:hover:not(:disabled) {
+    background-color: #f1f5f9;
+
+    border-color: #94a3b8;
+
+    color: #0f172a;
+}
+
+.sr-page-num.active {
+    background-color: #dbeafe;
+
+    border-color: #93c5fd;
+
+    color: #1d4ed8;
+
+    font-weight: 700;
+}
+
+.sr-page-arrow:disabled {
+    opacity: 0.5;
+
+    cursor: not-allowed;
+
+    background-color: #f8fafc;
+}
+
+.sr-page-dots {
+    padding: 0 4px;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   Tablet
+========================================================= */
+
+@media (max-width: 1024px) {
+
+    .sr-page-container {
+        padding: 20px;
+    }
+
+    .sr-card-amount {
+        font-size: 28px;
+    }
+
+    .sr-data-table th,
+    .sr-data-table td {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+}
+
+
+/* =========================================================
+   Mobile
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .sr-page-container {
+        padding: 16px;
+
+        gap: 18px;
+    }
+
+    /* Back Button */
+
+    .sr-back-btn {
+        padding: 7px 11px;
+
+        font-size: 12px;
+    }
+
+    /* Header */
+
+    .sr-header-section {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 14px;
+    }
+
+    .sr-page-title {
+        font-size: 24px;
+    }
+
+    .sr-page-subtitle {
+        font-size: 13px;
+
+        line-height: 1.5;
+    }
+
+    .sr-btn-export {
+        width: 100%;
+    }
+
+    /* Tabs */
+
+    .sr-filter-tabs-container {
+        width: 100%;
+    }
+
+    .sr-tab-btn {
+        flex: 1;
+
+        padding: 8px 12px;
+    }
+
+    /* Stats */
+
+    .sr-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sr-stat-card {
+        padding: 20px;
+    }
+
+    .sr-card-amount {
+        font-size: 26px;
+    }
+
+    /* Table */
+
+    .sr-table-header {
+        padding: 16px;
+    }
+
+    .sr-table-title {
+        font-size: 16px;
+    }
+
+    /* Pagination */
+
+    .sr-pagination-footer {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 14px;
+
+        padding: 14px 16px;
+    }
+
+    .sr-pagination-controls {
+        width: 100%;
+
+        justify-content: flex-end;
+    }
+}
+
+
+/* =========================================================
+   Small Mobile
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .sr-page-container {
+        padding: 12px;
+    }
+
+    .sr-page-title {
+        font-size: 22px;
+    }
+
+    .sr-card-amount {
+        font-size: 24px;
+    }
+
+    .sr-card-icon-wrapper {
+        width: 40px;
+        height: 40px;
+
+        padding: 10px;
+    }
+
+    .sr-pagination-info {
+        font-size: 12px;
+    }
+
+    .sr-page-num,
+    .sr-page-arrow {
+        width: 30px;
+        height: 30px;
+    }
+}

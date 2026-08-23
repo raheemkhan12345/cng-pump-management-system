@@ -1,0 +1,288 @@
+.actions-overview-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ==========================================
+   Dashboard Section Card
+========================================== */
+
+.dashboard-section-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+/* ==========================================
+   Section Title
+========================================== */
+
+.section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 16px;
+}
+
+/* ==========================================
+   Quick Actions
+========================================== */
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.qa-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+
+    border: none;
+    border-radius: 6px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.qa-btn svg {
+    flex-shrink: 0;
+    font-size: 14px;
+}
+
+/* Green Button */
+
+.btn-green {
+    background-color: #065f46;
+    color: #ffffff;
+}
+
+.btn-green:hover {
+    background-color: #047857;
+    box-shadow: 0 4px 10px rgba(6, 95, 70, 0.15);
+    transform: translateY(-1px);
+}
+
+/* Gray Buttons */
+
+.btn-gray {
+    background-color: #e2e8f0;
+    color: #334155;
+}
+
+.btn-gray:hover {
+    background-color: #cbd5e1;
+    color: #0f172a;
+    transform: translateY(-1px);
+}
+
+/* Keyboard Accessibility */
+
+.qa-btn:focus-visible {
+    outline: 2px solid #065f46;
+    outline-offset: 2px;
+}
+
+/* ==========================================
+   Overview Split Grid
+========================================== */
+
+.overview-split-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+/* ==========================================
+   Overview List
+========================================== */
+
+.overview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ==========================================
+   Overview Row
+========================================== */
+
+.overview-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+
+    font-size: 14px;
+}
+
+/* ==========================================
+   Labels
+========================================== */
+
+.overview-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #64748b;
+}
+
+.status-icon {
+    flex-shrink: 0;
+    font-size: 14px;
+    color: #475569;
+}
+
+/* ==========================================
+   Values
+========================================== */
+
+.font-bold {
+    font-weight: 700;
+    color: #0f172a;
+    text-align: right;
+}
+
+/* ==========================================
+   Divider
+========================================== */
+
+.overview-divider {
+    width: 100%;
+    border-top: 1px dashed #e2e8f0;
+    margin: 4px 0;
+}
+
+/* ==========================================
+   Recent Transfer
+========================================== */
+
+.recent-transfer-row {
+    gap: 12px;
+}
+
+.overview-sublabel {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* ==========================================
+   Transfer Badge
+========================================== */
+
+.badge-transfer-green {
+    display: inline-flex;
+    align-items: center;
+
+    background-color: #d1fae5;
+    color: #065f46;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    padding: 4px 8px;
+    border-radius: 4px;
+
+    white-space: nowrap;
+}
+
+/* ==========================================
+   Tablet
+========================================== */
+
+@media (max-width: 900px) {
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .overview-split-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================
+   Mobile
+========================================== */
+
+@media (max-width: 640px) {
+    .actions-overview-container {
+        gap: 16px;
+    }
+
+    .dashboard-section-card {
+        padding: 16px;
+        border-radius: 8px;
+    }
+
+    .section-title {
+        font-size: 15px;
+        margin-bottom: 14px;
+    }
+
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .qa-btn {
+        min-height: 40px;
+        padding: 9px 8px;
+        font-size: 12px;
+    }
+
+    .qa-btn svg {
+        font-size: 13px;
+    }
+
+    .overview-row {
+        font-size: 13px;
+        gap: 10px;
+    }
+}
+
+/* ==========================================
+   Small Mobile
+========================================== */
+
+@media (max-width: 400px) {
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .qa-btn {
+        justify-content: flex-start;
+        padding: 10px 12px;
+    }
+
+    .overview-row {
+        align-items: flex-start;
+    }
+
+    .font-bold {
+        text-align: right;
+    }
+
+    .recent-transfer-row {
+        align-items: center;
+    }
+
+    .badge-transfer-green {
+        font-size: 10px;
+        padding: 4px 6px;
+    }
+}
