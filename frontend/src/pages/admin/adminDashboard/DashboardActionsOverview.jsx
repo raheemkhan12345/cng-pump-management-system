@@ -8,7 +8,7 @@ import {
     FaBuildingColumns,
 } from 'react-icons/fa6';
 import './DashboardActionsOverview.css';
-import NewSaleModal from '../../../components/adminDashboardForms/RecordNewSaleModel'; // Modal ko import karein
+import NewSaleModal from '../../../components/adminDashboardForms/recordNewSaleForm/RecordNewSaleModel'; // Modal ko import karein
 
 const quickActions = [
     {

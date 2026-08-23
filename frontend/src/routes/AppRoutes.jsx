@@ -18,11 +18,13 @@ import Settings from '../pages/superAdmin/settings/Settings';
 import AdminDashboard from '../pages/admin/adminDashboard/AdminDashboard';
 import CngSales from '../pages/admin/cngSales/CngSales';
 import SalesReport from '../pages/admin/cngSales/SalesReport';
+import CashBank from '../pages/admin/cashBank/CashBank';
+import Expenses from '../pages/admin/expenses/Expenses';
 
 // Admin Pages (Agar abhi files nahi bani toh yeh fallback render karega)
 
-const CashBank = () => <div>Cash & Bank Content</div>;
-const Expenses = () => <div>Expenses Content</div>;
+
+
 const Loans = () => <div>Loans Content</div>;
 const Ledger = () => <div>Ledger Content</div>;
 const Inventory = () => <div>Inventory Content</div>;

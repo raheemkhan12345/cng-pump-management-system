@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // React Router Navigation
 import { PlusCircle, FileText, Banknote, Fuel, CheckCircle2, TrendingUp } from 'lucide-react';
 import './CngSales.css';
-import RecordNewSaleModal from '../../../components/adminDashboardForms/RecordNewSaleModel';
+import RecordNewSaleModal from '../../../components/adminDashboardForms/recordNewSaleForm/RecordNewSaleModel';
 
 const CngSales = () => {
     const [isNewSaleModalOpen, setIsNewSaleModalOpen] = useState(false);
