@@ -1,186 +1,233 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from "react";
+
+import { createAdmin } from "../services/superAdminDash";
 
 const PumpContext = createContext(null);
 
 /* ==========================================
-   INITIAL MOCK DATA
-   ========================================== */
-
-const initialPumps = [
-    {
-        id: 1,
-        pumpNo: 'P-9923',
-        name: 'Station Alpha-01',
-        location: 'Downtown Hub',
-        status: 'Active',
-        admin: {
-            name: 'John Doe',
-            email: 'john.doe@cngpump.com',
-            initials: 'JD',
-            assigned: true,
-            lastLogin: 'Today, 09:41 AM'
-        },
-        dateCommissioned: 'Oct 12, 2023',
-    },
-    {
-        id: 2,
-        pumpNo: 'P-8812',
-        name: 'Station Beta-04',
-        location: 'Northside Industrial',
-        status: 'Active',
-        admin: {
-            name: 'Sarah Allen',
-            email: 's.allen@cngpump.com',
-            initials: 'SA',
-            assigned: true,
-            lastLogin: 'Yesterday, 14:20 PM'
-        },
-        dateCommissioned: 'Nov 05, 2023',
-    },
-    {
-        id: 3,
-        pumpNo: 'P-4451',
-        name: 'Station Gamma-02',
-        location: 'West Valley',
-        status: 'Inactive',
-        admin: {
-            name: 'Mike Ross',
-            email: 'm.ross@cngpump.com',
-            initials: 'MR',
-            assigned: false,
-            lastLogin: 'Never'
-        },
-        dateCommissioned: 'Jan 22, 2022',
-    },
-];
-
-
-/* ==========================================
    PUMP PROVIDER
-   ========================================== */
+========================================== */
 
 export const PumpProvider = ({ children }) => {
+  // ==========================================
+  // Pumps State
+  // ==========================================
 
-    /*
-     * Mock data se state initialize hogi.
-     *
-     * Page refresh hone par React dobara mount hoga
-     * aur initialPumps se fresh data load hoga.
-     */
-    const [pumps, setPumps] = useState(initialPumps);
+  const [pumps, setPumps] = useState([]);
 
+  // ==========================================
+  // Loading State
+  // ==========================================
 
-    /* ==========================================
-       ADD NEW PUMP
-       ========================================== */
+  const [isLoading, setIsLoading] = useState(false);
 
-    const addNewPump = (formData) => {
+  // ==========================================
+  // Error State
+  // ==========================================
 
-        const hasAdmin = Boolean(
-            formData.adminName &&
-            formData.adminName.trim() !== ''
-        );
+  const [error, setError] = useState(null);
 
+  /* ==========================================
+     CREATE NEW PUMP / ADMIN
+  ========================================== */
 
-        const newPump = {
-            id: Date.now(),
+  const addNewPump = async (formData) => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-            pumpNo: `P-${Math.floor(
-                1000 + Math.random() * 9000
-            )}`,
+      console.log("Creating new pump:", formData);
 
-            name: formData.pumpName,
+      // ==========================================
+      // API Request
+      // ==========================================
 
-            location: formData.pumpAddress,
+      const response = await createAdmin({
+        pumpName: formData.pumpName,
 
-            status: 'Active',
+        pumpAddress: formData.pumpAddress,
 
-            admin: {
-                name: formData.adminName || '',
+        adminName: formData.adminName,
 
-                email: formData.email || '',
+        email: formData.email,
 
-                initials: hasAdmin
-                    ? formData.adminName
-                        .trim()
-                        .split(/\s+/)
-                        .map((name) => name[0])
-                        .join('')
-                        .toUpperCase()
-                        .slice(0, 2)
-                    : '',
+        password: formData.password,
+      });
 
-                assigned: hasAdmin,
+      console.log("Create Admin API Response:", response);
 
-                lastLogin: 'Just now'
-            },
+      // ==========================================
+      // Validate API Response
+      // ==========================================
 
-            dateCommissioned: new Date().toLocaleDateString(
-                'en-US',
-                {
-                    month: 'short',
-                    day: '2-digit',
-                    year: 'numeric',
-                }
-            ),
-        };
+      if (!response) {
+        throw new Error("No response received from server.");
+      }
 
+      if (response.success === false) {
+        throw new Error(response.message || "Failed to create pump.");
+      }
 
-        /*
-         * New pump list ke beginning mein add hoga.
-         */
-        setPumps((prevPumps) => [
-            newPump,
-            ...prevPumps
-        ]);
-    };
+      // ==========================================
+      // Get Created Pump/Admin
+      // ==========================================
 
+      const createdData =
+        response.data || response.admin || response.pump || null;
 
-    /* ==========================================
-       REMOVE PUMP
-       ========================================== */
+      /*
+       * Backend agar created record return karta hai
+       * to dashboard mein immediately show karenge.
+       */
 
-    const removePump = (id) => {
+      if (createdData) {
+        const normalizedPump = normalizePump(createdData);
 
-        setPumps((prevPumps) =>
-            prevPumps.filter(
-                (pump) => pump.id !== id
-            )
-        );
-    };
+        setPumps((prevPumps) => [normalizedPump, ...prevPumps]);
+      }
 
+      return response;
+    } catch (error) {
+      console.error("Add Pump Error:", error);
 
-    /* ==========================================
-       CONTEXT VALUE
-       ========================================== */
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to create pump.";
 
-    return (
-        <PumpContext.Provider
-            value={{
-                pumps,
-                addNewPump,
-                removePump,
-            }}
-        >
-            {children}
-        </PumpContext.Provider>
+      setError(message);
+
+      throw new Error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /* ==========================================
+     REMOVE PUMP
+     
+     NOTE:
+     Abhi remove API available nahi hai,
+     isliye is function ko sirf frontend
+     state removal ke liye rakha gaya hai.
+     
+     Jab backend DELETE API milegi,
+     isko API based kar denge.
+  ========================================== */
+
+  const removePump = (id) => {
+    setPumps((prevPumps) =>
+      prevPumps.filter((pump) => pump.id !== id && pump._id !== id),
     );
+  };
+
+  /* ==========================================
+     CLEAR ERROR
+  ========================================== */
+
+  const clearError = () => {
+    setError(null);
+  };
+
+  /* ==========================================
+     CONTEXT
+  ========================================== */
+
+  return (
+    <PumpContext.Provider
+      value={{
+        pumps,
+
+        addNewPump,
+
+        removePump,
+
+        isLoading,
+
+        error,
+
+        clearError,
+      }}
+    >
+      {children}
+    </PumpContext.Provider>
+  );
 };
 
+/* ==========================================
+   NORMALIZE PUMP DATA
+
+   Backend response ka exact structure
+   abhi confirm nahi hai.
+
+   Isliye common field names handle
+   kar rahe hain.
+========================================== */
+
+const normalizePump = (data) => {
+  const admin = data.admin || data.user || data.adminData || {};
+
+  const adminName =
+    admin.name || admin.fullName || data.adminName || "Unassigned";
+
+  const initials =
+    admin.initials ||
+    adminName
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((name) => name.charAt(0))
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+
+  return {
+    // Backend ID
+    id: data.id || data._id,
+
+    _id: data._id || data.id,
+
+    // Pump Number
+    pumpNo: data.pumpNo || data.pumpNumber || data.stationNumber || "N/A",
+
+    // Pump Name
+    name: data.name || data.pumpName || data.stationName || "Unnamed Pump",
+
+    // Location
+    location: data.location || data.pumpAddress || data.address || "N/A",
+
+    // Status
+    status: data.status || "Active",
+
+    // Admin
+    admin: {
+      name: adminName,
+
+      email: admin.email || data.email || "",
+
+      initials,
+
+      assigned: Boolean(admin.name || admin.fullName || data.adminName),
+
+      lastLogin: admin.lastLogin || "Never",
+    },
+
+    // Commission Date
+    dateCommissioned: data.dateCommissioned || data.createdAt || "N/A",
+  };
+};
 
 /* ==========================================
    CUSTOM HOOK
-   ========================================== */
+========================================== */
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const usePumps = () => {
+  const context = useContext(PumpContext);
 
-    const context = useContext(PumpContext);
+  if (!context) {
+    throw new Error("usePumps must be used within a PumpProvider");
+  }
 
-    if (!context) {
-        throw new Error(
-            'usePumps must be used within a PumpProvider'
-        );
-    }
-
-    return context;
+  return context;
 };
