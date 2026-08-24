@@ -1,0 +1,231 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+    /* Mobile par screen edges se spacing ke liye */
+    overflow-y: auto;
+    /* Agar modal screen se bada ho toh overlay scroll ho sake */
+}
+
+.modal-container {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 550px;
+    max-height: 90vh;
+    /* Screen height ke 90% tak restrict karega */
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
+    /* Header visible rahega scroll ke dauran */
+}
+
+.modal-header h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    /* Body content ke andar scrolling enable karta hai */
+    flex-grow: 1;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 6px;
+    letter-spacing: 0.05em;
+}
+
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    color: #9ca3af;
+}
+
+.input-with-icon input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    outline: none;
+}
+
+.input-with-icon input {
+    padding-left: 38px;
+}
+
+.amount-input-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.currency-prefix {
+    background: #f3f4f6;
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    color: #374151;
+    font-weight: 500;
+    border-right: 1px solid #d1d5db;
+}
+
+.amount-input-box input {
+    border: none;
+    padding: 10px 12px;
+    width: 100%;
+    outline: none;
+}
+
+.payment-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.payment-card {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    background: #fff;
+    transition: all 0.2s ease;
+}
+
+.payment-card p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.payment-card strong {
+    font-size: 0.875rem;
+    display: block;
+}
+
+.payment-card.selected {
+    border-color: #047857;
+    background-color: #ecfdf5;
+    color: #047857;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-submit {
+    padding: 8px 16px;
+    background: #047857;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+/* =========================================================
+   Mobile Responsiveness Media Query
+========================================================= */
+@media (max-width: 640px) {
+    .modal-overlay {
+        padding: 10px;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        /* Single column layout on mobile */
+    }
+
+    .full-width {
+        grid-column: span 1;
+    }
+
+    .payment-options {
+        grid-template-columns: 1fr;
+        /* Stack payment cards on smaller screens */
+    }
+
+    .modal-footer {
+        flex-direction: column-reverse;
+        /* Cancel button niche, submit uper */
+        gap: 8px;
+    }
+
+    .btn-cancel,
+    .btn-submit {
+        width: 100%;
+        justify-content: center;
+    }
+}

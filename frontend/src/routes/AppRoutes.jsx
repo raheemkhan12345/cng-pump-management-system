@@ -20,13 +20,14 @@ import CngSales from '../pages/admin/cngSales/CngSales';
 import SalesReport from '../pages/admin/cngSales/SalesReport';
 import CashBank from '../pages/admin/cashBank/CashBank';
 import Expenses from '../pages/admin/expenses/Expenses';
+import Loans from '../pages/admin/loans/Loans';
+import Ledger from '../pages/admin/ledger/Ledger';
 
 // Admin Pages (Agar abhi files nahi bani toh yeh fallback render karega)
 
 
 
-const Loans = () => <div>Loans Content</div>;
-const Ledger = () => <div>Ledger Content</div>;
+
 const Inventory = () => <div>Inventory Content</div>;
 const Profile = () => <div>Profile Content</div>;
 

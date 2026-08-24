@@ -1,0 +1,336 @@
+/* Container Layout */
+.ledger-container {
+    padding: 24px;
+    background-color: #f8fafc;
+    min-height: 100vh;
+    font-family: inherit;
+}
+
+/* Header Section */
+.ledger-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.ledger-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.ledger-subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+
+.ledger-add-btn {
+    background-color: #047857;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.ledger-add-btn:hover {
+    background-color: #065f46;
+}
+
+/* Filter Card Section */
+.ledger-filter-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.ledger-filter-grid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+.ledger-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 160px;
+}
+
+.ledger-filter-group.search-group {
+    flex: 2;
+    min-width: 240px;
+}
+
+.ledger-filter-group label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.ledger-search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ledger-search-icon {
+    position: absolute;
+    right: 12px;
+    color: #94a3b8;
+}
+
+.ledger-search-input-wrapper input {
+    padding-left: 36px;
+}
+
+.ledger-filter-group input,
+.ledger-filter-group select {
+    width: 100%;
+    height: 38px;
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #1e293b;
+    background-color: #f8fafc;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.ledger-filter-group input:focus,
+.ledger-filter-group select:focus {
+    border-color: #047857;
+    background-color: #ffffff;
+}
+
+.ledger-filter-action {
+    display: flex;
+    align-items: center;
+    height: 38px;
+}
+
+.ledger-reset-btn {
+    background: none;
+    border: none;
+    color: #475569;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.ledger-reset-btn:hover {
+    background-color: #f1f5f9;
+}
+
+/* Table Card Section */
+.ledger-table-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ledger-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.ledger-table thead {
+    background-color: #1e293b;
+    color: #f8fafc;
+}
+
+.ledger-table th {
+    padding: 14px 16px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #334155;
+    white-space: nowrap;
+}
+
+.ledger-table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.15s ease;
+}
+
+.ledger-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.ledger-table td {
+    padding: 16px;
+    font-size: 0.875rem;
+    color: #334155;
+    vertical-align: middle;
+}
+
+/* Specific Cell Styles */
+.ledger-td-date {
+    color: #475569;
+    white-space: nowrap;
+}
+
+.ledger-td-head {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 0.8rem;
+}
+
+.ledger-td-detail {
+    color: #475569;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.ledger-td-amount {
+    font-weight: 700;
+    color: #0f172a;
+    white-space: nowrap;
+}
+
+.ledger-td-pool {
+    color: #475569;
+    font-size: 0.8125rem;
+}
+
+.ledger-td-vol {
+    color: #334155;
+    font-weight: 500;
+}
+
+.ledger-empty-state {
+    text-align: center;
+    color: #94a3b8;
+    padding: 32px;
+}
+
+/* Badges */
+.ledger-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.ledger-badge-sale {
+    background-color: #4ade80;
+    color: #052e16;
+}
+
+.ledger-badge-expense {
+    background-color: #fca5a5;
+    color: #450a0a;
+}
+
+.ledger-badge-transfer {
+    background-color: #bfdbfe;
+    color: #1e3a8a;
+}
+
+/* Footer & Pagination Section */
+.ledger-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: #ffffff;
+    border-top: 1px solid #e2e8f0;
+}
+
+.ledger-pagination-text {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.ledger-pagination-text b {
+    color: #0f172a;
+}
+
+.ledger-pagination-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.ledger-page-btn {
+    padding: 6px 14px;
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ledger-page-btn:hover:not(:disabled) {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.ledger-page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive Media Query */
+@media (max-width: 768px) {
+    .ledger-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .ledger-add-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .ledger-filter-grid {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ledger-filter-group {
+        width: 100%;
+    }
+
+    .ledger-filter-action {
+        justify-content: flex-end;
+    }
+
+    .ledger-footer {
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+    }
+}
