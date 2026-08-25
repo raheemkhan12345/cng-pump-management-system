@@ -15,7 +15,7 @@ import AddPumpModal from "../../../components/addNewPumpForm/AddPumpForm";
 
 import EditNewPump from "../../../components/superAdminForms/EditPumpModal";
 
-import { getAllAdmins } from "../../../services/superAdminDash";
+import { getAllAdmins, deleteAdmin } from "../../../services/superAdminDash";
 
 import "./CngPumps.css";
 
@@ -297,6 +297,8 @@ const CngPumps = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const [error, setError] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -502,25 +504,54 @@ const CngPumps = () => {
   };
 
   // ===================================================
-  // DELETE
+  // DELETE ADMIN / PUMP
   // ===================================================
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (!id) {
       console.error("Delete failed: MongoDB ID missing.");
-
+      setError("Unable to delete this pump because Admin ID is missing.");
       return;
     }
 
-    if (!window.confirm("Are you sure you want to delete this pump?")) {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this pump?",
+    );
+
+    if (!confirmed) {
       return;
     }
 
-    console.log("Delete requested for MongoDB ID:", id);
+    try {
+      setError("");
 
-    /*
-     * Delete API can be added here.
-     */
+      console.log("========================================");
+      console.log("DELETE PUMP / ADMIN");
+      console.log("========================================");
+
+      console.log("Admin ID:", id);
+
+      const response = await deleteAdmin(id);
+
+      console.log("Delete Admin Response:", response);
+
+      if (response?.success === false) {
+        throw new Error(response?.message || "Failed to delete admin.");
+      }
+
+      // Backend se fresh data
+      await fetchPumps();
+    } catch (error) {
+      console.error("Delete Admin Error:", error);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to delete pump.";
+
+      setError(message);
+    }
   };
 
   // ===================================================
@@ -630,7 +661,7 @@ const CngPumps = () => {
 
   // ===================================================
   // RENDER
-  // =====================================================
+  // ===================================================
 
   return (
     <div className="pumps-page">
@@ -651,7 +682,7 @@ const CngPumps = () => {
           className="add-pump-btn"
           onClick={() => setIsModalOpen(true)}
           type="button"
-          disabled={isLoading}
+          disabled={isLoading || isDeleting}
         >
           <FaPlus size={13} />
 
@@ -678,7 +709,12 @@ const CngPumps = () => {
           <h3 className="section-title">Active Infrastructure</h3>
 
           <div className="controls-right">
-            <button className="icon-filter-btn" title="Filter" type="button">
+            <button
+              className="icon-filter-btn"
+              title="Filter"
+              type="button"
+              disabled={isDeleting}
+            >
               <FaFilter size={13} />
             </button>
 
@@ -691,7 +727,7 @@ const CngPumps = () => {
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="search-input"
-                disabled={isLoading}
+                disabled={isLoading || isDeleting}
               />
             </div>
           </div>
@@ -735,8 +771,8 @@ const CngPumps = () => {
                   return (
                     <tr key={pump._id || pump.id}>
                       {/* =================================
-                          PUMP
-                      ================================= */}
+                            PUMP
+                        ================================= */}
 
                       <td>
                         <div className="pump-info-cell">
@@ -755,8 +791,8 @@ const CngPumps = () => {
                       </td>
 
                       {/* =================================
-                          LOCATION
-                      ================================= */}
+                            LOCATION
+                        ================================= */}
 
                       <td>
                         <span className="location-text">
@@ -765,8 +801,8 @@ const CngPumps = () => {
                       </td>
 
                       {/* =================================
-                          STATUS
-                      ================================= */}
+                            STATUS
+                        ================================= */}
 
                       <td>
                         <span
@@ -781,8 +817,8 @@ const CngPumps = () => {
                       </td>
 
                       {/* =================================
-                          ASSIGNED ADMIN
-                      ================================= */}
+                            ASSIGNED ADMIN
+                        ================================= */}
 
                       <td>
                         {pump.admin?.assigned ? (
@@ -806,7 +842,11 @@ const CngPumps = () => {
                             </div>
                           </div>
                         ) : (
-                          <button className="assign-admin-btn" type="button">
+                          <button
+                            className="assign-admin-btn"
+                            type="button"
+                            disabled={isDeleting}
+                          >
                             <FaUserPlus size={12} />
 
                             <span>Assign Admin</span>
@@ -815,8 +855,8 @@ const CngPumps = () => {
                       </td>
 
                       {/* =================================
-                          DATE
-                      ================================= */}
+                            DATE
+                        ================================= */}
 
                       <td className="table-text-muted">
                         {pumpDate ? (
@@ -835,8 +875,8 @@ const CngPumps = () => {
                       </td>
 
                       {/* =================================
-                          ACTIONS
-                      ================================= */}
+                            ACTIONS
+                        ================================= */}
 
                       <td>
                         <div className="action-icons">
@@ -847,6 +887,7 @@ const CngPumps = () => {
                             title="Edit Pump"
                             type="button"
                             onClick={() => handleEditPump(pump)}
+                            disabled={isDeleting}
                           >
                             <FaEdit size={14} />
                           </button>
@@ -857,7 +898,14 @@ const CngPumps = () => {
                             className="action-btn delete-btn"
                             title="Delete Pump"
                             type="button"
-                            onClick={() => handleDelete(pump._id)}
+                            onClick={() =>
+                              handleDelete(
+                                pump?.admin?._id ||
+                                  pump?.adminId ||
+                                  pump?._id ||
+                                  pump?.id,
+                              )
+                            }
                           >
                             <FaTrashAlt size={13} />
                           </button>
@@ -901,7 +949,7 @@ const CngPumps = () => {
               <button
                 className="page-nav-btn"
                 type="button"
-                disabled={currentPage === 1}
+                disabled={currentPage === 1 || isDeleting}
                 onClick={handlePreviousPage}
               >
                 <FaChevronLeft size={10} />
@@ -925,6 +973,7 @@ const CngPumps = () => {
                     }`}
                     type="button"
                     onClick={() => handlePageChange(page)}
+                    disabled={isDeleting}
                     aria-current={currentPage === page ? "page" : undefined}
                   >
                     {page}
@@ -937,7 +986,7 @@ const CngPumps = () => {
               <button
                 className="page-nav-btn"
                 type="button"
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalPages || isDeleting}
                 onClick={handleNextPage}
               >
                 <span>Next</span>
