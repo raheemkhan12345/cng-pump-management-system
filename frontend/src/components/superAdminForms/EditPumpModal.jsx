@@ -121,9 +121,13 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
     // NORMALIZE STATUS
     // ===================================================
 
+    const normalizedExistingStatus = String(existingStatus)
+      .trim()
+      .toLowerCase();
+
     const normalizedStatus =
-      String(existingStatus).toLowerCase() === "inactive" ||
-      String(existingStatus).toLowerCase() === "in active"
+      normalizedExistingStatus === "inactive" ||
+      normalizedExistingStatus === "in active"
         ? "inactive"
         : "active";
 
@@ -146,7 +150,7 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
     console.log("Existing Values:", existingValues);
 
     // ===================================================
-    // FORM DATA
+    // SET FORM DATA
     // ===================================================
 
     setFormData({
@@ -238,8 +242,6 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
      * Backend update route:
      *
      * PUT /admins/updateAdmin/:id
-     *
-     * Prefer Admin ID first.
      */
 
     return (
@@ -329,11 +331,9 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
 
     // ===================================================
     // CREATE UPDATE DATA
-    // =====================================================
+    // ===================================================
 
     /*
-     * IMPORTANT:
-     *
      * Sirf changed fields request mein jayengi.
      */
 
@@ -381,15 +381,13 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
 
     // ===================================================
     // PASSWORD
-    // ===================================================
+    // =====================================================
 
     /*
      * Password blank hai:
-     *
      * Request mein nahi jayega.
      *
      * Password enter kiya:
-     *
      * Request mein jayega.
      */
 
@@ -570,6 +568,7 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
             className="edit-modal-close-btn"
             onClick={handleClose}
             disabled={isUpdating}
+            aria-label="Close modal"
           >
             <X size={18} />
           </button>
@@ -632,10 +631,12 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
               <label>Pump Status</label>
 
               <div className="status-toggle-container">
+                {/* ACTIVE BUTTON */}
+
                 <button
                   type="button"
                   className={`status-btn ${
-                    formData.status === "Active" ? "active" : ""
+                    formData.status === "active" ? "active" : ""
                   }`}
                   onClick={() => handleStatusChange("active")}
                   disabled={isUpdating}
@@ -643,10 +644,12 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
                   Active
                 </button>
 
+                {/* INACTIVE BUTTON */}
+
                 <button
                   type="button"
                   className={`status-btn ${
-                    formData.status === "Inactive" ? "inactive" : ""
+                    formData.status === "inactive" ? "inactive" : ""
                   }`}
                   onClick={() => handleStatusChange("inactive")}
                   disabled={isUpdating}

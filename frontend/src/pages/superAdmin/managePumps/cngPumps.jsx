@@ -33,6 +33,8 @@ const DEFAULT_PUMP_ADDRESS = "N/A";
 
 const DEFAULT_ADMIN_NAME = "Unassigned";
 
+const DEFAULT_ADMIN_EMAIL = "N/A";
+
 // =====================================================
 // DATE HELPERS
 // =====================================================
@@ -119,7 +121,7 @@ const normalizePump = (item, index) => {
   const mongoId = item?._id || item?.id || null;
 
   // ===================================================
-  // ADMIN
+  // ADMIN NAME
   // ===================================================
 
   const adminName =
@@ -130,8 +132,15 @@ const normalizePump = (item, index) => {
     item?.name ||
     DEFAULT_ADMIN_NAME;
 
+  // ===================================================
+  // ADMIN EMAIL
+  // ===================================================
+
   const adminEmail =
-    item?.admin?.email || item?.adminEmail || item?.email || "N/A";
+    item?.admin?.email ||
+    item?.adminEmail ||
+    item?.email ||
+    DEFAULT_ADMIN_EMAIL;
 
   // ===================================================
   // PUMP NAME
@@ -235,6 +244,10 @@ const normalizePump = (item, index) => {
 
     pumpStatus: status,
 
+    // =================================================
+    // ADMIN OBJECT
+    // =================================================
+
     admin: {
       ...(item?.admin || {}),
 
@@ -323,7 +336,7 @@ const CngPumps = () => {
       console.log("Formatted Pumps:", formattedPumps);
 
       // =================================================
-      // CHECK IDS
+      // CHECK IDS + ADMIN DATA
       // =================================================
 
       formattedPumps.forEach((pump) => {
@@ -334,6 +347,10 @@ const CngPumps = () => {
           pump._id,
           "| Admin ID:",
           pump?.admin?._id,
+          "| Admin Name:",
+          pump?.admin?.name,
+          "| Admin Email:",
+          pump?.admin?.email,
         );
       });
 
@@ -407,6 +424,10 @@ const CngPumps = () => {
     console.log("MongoDB _id:", pump?._id);
 
     console.log("Admin _id:", pump?.admin?._id);
+
+    console.log("Admin Name:", pump?.admin?.name);
+
+    console.log("Admin Email:", pump?.admin?.email);
 
     // =================================================
     // CHECK ID
@@ -609,7 +630,7 @@ const CngPumps = () => {
 
   // ===================================================
   // RENDER
-  // ===================================================
+  // =====================================================
 
   return (
     <div className="pumps-page">
@@ -713,7 +734,9 @@ const CngPumps = () => {
 
                   return (
                     <tr key={pump._id || pump.id}>
-                      {/* PUMP */}
+                      {/* =================================
+                          PUMP
+                      ================================= */}
 
                       <td>
                         <div className="pump-info-cell">
@@ -731,7 +754,9 @@ const CngPumps = () => {
                         </div>
                       </td>
 
-                      {/* LOCATION */}
+                      {/* =================================
+                          LOCATION
+                      ================================= */}
 
                       <td>
                         <span className="location-text">
@@ -739,7 +764,9 @@ const CngPumps = () => {
                         </span>
                       </td>
 
-                      {/* STATUS */}
+                      {/* =================================
+                          STATUS
+                      ================================= */}
 
                       <td>
                         <span
@@ -753,18 +780,30 @@ const CngPumps = () => {
                         </span>
                       </td>
 
-                      {/* ADMIN */}
+                      {/* =================================
+                          ASSIGNED ADMIN
+                      ================================= */}
 
                       <td>
                         {pump.admin?.assigned ? (
                           <div className="admin-profile-cell">
+                            {/* ADMIN INITIALS */}
+
                             <div className="admin-initials">
                               {pump.admin?.initials || "U"}
                             </div>
 
-                            <span className="admin-name">
-                              {pump.admin?.name || DEFAULT_ADMIN_NAME}
-                            </span>
+                            {/* ADMIN DETAILS */}
+
+                            <div className="admin-details">
+                              <span className="admin-name">
+                                {pump.admin?.name || DEFAULT_ADMIN_NAME}
+                              </span>
+
+                              <span className="admin-email">
+                                {pump.admin?.email || DEFAULT_ADMIN_EMAIL}
+                              </span>
+                            </div>
                           </div>
                         ) : (
                           <button className="assign-admin-btn" type="button">
@@ -775,7 +814,9 @@ const CngPumps = () => {
                         )}
                       </td>
 
-                      {/* DATE */}
+                      {/* =================================
+                          DATE
+                      ================================= */}
 
                       <td className="table-text-muted">
                         {pumpDate ? (
@@ -793,7 +834,9 @@ const CngPumps = () => {
                         )}
                       </td>
 
-                      {/* ACTIONS */}
+                      {/* =================================
+                          ACTIONS
+                      ================================= */}
 
                       <td>
                         <div className="action-icons">

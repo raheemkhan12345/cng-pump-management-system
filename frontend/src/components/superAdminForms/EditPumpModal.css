@@ -1,34 +1,57 @@
-/* Overlay background */
+/* =====================================================
+   OVERLAY
+===================================================== */
+
 .edit-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
+
     background-color: rgba(0, 0, 0, 0.45);
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     z-index: 1000;
+
     padding: 16px;
+
     overflow-y: auto;
+
     backdrop-filter: blur(2px);
 }
 
-/* Main Modal Card Box */
+
+/* =====================================================
+   MAIN MODAL
+===================================================== */
+
 .edit-modal-container {
     background: #ffffff;
+
     border-radius: 12px;
+
     width: 100%;
     max-width: 480px;
+
     max-height: 90vh;
+
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
         0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
     overflow: hidden;
+
     animation: modalSlideIn 0.2s ease-out;
 }
+
+
+/* =====================================================
+   MODAL ANIMATION
+===================================================== */
 
 @keyframes modalSlideIn {
     from {
@@ -42,91 +65,170 @@
     }
 }
 
-/* Modal Header Section */
+
+/* =====================================================
+   HEADER
+===================================================== */
+
 .edit-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     padding: 18px 24px;
+
     border-bottom: 1px solid #f1f5f9;
 }
 
 .edit-modal-header h2 {
     font-size: 1.125rem;
     font-weight: 600;
+
     color: #0f172a;
+
     margin: 0;
 }
 
+
+/* =====================================================
+   CLOSE BUTTON
+===================================================== */
+
 .edit-modal-close-btn {
     background: transparent;
+
     border: none;
+
     color: #64748b;
+
     cursor: pointer;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     padding: 4px;
+
     border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
 }
 
 .edit-modal-close-btn:hover {
     background-color: #f1f5f9;
+
     color: #0f172a;
 }
 
-/* Error Alert Box */
+.edit-modal-close-btn:disabled {
+    opacity: 0.5;
+
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   ERROR
+===================================================== */
+
 .edit-modal-error {
     background-color: #fef2f2;
+
     color: #dc2626;
+
     padding: 10px 16px;
+
     font-size: 0.8125rem;
+
     border-left: 4px solid #dc2626;
+
     margin: 12px 24px 0 24px;
+
     border-radius: 4px;
 }
 
-/* Modal Form and Body Section */
+
+/* =====================================================
+   FORM
+===================================================== */
+
 .edit-modal-form {
     display: flex;
     flex-direction: column;
+
     flex-grow: 1;
+
     overflow: hidden;
 }
 
+
+/* =====================================================
+   BODY
+===================================================== */
+
 .edit-modal-body {
     padding: 20px 24px;
+
     display: flex;
     flex-direction: column;
+
     gap: 14px;
+
     overflow-y: auto;
+
     flex-grow: 1;
 }
+
+
+/* =====================================================
+   FORM GROUP
+===================================================== */
 
 .edit-form-group {
     display: flex;
     flex-direction: column;
+
     gap: 6px;
 }
 
 .edit-form-group label {
     font-size: 0.8125rem;
+
     font-weight: 500;
+
     color: #334155;
 }
 
+
+/* =====================================================
+   INPUT
+===================================================== */
+
 .edit-form-group input {
     width: 100%;
+
     height: 42px;
+
     padding: 10px 14px;
+
     border: 1px solid #cbd5e1;
+
     border-radius: 6px;
+
     font-size: 0.875rem;
+
     color: #0f172a;
+
     background-color: #ffffff;
+
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
 }
 
 .edit-form-group input::placeholder {
@@ -135,47 +237,163 @@
 
 .edit-form-group input:focus {
     border-color: #0f172a;
-    box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.05);
+
+    box-shadow:
+        0 0 0 2px rgba(15, 23, 42, 0.05);
 }
 
-/* Pump Status Toggle Styling */
+.edit-form-group input:disabled {
+    background-color: #f8fafc;
+
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   STATUS TOGGLE
+===================================================== */
+
 .status-toggle-container {
     display: flex;
+
     gap: 12px;
+
     width: 100%;
 }
 
+
+/* =====================================================
+   STATUS BUTTON BASE
+===================================================== */
+
 .status-btn {
     flex: 1;
+
     height: 42px;
+
     border: 1px solid #cbd5e1;
+
     background-color: #ffffff;
+
     border-radius: 6px;
+
     font-size: 0.875rem;
+
     font-weight: 500;
+
     color: #475569;
+
     cursor: pointer;
-    transition: all 0.2s ease;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.1s ease;
 }
+
+
+/* =====================================================
+   ACTIVE SELECTED = GREEN
+===================================================== */
 
 .status-btn.active {
     background-color: #dcfce7;
-    /* Light Green */
+
     border-color: #86efac;
+
     color: #166534;
+
     font-weight: 600;
+
+    box-shadow:
+        0 0 0 1px rgba(34, 197, 94, 0.05);
 }
+
+
+/* =====================================================
+   INACTIVE SELECTED = GREY
+===================================================== */
 
 .status-btn.inactive {
-    background-color: #ffffff;
-    border-color: #cbd5e1;
+    background-color: #e2e8f0;
+
+    border-color: #94a3b8;
+
     color: #475569;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 0 0 1px rgba(100, 116, 139, 0.05);
 }
 
-/* Password Field Wrapper & Toggle Button */
+
+/* =====================================================
+   NORMAL HOVER
+===================================================== */
+
+.status-btn:not(:disabled):hover {
+    border-color: #94a3b8;
+}
+
+
+/* =====================================================
+   ACTIVE HOVER
+===================================================== */
+
+.status-btn.active:not(:disabled):hover {
+    background-color: #bbf7d0;
+
+    border-color: #4ade80;
+
+    color: #166534;
+}
+
+
+/* =====================================================
+   INACTIVE HOVER
+===================================================== */
+
+.status-btn.inactive:not(:disabled):hover {
+    background-color: #cbd5e1;
+
+    border-color: #64748b;
+
+    color: #334155;
+}
+
+
+/* =====================================================
+   STATUS BUTTON ACTIVE PRESS
+===================================================== */
+
+.status-btn:not(:disabled):active {
+    transform: scale(0.98);
+}
+
+
+/* =====================================================
+   STATUS BUTTON DISABLED
+===================================================== */
+
+.status-btn:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   PASSWORD WRAPPER
+===================================================== */
+
 .password-input-wrapper {
     position: relative;
+
     display: flex;
+
     align-items: center;
 }
 
@@ -183,76 +401,168 @@
     padding-right: 42px;
 }
 
+
+/* =====================================================
+   PASSWORD TOGGLE
+===================================================== */
+
 .password-toggle-btn {
     position: absolute;
+
     right: 10px;
+
     background: none;
+
     border: none;
+
     color: #64748b;
+
     cursor: pointer;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     padding: 4px;
+
     border-radius: 4px;
+
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
 }
 
 .password-toggle-btn:hover {
     color: #0f172a;
+
+    background-color: #f1f5f9;
 }
 
-/* Footer & Actions */
+.password-toggle-btn:disabled {
+    opacity: 0.5;
+
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
 .edit-modal-footer {
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     gap: 16px;
+
     padding: 16px 24px 24px 24px;
+
     background-color: #ffffff;
 }
 
+
+/* =====================================================
+   CANCEL BUTTON
+===================================================== */
+
 .btn-edit-cancel {
     padding: 10px 24px;
+
     border: none;
+
     background-color: transparent;
+
     font-size: 0.875rem;
+
     font-weight: 500;
+
     color: #334155;
+
     cursor: pointer;
-    transition: color 0.2s;
+
+    transition: color 0.2s ease;
 }
 
 .btn-edit-cancel:hover {
     color: #0f172a;
 }
 
+.btn-edit-cancel:disabled {
+    opacity: 0.5;
+
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   SAVE BUTTON
+===================================================== */
+
 .btn-edit-save {
     padding: 10px 24px;
+
     background-color: #0b1329;
-    /* Exact Dark Blue/Black from image */
+
     color: #ffffff;
+
     border: none;
+
     border-radius: 8px;
+
     font-size: 0.875rem;
+
     font-weight: 500;
+
     display: flex;
+
     align-items: center;
+
+    justify-content: center;
+
     gap: 8px;
+
     cursor: pointer;
-    transition: background-color 0.2s ease;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.1s ease;
 }
 
 .btn-edit-save:hover {
     background-color: #1e293b;
 }
 
-/* Spinner */
+.btn-edit-save:active {
+    transform: scale(0.98);
+}
+
+.btn-edit-save:disabled {
+    opacity: 0.7;
+
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   LOADING SPINNER
+===================================================== */
+
 .edit-loading-spinner {
     width: 14px;
+
     height: 14px;
+
     border: 2px solid rgba(255, 255, 255, 0.3);
+
     border-top-color: #ffffff;
+
     border-radius: 50%;
+
     animation: spin 0.6s linear infinite;
 }
 
@@ -262,25 +572,81 @@
     }
 }
 
-/* Mobile Responsiveness */
+
+/* =====================================================
+   MOBILE RESPONSIVENESS
+===================================================== */
+
 @media (max-width: 640px) {
     .edit-modal-overlay {
         padding: 12px;
     }
 
+    .edit-modal-container {
+        max-height: 94vh;
+
+        border-radius: 10px;
+    }
+
+    .edit-modal-header {
+        padding: 16px;
+    }
+
     .edit-modal-body {
         padding: 16px;
+
+        gap: 13px;
+    }
+
+    .edit-modal-error {
+        margin: 12px 16px 0 16px;
     }
 
     .edit-modal-footer {
         flex-direction: column-reverse;
+
         gap: 8px;
-        padding: 12px 16px;
+
+        padding: 12px 16px 16px;
     }
 
     .btn-edit-cancel,
     .btn-edit-save {
         width: 100%;
+
         justify-content: center;
+    }
+
+    .status-toggle-container {
+        gap: 8px;
+    }
+}
+
+
+/* =====================================================
+   VERY SMALL SCREENS
+===================================================== */
+
+@media (max-width: 380px) {
+    .edit-modal-overlay {
+        padding: 8px;
+    }
+
+    .edit-modal-header {
+        padding: 14px;
+    }
+
+    .edit-modal-body {
+        padding: 14px;
+    }
+
+    .edit-modal-footer {
+        padding: 10px 14px 14px;
+    }
+
+    .status-btn {
+        height: 40px;
+
+        font-size: 0.8125rem;
     }
 }
