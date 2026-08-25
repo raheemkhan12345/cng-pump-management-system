@@ -20,7 +20,7 @@
     background: #ffffff;
     border-radius: 12px;
     width: 100%;
-    max-width: 460px;
+    max-width: 480px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
@@ -47,7 +47,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
+    padding: 18px 24px;
     border-bottom: 1px solid #f1f5f9;
 }
 
@@ -76,6 +76,17 @@
     color: #0f172a;
 }
 
+/* Error Alert Box */
+.edit-modal-error {
+    background-color: #fef2f2;
+    color: #dc2626;
+    padding: 10px 16px;
+    font-size: 0.8125rem;
+    border-left: 4px solid #dc2626;
+    margin: 12px 24px 0 24px;
+    border-radius: 4px;
+}
+
 /* Modal Form and Body Section */
 .edit-modal-form {
     display: flex;
@@ -85,10 +96,10 @@
 }
 
 .edit-modal-body {
-    padding: 20px;
+    padding: 20px 24px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
     overflow-y: auto;
     flex-grow: 1;
 }
@@ -118,9 +129,47 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.edit-form-group input::placeholder {
+    color: #94a3b8;
+}
+
 .edit-form-group input:focus {
     border-color: #0f172a;
     box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.05);
+}
+
+/* Pump Status Toggle Styling */
+.status-toggle-container {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.status-btn {
+    flex: 1;
+    height: 42px;
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.status-btn.active {
+    background-color: #dcfce7;
+    /* Light Green */
+    border-color: #86efac;
+    color: #166534;
+    font-weight: 600;
+}
+
+.status-btn.inactive {
+    background-color: #ffffff;
+    border-color: #cbd5e1;
+    color: #475569;
 }
 
 /* Password Field Wrapper & Toggle Button */
@@ -155,38 +204,35 @@
 /* Footer & Actions */
 .edit-modal-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
-    gap: 12px;
-    padding: 16px 20px;
+    gap: 16px;
+    padding: 16px 24px 24px 24px;
     background-color: #ffffff;
-    border-top: 1px solid #f1f5f9;
 }
 
 .btn-edit-cancel {
-    padding: 9px 18px;
-    border: 1px solid #cbd5e1;
-    background-color: #ffffff;
-    border-radius: 6px;
+    padding: 10px 24px;
+    border: none;
+    background-color: transparent;
     font-size: 0.875rem;
     font-weight: 500;
     color: #334155;
     cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
+    transition: color 0.2s;
 }
 
 .btn-edit-cancel:hover {
-    background-color: #f8fafc;
-    border-color: #94a3b8;
+    color: #0f172a;
 }
 
 .btn-edit-save {
-    padding: 9px 18px;
-    background-color: #0f172a;
-    /* Dark Navy Accent */
+    padding: 10px 24px;
+    background-color: #0b1329;
+    /* Exact Dark Blue/Black from image */
     color: #ffffff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 0.875rem;
     font-weight: 500;
     display: flex;
@@ -198,6 +244,22 @@
 
 .btn-edit-save:hover {
     background-color: #1e293b;
+}
+
+/* Spinner */
+.edit-loading-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Mobile Responsiveness */

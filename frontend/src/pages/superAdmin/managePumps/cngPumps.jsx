@@ -12,21 +12,25 @@ import {
 } from "react-icons/fa";
 
 import AddPumpModal from "../../../components/addNewPumpForm/AddPumpForm";
-import EditNewPump from "../../../components/superAdminForms/EditAdminModal";
+
+import EditNewPump from "../../../components/superAdminForms/EditPumpModal";
 
 import { getAllAdmins } from "../../../services/superAdminDash";
 
 import "./CngPumps.css";
 
-const ITEMS_PER_PAGE = 5;
-
 // =====================================================
 // CONSTANTS
 // =====================================================
 
+const ITEMS_PER_PAGE = 5;
+
 const DEFAULT_STATUS = "Active";
+
 const DEFAULT_PUMP_NAME = "Unnamed Pump";
+
 const DEFAULT_PUMP_ADDRESS = "N/A";
+
 const DEFAULT_ADMIN_NAME = "Unassigned";
 
 // =====================================================
@@ -109,6 +113,12 @@ const extractApiData = (response) => {
 
 const normalizePump = (item, index) => {
   // ===================================================
+  // MONGODB ID
+  // ===================================================
+
+  const mongoId = item?._id || item?.id || null;
+
+  // ===================================================
   // ADMIN
   // ===================================================
 
@@ -151,7 +161,8 @@ const normalizePump = (item, index) => {
   // STATUS
   // ===================================================
 
-  const status = item?.status || item?.pump?.status || DEFAULT_STATUS;
+  const status =
+    item?.pumpStatus || item?.status || item?.pump?.status || DEFAULT_STATUS;
 
   // ===================================================
   // PUMP NUMBER
@@ -200,19 +211,15 @@ const normalizePump = (item, index) => {
   );
 
   // ===================================================
-  // NORMALIZED OBJECT
+  // RETURN NORMALIZED OBJECT
   // ===================================================
 
   return {
-    // Original backend object bhi preserve kar rahe hain
-    // EditNewPump ko agar backend-specific field chahiye
-    // to available rahegi.
     ...item,
 
-    id:
-      item?._id || item?.id || item?.adminId || item?.pumpId || `pump-${index}`,
+    _id: mongoId,
 
-    _id: item?._id,
+    id: mongoId || `pump-${index}`,
 
     pumpNo,
 
@@ -225,6 +232,8 @@ const normalizePump = (item, index) => {
     pumpAddress,
 
     status,
+
+    pumpStatus: status,
 
     admin: {
       ...(item?.admin || {}),
@@ -247,18 +256,18 @@ const normalizePump = (item, index) => {
 };
 
 // =====================================================
-// CNG PUMPS COMPONENT
+// CNG PUMPS
 // =====================================================
 
 const CngPumps = () => {
   // ===================================================
-  // ADD PUMP STATES
+  // ADD MODAL
   // ===================================================
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // ===================================================
-  // EDIT PUMP STATES
+  // EDIT MODAL
   // ===================================================
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -266,7 +275,7 @@ const CngPumps = () => {
   const [selectedPump, setSelectedPump] = useState(null);
 
   // ===================================================
-  // TABLE STATES
+  // TABLE
   // ===================================================
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -289,14 +298,16 @@ const CngPumps = () => {
 
       setError("");
 
-      console.log("Fetching Admins/Pumps...");
+      console.log("========================================");
+      console.log("FETCHING CNG PUMPS");
+      console.log("========================================");
 
       const response = await getAllAdmins();
 
       console.log("Get All Admins API Response:", response);
 
       // =================================================
-      // EXTRACT API DATA
+      // EXTRACT
       // =================================================
 
       const apiData = extractApiData(response);
@@ -304,18 +315,45 @@ const CngPumps = () => {
       console.log("Extracted Pump/Admin Data:", apiData);
 
       // =================================================
-      // NORMALIZE DATA
+      // NORMALIZE
       // =================================================
 
       const formattedPumps = apiData.map(normalizePump);
 
       console.log("Formatted Pumps:", formattedPumps);
 
+      // =================================================
+      // CHECK IDS
+      // =================================================
+
+      formattedPumps.forEach((pump) => {
+        console.log(
+          "Pump:",
+          pump.pumpName,
+          "| MongoDB ID:",
+          pump._id,
+          "| Admin ID:",
+          pump?.admin?._id,
+        );
+      });
+
       setPumps(formattedPumps);
 
       setCurrentPage(1);
     } catch (error) {
-      console.error("Get All Admins Error:", error);
+      console.error("========================================");
+
+      console.error("GET ALL ADMINS / PUMPS ERROR");
+
+      console.error("========================================");
+
+      console.error("Full Error:", error);
+
+      console.error("Response:", error?.response);
+
+      console.error("Response Data:", error?.response?.data);
+
+      console.error("Status:", error?.response?.status);
 
       const message =
         error?.response?.data?.message ||
@@ -334,7 +372,7 @@ const CngPumps = () => {
   }, []);
 
   // ===================================================
-  // FETCH DATA ON PAGE LOAD
+  // INITIAL LOAD
   // ===================================================
 
   useEffect(() => {
@@ -342,11 +380,11 @@ const CngPumps = () => {
   }, [fetchPumps]);
 
   // ===================================================
-  // ADD PUMP
+  // ADD PUMP SUCCESS
   // ===================================================
 
   const handleAddPump = async () => {
-    console.log("Pump added. Refreshing pump list...");
+    console.log("Pump added successfully.");
 
     setIsModalOpen(false);
 
@@ -358,20 +396,51 @@ const CngPumps = () => {
   // ===================================================
 
   const handleEditPump = (pump) => {
-    console.log("Edit Pump clicked:");
+    console.log("========================================");
 
-    console.log(pump);
+    console.log("EDIT PUMP CLICKED");
+
+    console.log("========================================");
+
+    console.log("Selected Pump:", pump);
+
+    console.log("MongoDB _id:", pump?._id);
+
+    console.log("Admin _id:", pump?.admin?._id);
+
+    // =================================================
+    // CHECK ID
+    // =================================================
+
+    const adminId =
+      pump?.admin?._id ||
+      pump?.admin?.id ||
+      pump?.adminId ||
+      pump?._id ||
+      pump?.id;
+
+    if (!adminId) {
+      console.error("Admin/Pump MongoDB ID is missing!");
+
+      setError("Unable to edit this pump because Admin ID is missing.");
+
+      return;
+    }
 
     setSelectedPump(pump);
 
     setIsEditModalOpen(true);
+
+    setError("");
   };
 
   // ===================================================
-  // EDIT MODAL CLOSE
+  // CLOSE EDIT MODAL
   // ===================================================
 
   const handleCloseEditModal = () => {
+    console.log("Edit Pump Modal Closed");
+
     setIsEditModalOpen(false);
 
     setSelectedPump(null);
@@ -381,36 +450,60 @@ const CngPumps = () => {
   // EDIT SUCCESS
   // ===================================================
 
-  const handlePumpUpdated = async (updatedPump) => {
-    console.log("Pump updated successfully:", updatedPump);
+  const handlePumpUpdated = async (updatedPump, changedFields) => {
+    console.log("========================================");
 
-    handleCloseEditModal();
+    console.log("PUMP / ADMIN UPDATED SUCCESSFULLY");
 
-    // Backend se latest data dobara load hoga
+    console.log("========================================");
+
+    console.log("Updated Pump:", updatedPump);
+
+    console.log("Changed Fields:", changedFields);
+
+    // =================================================
+    // CLOSE MODAL
+    // =================================================
+
+    setIsEditModalOpen(false);
+
+    setSelectedPump(null);
+
+    // =================================================
+    // REFRESH FROM BACKEND
+    // =================================================
+
+    console.log("Refreshing CNG pump list...");
+
     await fetchPumps();
+
+    console.log("CNG pump list refreshed successfully.");
   };
 
   // ===================================================
-  // DELETE PUMP
+  // DELETE
   // ===================================================
 
   const handleDelete = (id) => {
+    if (!id) {
+      console.error("Delete failed: MongoDB ID missing.");
+
+      return;
+    }
+
     if (!window.confirm("Are you sure you want to delete this pump?")) {
       return;
     }
 
-    /*
-     * Delete API abhi available nahi hai.
-     *
-     * Jab backend delete API dega,
-     * yahan API call add karenge.
-     */
+    console.log("Delete requested for MongoDB ID:", id);
 
-    console.log("Delete requested for:", id);
+    /*
+     * Delete API can be added here.
+     */
   };
 
   // ===================================================
-  // SEARCH + DATE SORTING
+  // SEARCH + SORT
   // ===================================================
 
   const filteredPumps = useMemo(() => {
@@ -520,9 +613,9 @@ const CngPumps = () => {
 
   return (
     <div className="pumps-page">
-      {/* =================================================
+      {/* ================================================
           HEADER
-      ================================================= */}
+      ================================================ */}
 
       <div className="page-header-container">
         <div className="page-header">
@@ -545,20 +638,20 @@ const CngPumps = () => {
         </button>
       </div>
 
-      {/* =================================================
+      {/* ================================================
           ERROR
-      ================================================= */}
+      ================================================ */}
 
       {error && <div className="dashboard-error">{error}</div>}
 
-      {/* =================================================
+      {/* ================================================
           PUMPS CARD
-      ================================================= */}
+      ================================================ */}
 
       <div className="pumps-card">
-        {/* =================================================
+        {/* ==============================================
             CONTROLS
-        ================================================= */}
+        ============================================== */}
 
         <div className="table-controls">
           <h3 className="section-title">Active Infrastructure</h3>
@@ -583,9 +676,9 @@ const CngPumps = () => {
           </div>
         </div>
 
-        {/* =================================================
+        {/* ==============================================
             TABLE
-        ================================================= */}
+        ============================================== */}
 
         <div className="table-responsive">
           <table className="pumps-table">
@@ -606,9 +699,7 @@ const CngPumps = () => {
             </thead>
 
             <tbody>
-              {/* =================================================
-                  LOADING
-              ================================================= */}
+              {/* LOADING */}
 
               {isLoading ? (
                 <tr>
@@ -621,10 +712,8 @@ const CngPumps = () => {
                   const pumpDate = getPumpDate(pump);
 
                   return (
-                    <tr key={pump.id || pump._id}>
-                      {/* =================================================
-                            PUMP
-                        ================================================= */}
+                    <tr key={pump._id || pump.id}>
+                      {/* PUMP */}
 
                       <td>
                         <div className="pump-info-cell">
@@ -642,9 +731,7 @@ const CngPumps = () => {
                         </div>
                       </td>
 
-                      {/* =================================================
-                            LOCATION
-                        ================================================= */}
+                      {/* LOCATION */}
 
                       <td>
                         <span className="location-text">
@@ -652,9 +739,7 @@ const CngPumps = () => {
                         </span>
                       </td>
 
-                      {/* =================================================
-                            STATUS
-                        ================================================= */}
+                      {/* STATUS */}
 
                       <td>
                         <span
@@ -664,13 +749,11 @@ const CngPumps = () => {
                             .toLowerCase()
                             .replace(/\s+/g, "-")}`}
                         >
-                          • {pump.status || DEFAULT_STATUS}
+                          {pump.status || DEFAULT_STATUS}
                         </span>
                       </td>
 
-                      {/* =================================================
-                            ADMIN
-                        ================================================= */}
+                      {/* ADMIN */}
 
                       <td>
                         {pump.admin?.assigned ? (
@@ -692,9 +775,7 @@ const CngPumps = () => {
                         )}
                       </td>
 
-                      {/* =================================================
-                            DATE & TIME
-                        ================================================= */}
+                      {/* DATE */}
 
                       <td className="table-text-muted">
                         {pumpDate ? (
@@ -712,15 +793,11 @@ const CngPumps = () => {
                         )}
                       </td>
 
-                      {/* =================================================
-                            ACTIONS
-                        ================================================= */}
+                      {/* ACTIONS */}
 
                       <td>
                         <div className="action-icons">
-                          {/* ==============================
-                                EDIT BUTTON
-                            ============================== */}
+                          {/* EDIT */}
 
                           <button
                             className="action-btn edit-btn"
@@ -731,15 +808,13 @@ const CngPumps = () => {
                             <FaEdit size={14} />
                           </button>
 
-                          {/* ==============================
-                                DELETE BUTTON
-                            ============================== */}
+                          {/* DELETE */}
 
                           <button
                             className="action-btn delete-btn"
                             title="Delete Pump"
                             type="button"
-                            onClick={() => handleDelete(pump.id)}
+                            onClick={() => handleDelete(pump._id)}
                           >
                             <FaTrashAlt size={13} />
                           </button>
@@ -749,10 +824,6 @@ const CngPumps = () => {
                   );
                 })
               ) : (
-                /* =================================================
-                    NO DATA
-                ================================================= */
-
                 <tr>
                   <td colSpan="6" className="no-data">
                     {searchTerm
@@ -765,9 +836,9 @@ const CngPumps = () => {
           </table>
         </div>
 
-        {/* =================================================
-            FOOTER / PAGINATION
-        ================================================= */}
+        {/* ==============================================
+            FOOTER
+        ============================================== */}
 
         <div className="table-footer">
           <span className="entries-count">
@@ -778,9 +849,7 @@ const CngPumps = () => {
                 : `Showing ${showingFrom} to ${showingTo} of ${filteredPumps.length} pumps`}
           </span>
 
-          {/* =================================================
-              PAGINATION
-          ================================================= */}
+          {/* PAGINATION */}
 
           {!isLoading && filteredPumps.length > 0 && totalPages > 1 && (
             <div className="pagination-wrapper">
@@ -791,8 +860,6 @@ const CngPumps = () => {
                 type="button"
                 disabled={currentPage === 1}
                 onClick={handlePreviousPage}
-                aria-label="Previous page"
-                title="Previous page"
               >
                 <FaChevronLeft size={10} />
 
@@ -815,7 +882,6 @@ const CngPumps = () => {
                     }`}
                     type="button"
                     onClick={() => handlePageChange(page)}
-                    aria-label={`Go to page ${page}`}
                     aria-current={currentPage === page ? "page" : undefined}
                   >
                     {page}
@@ -830,8 +896,6 @@ const CngPumps = () => {
                 type="button"
                 disabled={currentPage === totalPages}
                 onClick={handleNextPage}
-                aria-label="Next page"
-                title="Next page"
               >
                 <span>Next</span>
 
@@ -842,9 +906,9 @@ const CngPumps = () => {
         </div>
       </div>
 
-      {/* =================================================
+      {/* ================================================
           ADD PUMP MODAL
-      ================================================= */}
+      ================================================ */}
 
       <AddPumpModal
         isOpen={isModalOpen}
@@ -852,15 +916,15 @@ const CngPumps = () => {
         onAddPump={handleAddPump}
       />
 
-      {/* =================================================
+      {/* ================================================
           EDIT PUMP MODAL
-      ================================================= */}
+      ================================================ */}
 
       <EditNewPump
         isOpen={isEditModalOpen}
-        pump={selectedPump}
         onClose={handleCloseEditModal}
-        onUpdated={handlePumpUpdated}
+        pumpData={selectedPump}
+        onSave={handlePumpUpdated}
       />
     </div>
   );
