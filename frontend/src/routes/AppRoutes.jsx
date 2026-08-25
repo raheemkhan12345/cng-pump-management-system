@@ -14,7 +14,6 @@ import AdminLayout from '../layouts/adminLayout';
 import SuperAdminDashboard from '../pages/superAdmin/superAdminDashboard/SuperAdminDashboard';
 import Admins from '../pages/superAdmin/admins/Admins';
 import CngPumps from '../pages/superAdmin/managePumps/cngPumps';
-import Settings from '../pages/superAdmin/settings/Settings';
 import AdminDashboard from '../pages/admin/adminDashboard/AdminDashboard';
 import CngSales from '../pages/admin/cngSales/CngSales';
 import SalesReport from '../pages/admin/cngSales/SalesReport';
@@ -46,7 +45,6 @@ const AppRoutes = () => {
             <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
             <Route path="/super-admin/admins" element={<Admins />} />
             <Route path="/super-admin/pumps" element={<CngPumps />} />
-            <Route path="/super-admin/settings" element={<Settings />} />
           </Route>
         </Route>
 

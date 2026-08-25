@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-import { Plus, Search, Filter, Fuel, Wrench } from "lucide-react";
+import { Plus, Search, Filter, Fuel } from "lucide-react";
 
 import AddPumpModal from "../../../components/addNewPumpForm/AddPumpForm";
 
 import { getAllAdmins } from "../../../services/superAdminDash";
 
 import "./SuperAdminDashboard.css";
+
+const ITEMS_PER_PAGE = 5;
 
 const SuperAdminDashboard = () => {
   // =====================================================
@@ -29,8 +31,6 @@ const SuperAdminDashboard = () => {
   // PAGINATION
   // =====================================================
 
-  const ITEMS_PER_PAGE = 5;
-
   const [adminCurrentPage, setAdminCurrentPage] = useState(1);
 
   const [pumpCurrentPage, setPumpCurrentPage] = useState(1);
@@ -42,7 +42,6 @@ const SuperAdminDashboard = () => {
   const fetchAdmins = useCallback(async () => {
     try {
       setIsLoading(true);
-
       setError("");
 
       console.log("Fetching All Admins...");
@@ -50,6 +49,10 @@ const SuperAdminDashboard = () => {
       const response = await getAllAdmins();
 
       console.log("Get All Admins API Response:", response);
+
+      // =================================================
+      // EXTRACT API DATA
+      // =================================================
 
       let adminData = [];
 
@@ -69,7 +72,7 @@ const SuperAdminDashboard = () => {
 
       setPumps(adminData);
 
-      // Reset pagination after fresh data
+      // Fresh data ke baad pagination reset
       setAdminCurrentPage(1);
       setPumpCurrentPage(1);
     } catch (error) {
@@ -85,7 +88,6 @@ const SuperAdminDashboard = () => {
 
       setPumps([]);
 
-      // Reset pagination on error
       setAdminCurrentPage(1);
       setPumpCurrentPage(1);
     } finally {
@@ -108,22 +110,9 @@ const SuperAdminDashboard = () => {
   const handleAddPump = async (formData, response) => {
     try {
       setIsCreating(true);
-
       setError("");
 
       console.log("Pump/Admin successfully created:", response);
-
-      /*
-       * Important:
-       *
-       * createAdmin API successful hone ke baad
-       * hum fake/temp pump create nahi karenge.
-       *
-       * Backend se fresh GET request karenge.
-       *
-       * Is se dashboard mein wahi data show hoga
-       * jo database mein actually save hua hai.
-       */
 
       if (response?.success) {
         console.log("Admin created successfully.");
@@ -155,13 +144,12 @@ const SuperAdminDashboard = () => {
   // NORMALIZE PUMP DATA
   // =====================================================
 
-  /*
-   * Backend ke field names agar thore different hon
-   * to UI phir bhi properly work kare.
-   */
-
   const normalizedPumps = pumps.map((pump, index) => {
     const admin = pump?.admin || pump?.user || pump?.adminDetails || {};
+
+    // -------------------------------------------------
+    // PUMP NAME
+    // -------------------------------------------------
 
     const pumpName =
       pump?.pumpName ||
@@ -170,12 +158,20 @@ const SuperAdminDashboard = () => {
       pump?.pump?.name ||
       "Unnamed Pump";
 
+    // -------------------------------------------------
+    // PUMP ADDRESS
+    // -------------------------------------------------
+
     const pumpAddress =
       pump?.pumpAddress ||
       pump?.location ||
       pump?.address ||
       pump?.pump?.address ||
       "N/A";
+
+    // -------------------------------------------------
+    // ADMIN NAME
+    // -------------------------------------------------
 
     const adminName =
       pump?.adminName ||
@@ -185,12 +181,28 @@ const SuperAdminDashboard = () => {
       pump?.name ||
       "Unassigned";
 
+    // -------------------------------------------------
+    // ADMIN EMAIL
+    // -------------------------------------------------
+
     const adminEmail = pump?.email || admin?.email || "";
+
+    // -------------------------------------------------
+    // STATUS
+    // -------------------------------------------------
 
     const status = pump?.status || admin?.status || "Active";
 
+    // -------------------------------------------------
+    // ID
+    // -------------------------------------------------
+
     const id =
       pump?._id || pump?.id || admin?._id || admin?.id || `row-${index}`;
+
+    // -------------------------------------------------
+    // ADMIN INITIALS
+    // -------------------------------------------------
 
     const initials =
       admin?.initials ||
@@ -263,12 +275,15 @@ const SuperAdminDashboard = () => {
   // SEARCH ADMINS
   // =====================================================
 
-  const filteredAdmins = admins.filter(
-    (admin) =>
-      admin.name.toLowerCase().includes(adminSearch.toLowerCase()) ||
-      admin.email.toLowerCase().includes(adminSearch.toLowerCase()) ||
-      admin.pump.toLowerCase().includes(adminSearch.toLowerCase()),
-  );
+  const normalizedSearch = adminSearch.toLowerCase().trim();
+
+  const filteredAdmins = admins.filter((admin) => {
+    return (
+      admin.name.toLowerCase().includes(normalizedSearch) ||
+      admin.email.toLowerCase().includes(normalizedSearch) ||
+      admin.pump.toLowerCase().includes(normalizedSearch)
+    );
+  });
 
   // =====================================================
   // ADMIN PAGINATION
@@ -276,10 +291,11 @@ const SuperAdminDashboard = () => {
 
   const adminTotalPages = Math.ceil(filteredAdmins.length / ITEMS_PER_PAGE);
 
-  const paginatedAdmins = filteredAdmins.slice(
-    (adminCurrentPage - 1) * ITEMS_PER_PAGE,
-    adminCurrentPage * ITEMS_PER_PAGE,
-  );
+  const adminStartIndex = (adminCurrentPage - 1) * ITEMS_PER_PAGE;
+
+  const adminEndIndex = adminStartIndex + ITEMS_PER_PAGE;
+
+  const paginatedAdmins = filteredAdmins.slice(adminStartIndex, adminEndIndex);
 
   // =====================================================
   // PUMP PAGINATION
@@ -287,10 +303,11 @@ const SuperAdminDashboard = () => {
 
   const pumpTotalPages = Math.ceil(normalizedPumps.length / ITEMS_PER_PAGE);
 
-  const paginatedPumps = normalizedPumps.slice(
-    (pumpCurrentPage - 1) * ITEMS_PER_PAGE,
-    pumpCurrentPage * ITEMS_PER_PAGE,
-  );
+  const pumpStartIndex = (pumpCurrentPage - 1) * ITEMS_PER_PAGE;
+
+  const pumpEndIndex = pumpStartIndex + ITEMS_PER_PAGE;
+
+  const paginatedPumps = normalizedPumps.slice(pumpStartIndex, pumpEndIndex);
 
   // =====================================================
   // ADMIN PAGINATION HANDLERS
@@ -398,7 +415,6 @@ const SuperAdminDashboard = () => {
                 onChange={(e) => {
                   setAdminSearch(e.target.value);
 
-                  // Search change hone par page 1
                   setAdminCurrentPage(1);
                 }}
               />
@@ -414,8 +430,6 @@ const SuperAdminDashboard = () => {
                   <th>ASSIGNED PUMP</th>
 
                   <th>STATUS</th>
-
-                  <th>ACTIONS</th>
                 </tr>
               </thead>
 
@@ -423,7 +437,7 @@ const SuperAdminDashboard = () => {
                 {isLoading ? (
                   <tr>
                     <td
-                      colSpan="4"
+                      colSpan="3"
                       className="cell-text"
                       style={{
                         textAlign: "center",
@@ -436,6 +450,8 @@ const SuperAdminDashboard = () => {
                 ) : filteredAdmins.length > 0 ? (
                   paginatedAdmins.map((admin) => (
                     <tr key={admin.id}>
+                      {/* ADMIN */}
+
                       <td>
                         <div className="user-cell">
                           <div className="avatar-circle">{admin.avatar}</div>
@@ -452,7 +468,11 @@ const SuperAdminDashboard = () => {
                         </div>
                       </td>
 
+                      {/* PUMP */}
+
                       <td className="cell-text">{admin.pump}</td>
+
+                      {/* STATUS */}
 
                       <td>
                         <span
@@ -463,22 +483,12 @@ const SuperAdminDashboard = () => {
                           • {admin.status}
                         </span>
                       </td>
-
-                      <td>
-                        <button
-                          className="icon-btn"
-                          title="Manage"
-                          type="button"
-                        >
-                          <Wrench size={16} />
-                        </button>
-                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td
-                      colSpan="4"
+                      colSpan="3"
                       className="cell-text"
                       style={{
                         textAlign: "center",
@@ -497,7 +507,7 @@ const SuperAdminDashboard = () => {
               ADMIN PAGINATION
           ================================================= */}
 
-          {!isLoading && filteredAdmins.length > 0 && (
+          {!isLoading && filteredAdmins.length > 0 && adminTotalPages > 1 && (
             <div className="pagination">
               <button
                 type="button"
@@ -510,7 +520,9 @@ const SuperAdminDashboard = () => {
 
               <div className="pagination-pages">
                 {Array.from(
-                  { length: adminTotalPages },
+                  {
+                    length: adminTotalPages,
+                  },
                   (_, index) => index + 1,
                 ).map((page) => (
                   <button
@@ -561,8 +573,6 @@ const SuperAdminDashboard = () => {
                   <th>LOCATION</th>
 
                   <th>STATUS</th>
-
-                  <th>ACTIONS</th>
                 </tr>
               </thead>
 
@@ -570,7 +580,7 @@ const SuperAdminDashboard = () => {
                 {isLoading ? (
                   <tr>
                     <td
-                      colSpan="4"
+                      colSpan="3"
                       className="cell-text"
                       style={{
                         textAlign: "center",
@@ -583,6 +593,8 @@ const SuperAdminDashboard = () => {
                 ) : normalizedPumps.length > 0 ? (
                   paginatedPumps.map((pump) => (
                     <tr key={pump.id}>
+                      {/* PUMP DETAILS */}
+
                       <td>
                         <div className="cell-title">{pump.name}</div>
 
@@ -596,7 +608,11 @@ const SuperAdminDashboard = () => {
                         </div>
                       </td>
 
+                      {/* LOCATION */}
+
                       <td className="cell-text">{pump.location}</td>
+
+                      {/* STATUS */}
 
                       <td>
                         <span
@@ -607,22 +623,12 @@ const SuperAdminDashboard = () => {
                           • {pump.status}
                         </span>
                       </td>
-
-                      <td>
-                        <button
-                          className="icon-btn"
-                          title="Manage"
-                          type="button"
-                        >
-                          <Wrench size={16} />
-                        </button>
-                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td
-                      colSpan="4"
+                      colSpan="3"
                       className="cell-text"
                       style={{
                         textAlign: "center",
@@ -641,7 +647,7 @@ const SuperAdminDashboard = () => {
               PUMP PAGINATION
           ================================================= */}
 
-          {!isLoading && normalizedPumps.length > 0 && (
+          {!isLoading && normalizedPumps.length > 0 && pumpTotalPages > 1 && (
             <div className="pagination">
               <button
                 type="button"
@@ -654,7 +660,9 @@ const SuperAdminDashboard = () => {
 
               <div className="pagination-pages">
                 {Array.from(
-                  { length: pumpTotalPages },
+                  {
+                    length: pumpTotalPages,
+                  },
                   (_, index) => index + 1,
                 ).map((page) => (
                   <button
