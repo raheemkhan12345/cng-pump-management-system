@@ -1,0 +1,233 @@
+/* Modal Overlay */
+.dem-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+/* Modal Container Box */
+.dem-modal-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 520px;
+    border-radius: 14px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    animation: demFadeIn 0.2s ease-out;
+}
+
+@keyframes demFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Header */
+.dem-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.dem-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.dem-close-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.dem-close-btn:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+/* Form Styling */
+.dem-form {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.dem-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.dem-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dem-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* Base Inputs */
+.dem-input {
+    width: 100%;
+    height: 44px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0 14px;
+    font-size: 14px;
+    color: #0f172a;
+    background-color: #f8fafc;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.dem-input:focus {
+    border-color: #007a3d;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 122, 61, 0.1);
+}
+
+/* Suffix Wrapper (Liters) */
+.dem-input-suffix-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.dem-input-suffix {
+    padding-right: 32px;
+}
+
+.dem-suffix {
+    position: absolute;
+    right: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+/* Prefix Wrapper (PKR) */
+.dem-input-prefix-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.dem-prefix {
+    position: absolute;
+    left: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.dem-input-prefix {
+    padding-left: 42px;
+}
+
+/* Textarea */
+.dem-textarea {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #0f172a;
+    background-color: #f8fafc;
+    outline: none;
+    resize: none;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.dem-textarea:focus {
+    border-color: #007a3d;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 122, 61, 0.1);
+}
+
+/* Footer Action Buttons */
+.dem-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.dem-btn-cancel {
+    height: 42px;
+    padding: 0 20px;
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+    color: #334155;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dem-btn-cancel:hover {
+    background-color: #f8fafc;
+}
+
+.dem-btn-submit {
+    height: 42px;
+    padding: 0 20px;
+    background-color: #007a3d;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.dem-btn-submit:hover {
+    background-color: #006331;
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+    .dem-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,778 +1,544 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from "react";
 import {
-    History,
-    Plus,
-    Landmark,
-    TrendingUp,
-    Users,
-    Filter,
-    ChevronLeft,
-    ChevronRight,
-} from 'lucide-react';
-import RecordLoanModal from '../../../components/adminDashboardForms/addNewLoanModel/RecordLoanModel'; // Modal Component
-import './Loans.css';
+  History,
+  Plus,
+  Landmark,
+  TrendingUp,
+  Users,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import RecordLoanModal from "../../../components/adminDashboardForms/addNewLoanModel/RecordLoanModel"; // Modal Component
+import "./Loans.css";
 
 const Loans = () => {
+  // =========================================================
+  // State
+  // =========================================================
 
-    // =========================================================
-    // State
-    // =========================================================
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const ITEMS_PER_PAGE = 5;
 
-    const ITEMS_PER_PAGE = 5;
+  // =========================================================
+  // Loan Transactions Data
+  // =========================================================
 
+  const [loanTransactions, setLoanTransactions] = useState([
+    {
+      id: 1,
+      date: "19-08-2026",
+      staffName: "Ali Raza",
+      type: "Loan Given",
+      amount: 10000,
+      remainingBal: 45000,
+      status: "Active",
+    },
+    {
+      id: 2,
+      date: "18-08-2026",
+      staffName: "Noman Ali",
+      type: "Recovery",
+      amount: 5000,
+      remainingBal: 0,
+      status: "Paid",
+    },
+    {
+      id: 3,
+      date: "15-08-2026",
+      staffName: "Muhammad Usman",
+      type: "Loan Given",
+      amount: 5000,
+      remainingBal: 15000,
+      status: "Active",
+    },
+    {
+      id: 4,
+      date: "12-08-2026",
+      staffName: "Sajid Khan",
+      type: "Recovery",
+      amount: 10000,
+      remainingBal: 120000,
+      status: "Active",
+    },
+    {
+      id: 5,
+      date: "10-08-2026",
+      staffName: "Ali Raza",
+      type: "Recovery",
+      amount: 15000,
+      remainingBal: 35000,
+      status: "Active",
+    },
+    {
+      id: 6,
+      date: "08-08-2026",
+      staffName: "Bilal Ahmad",
+      type: "Loan Given",
+      amount: 20000,
+      remainingBal: 20000,
+      status: "Active",
+    },
+    {
+      id: 7,
+      date: "05-08-2026",
+      staffName: "Usman Khan",
+      type: "Recovery",
+      amount: 8000,
+      remainingBal: 12000,
+      status: "Active",
+    },
+    {
+      id: 8,
+      date: "03-08-2026",
+      staffName: "Hamza Ali",
+      type: "Loan Given",
+      amount: 15000,
+      remainingBal: 15000,
+      status: "Active",
+    },
+    {
+      id: 9,
+      date: "30-07-2026",
+      staffName: "Noman Ali",
+      type: "Loan Given",
+      amount: 12000,
+      remainingBal: 12000,
+      status: "Active",
+    },
+    {
+      id: 10,
+      date: "28-07-2026",
+      staffName: "Sajid Khan",
+      type: "Recovery",
+      amount: 7000,
+      remainingBal: 130000,
+      status: "Active",
+    },
+    {
+      id: 11,
+      date: "25-07-2026",
+      staffName: "Ali Raza",
+      type: "Recovery",
+      amount: 10000,
+      remainingBal: 25000,
+      status: "Active",
+    },
+    {
+      id: 12,
+      date: "22-07-2026",
+      staffName: "Bilal Ahmad",
+      type: "Loan Given",
+      amount: 25000,
+      remainingBal: 25000,
+      status: "Active",
+    },
+  ]);
 
-    // =========================================================
-    // Loan Transactions Data
-    // =========================================================
+  // =========================================================
+  // Save New Loan Handler
+  // =========================================================
 
-    const [loanTransactions, setLoanTransactions] = useState([
-        {
-            id: 1,
-            date: '19-08-2026',
-            staffName: 'Ali Raza',
-            type: 'Loan Given',
-            amount: 10000,
-            remainingBal: 45000,
-            status: 'Active',
-        },
-        {
-            id: 2,
-            date: '18-08-2026',
-            staffName: 'Noman Ali',
-            type: 'Recovery',
-            amount: 5000,
-            remainingBal: 0,
-            status: 'Paid',
-        },
-        {
-            id: 3,
-            date: '15-08-2026',
-            staffName: 'Muhammad Usman',
-            type: 'Loan Given',
-            amount: 5000,
-            remainingBal: 15000,
-            status: 'Active',
-        },
-        {
-            id: 4,
-            date: '12-08-2026',
-            staffName: 'Sajid Khan',
-            type: 'Recovery',
-            amount: 10000,
-            remainingBal: 120000,
-            status: 'Active',
-        },
-        {
-            id: 5,
-            date: '10-08-2026',
-            staffName: 'Ali Raza',
-            type: 'Recovery',
-            amount: 15000,
-            remainingBal: 35000,
-            status: 'Active',
-        },
-        {
-            id: 6,
-            date: '08-08-2026',
-            staffName: 'Bilal Ahmad',
-            type: 'Loan Given',
-            amount: 20000,
-            remainingBal: 20000,
-            status: 'Active',
-        },
-        {
-            id: 7,
-            date: '05-08-2026',
-            staffName: 'Usman Khan',
-            type: 'Recovery',
-            amount: 8000,
-            remainingBal: 12000,
-            status: 'Active',
-        },
-        {
-            id: 8,
-            date: '03-08-2026',
-            staffName: 'Hamza Ali',
-            type: 'Loan Given',
-            amount: 15000,
-            remainingBal: 15000,
-            status: 'Active',
-        },
-        {
-            id: 9,
-            date: '30-07-2026',
-            staffName: 'Noman Ali',
-            type: 'Loan Given',
-            amount: 12000,
-            remainingBal: 12000,
-            status: 'Active',
-        },
-        {
-            id: 10,
-            date: '28-07-2026',
-            staffName: 'Sajid Khan',
-            type: 'Recovery',
-            amount: 7000,
-            remainingBal: 130000,
-            status: 'Active',
-        },
-        {
-            id: 11,
-            date: '25-07-2026',
-            staffName: 'Ali Raza',
-            type: 'Recovery',
-            amount: 10000,
-            remainingBal: 25000,
-            status: 'Active',
-        },
-        {
-            id: 12,
-            date: '22-07-2026',
-            staffName: 'Bilal Ahmad',
-            type: 'Loan Given',
-            amount: 25000,
-            remainingBal: 25000,
-            status: 'Active',
-        },
-    ]);
+  const handleSaveLoan = (newLoanData) => {
+    const formattedDate = newLoanData.date.split("-").reverse().join("-");
 
-
-    // =========================================================
-    // Save New Loan Handler
-    // =========================================================
-
-    const handleSaveLoan = (newLoanData) => {
-        const formattedDate = newLoanData.date.split('-').reverse().join('-');
-
-        const newEntry = {
-            id: Date.now(),
-            date: formattedDate,
-            staffName: newLoanData.personName,
-            type: newLoanData.loanType,
-            amount: Number(newLoanData.amount),
-            remainingBal: Number(newLoanData.amount),
-            status: newLoanData.status,
-        };
-
-        setLoanTransactions((prev) => [newEntry, ...prev]);
+    const newEntry = {
+      id: Date.now(),
+      date: formattedDate,
+      staffName: newLoanData.personName,
+      type: newLoanData.loanType,
+      amount: Number(newLoanData.amount),
+      remainingBal: Number(newLoanData.amount),
+      status: newLoanData.status,
     };
 
+    setLoanTransactions((prev) => [newEntry, ...prev]);
+  };
 
-    // =========================================================
-    // Currency Formatter
-    // =========================================================
+  // =========================================================
+  // Currency Formatter
+  // =========================================================
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-PK').format(amount);
-    };
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-PK").format(amount);
+  };
 
+  // =========================================================
+  // Current Date
+  // =========================================================
 
-    // =========================================================
-    // Current Date
-    // =========================================================
+  const today = new Date();
 
-    const today = new Date();
+  // =========================================================
+  // Loan Statistics
+  // =========================================================
 
+  const loanStats = useMemo(() => {
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
 
-    // =========================================================
-    // Loan Statistics
-    // =========================================================
+    // -----------------------------------------
+    // This Month Loan
+    // -----------------------------------------
 
-    const loanStats = useMemo(() => {
+    const thisMonthLoan = loanTransactions
+      .filter((transaction) => {
+        if (transaction.type !== "Loan Given") {
+          return false;
+        }
 
-        const currentMonth = today.getMonth();
-        const currentYear = today.getFullYear();
-
-
-        // -----------------------------------------
-        // This Month Loan
-        // -----------------------------------------
-
-        const thisMonthLoan = loanTransactions
-            .filter((transaction) => {
-
-                if (transaction.type !== 'Loan Given') {
-                    return false;
-                }
-
-                const transactionDate = new Date(
-                    `${transaction.date.split('-').reverse().join('-')}T00:00:00`
-                );
-
-                return (
-                    transactionDate.getMonth() === currentMonth &&
-                    transactionDate.getFullYear() === currentYear
-                );
-            })
-            .reduce(
-                (total, transaction) =>
-                    total + transaction.amount,
-                0
-            );
-
-
-        // -----------------------------------------
-        // Total Loans Given
-        // -----------------------------------------
-
-        const totalLoansGiven = loanTransactions
-            .filter(
-                (transaction) =>
-                    transaction.type === 'Loan Given'
-            )
-            .reduce(
-                (total, transaction) =>
-                    total + transaction.amount,
-                0
-            );
-
-
-        // -----------------------------------------
-        // This Month Recovery
-        // -----------------------------------------
-
-        const thisMonthRecovery = loanTransactions
-            .filter((transaction) => {
-
-                if (transaction.type !== 'Recovery') {
-                    return false;
-                }
-
-                const transactionDate = new Date(
-                    `${transaction.date.split('-').reverse().join('-')}T00:00:00`
-                );
-
-                return (
-                    transactionDate.getMonth() === currentMonth &&
-                    transactionDate.getFullYear() === currentYear
-                );
-            })
-            .reduce(
-                (total, transaction) =>
-                    total + transaction.amount,
-                0
-            );
-
-
-        // -----------------------------------------
-        // Active Loan Staff
-        // -----------------------------------------
-
-        const activeStaff = new Set(
-            loanTransactions
-                .filter(
-                    (transaction) =>
-                        transaction.remainingBal > 0
-                )
-                .map(
-                    (transaction) =>
-                        transaction.staffName
-                )
+        const transactionDate = new Date(
+          `${transaction.date.split("-").reverse().join("-")}T00:00:00`,
         );
 
+        return (
+          transactionDate.getMonth() === currentMonth &&
+          transactionDate.getFullYear() === currentYear
+        );
+      })
+      .reduce((total, transaction) => total + transaction.amount, 0);
 
-        return {
-            thisMonthLoan,
-            totalLoansGiven,
-            thisMonthRecovery,
-            activeLoanStaff: activeStaff.size,
-        };
+    // -----------------------------------------
+    // Total Loans Given
+    // -----------------------------------------
 
-    }, [loanTransactions]);
+    const totalLoansGiven = loanTransactions
+      .filter((transaction) => transaction.type === "Loan Given")
+      .reduce((total, transaction) => total + transaction.amount, 0);
 
+    // -----------------------------------------
+    // This Month Recovery
+    // -----------------------------------------
 
-    // =========================================================
-    // Pagination
-    // =========================================================
+    const thisMonthRecovery = loanTransactions
+      .filter((transaction) => {
+        if (transaction.type !== "Recovery") {
+          return false;
+        }
 
-    const totalResults = loanTransactions.length;
-
-    const totalPages = Math.ceil(
-        totalResults / ITEMS_PER_PAGE
-    );
-
-
-    const startIndex =
-        (currentPage - 1) * ITEMS_PER_PAGE;
-
-
-    const endIndex = Math.min(
-        startIndex + ITEMS_PER_PAGE,
-        totalResults
-    );
-
-
-    const currentTransactions =
-        loanTransactions.slice(
-            startIndex,
-            endIndex
+        const transactionDate = new Date(
+          `${transaction.date.split("-").reverse().join("-")}T00:00:00`,
         );
 
+        return (
+          transactionDate.getMonth() === currentMonth &&
+          transactionDate.getFullYear() === currentYear
+        );
+      })
+      .reduce((total, transaction) => total + transaction.amount, 0);
 
-    // =========================================================
-    // Page Numbers
-    // =========================================================
+    // -----------------------------------------
+    // Active Loan Staff
+    // -----------------------------------------
 
-    const pageNumbers = Array.from(
-        { length: totalPages },
-        (_, index) => index + 1
+    const activeStaff = new Set(
+      loanTransactions
+        .filter((transaction) => transaction.remainingBal > 0)
+        .map((transaction) => transaction.staffName),
     );
 
-
-    // =========================================================
-    // Previous Page
-    // =========================================================
-
-    const handlePreviousPage = () => {
-
-        if (currentPage > 1) {
-            setCurrentPage(
-                (previousPage) =>
-                    previousPage - 1
-            );
-        }
+    return {
+      thisMonthLoan,
+      totalLoansGiven,
+      thisMonthRecovery,
+      activeLoanStaff: activeStaff.size,
     };
+  }, [loanTransactions]);
 
+  // =========================================================
+  // Pagination
+  // =========================================================
 
-    // =========================================================
-    // Next Page
-    // =========================================================
+  const totalResults = loanTransactions.length;
 
-    const handleNextPage = () => {
+  const totalPages = Math.ceil(totalResults / ITEMS_PER_PAGE);
 
-        if (currentPage < totalPages) {
-            setCurrentPage(
-                (previousPage) =>
-                    previousPage + 1
-            );
-        }
-    };
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalResults);
 
-    // =========================================================
-    // Page Change
-    // =========================================================
+  const currentTransactions = loanTransactions.slice(startIndex, endIndex);
 
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
+  // =========================================================
+  // Page Numbers
+  // =========================================================
 
+  const pageNumbers = Array.from(
+    { length: totalPages },
+    (_, index) => index + 1,
+  );
 
-    // =========================================================
-    // Render
-    // =========================================================
+  // =========================================================
+  // Previous Page
+  // =========================================================
 
-    return (
-        <div className="loan-page-container">
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((previousPage) => previousPage - 1);
+    }
+  };
 
-            {/* =====================================================
+  // =========================================================
+  // Next Page
+  // =========================================================
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((previousPage) => previousPage + 1);
+    }
+  };
+
+  // =========================================================
+  // Page Change
+  // =========================================================
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  // =========================================================
+  // Render
+  // =========================================================
+
+  return (
+    <div className="loan-page-container">
+      {/* =====================================================
                 Header
             ===================================================== */}
 
-            <div className="loan-header-section">
+      <div className="loan-header-section">
+        <div>
+          <h1 className="loan-page-title">Loans</h1>
 
-                <div>
-                    <h1 className="loan-page-title">
-                        Loans
-                    </h1>
+          <p className="loan-page-subtitle">
+            Manage staff loans, recoveries, and outstanding balances.
+          </p>
+        </div>
 
-                    <p className="loan-page-subtitle">
-                        Manage staff loans, recoveries, and
-                        outstanding balances.
-                    </p>
-                </div>
+        <div className="loan-header-actions">
 
+          <button
+            className="loan-btn-primary"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Plus size={18} />
+            <span>New Loan Application</span>
+          </button>
+        </div>
+      </div>
 
-                <div className="loan-header-actions">
-
-                    <button className="loan-btn-history">
-                        <History size={16} />
-                        <span>
-                            View Loan History
-                        </span>
-                    </button>
-
-
-                    <button
-                        className="loan-btn-primary"
-                        onClick={() => setIsModalOpen(true)}
-                    >
-                        <Plus size={18} />
-                        <span>
-                            New Loan Application
-                        </span>
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            {/* =====================================================
+      {/* =====================================================
                 Statistics
             ===================================================== */}
 
-            <div className="loan-stats-grid">
+      <div className="loan-stats-grid">
+        {/* This Month Loan */}
 
-                {/* This Month Loan */}
+        <div className="loan-stat-card">
+          <div className="loan-icon-box loan-icon-bg-gray">
+            <Landmark size={18} className="loan-icon-gray" />
+          </div>
 
-                <div className="loan-stat-card">
+          <span className="loan-stat-label">This Month Loan</span>
 
-                    <div className="loan-icon-box loan-icon-bg-gray">
-                        <Landmark
-                            size={18}
-                            className="loan-icon-gray"
-                        />
-                    </div>
+          <h2 className="loan-stat-value">
+            Rs. {formatCurrency(loanStats.thisMonthLoan)}
+          </h2>
+        </div>
 
-                    <span className="loan-stat-label">
-                        This Month Loan
-                    </span>
+        {/* Total Loans Given */}
 
-                    <h2 className="loan-stat-value">
-                        Rs.{' '}
-                        {formatCurrency(
-                            loanStats.thisMonthLoan
-                        )}
-                    </h2>
+        <div className="loan-stat-card">
+          <div className="loan-icon-box loan-icon-bg-gray">
+            <Landmark size={18} className="loan-icon-gray" />
+          </div>
 
-                </div>
+          <span className="loan-stat-label">Total Loans Given</span>
 
+          <h2 className="loan-stat-value">
+            Rs. {formatCurrency(loanStats.totalLoansGiven)}
+          </h2>
 
-                {/* Total Loans Given */}
+          <span className="loan-stat-sub">Current outstanding</span>
+        </div>
 
-                <div className="loan-stat-card">
+        {/* This Month Recovery */}
 
-                    <div className="loan-icon-box loan-icon-bg-gray">
-                        <Landmark
-                            size={18}
-                            className="loan-icon-gray"
-                        />
-                    </div>
+        <div className="loan-stat-card">
+          <div className="loan-icon-box loan-icon-bg-gray">
+            <TrendingUp size={18} className="loan-icon-gray" />
+          </div>
 
-                    <span className="loan-stat-label">
-                        Total Loans Given
-                    </span>
+          <span className="loan-stat-label">This Month's Recovery</span>
 
-                    <h2 className="loan-stat-value">
-                        Rs.{' '}
-                        {formatCurrency(
-                            loanStats.totalLoansGiven
-                        )}
-                    </h2>
+          <h2 className="loan-stat-value loan-text-green">
+            Rs. {formatCurrency(loanStats.thisMonthRecovery)}
+          </h2>
+        </div>
 
-                    <span className="loan-stat-sub">
-                        Current outstanding
-                    </span>
+        {/* Active Staff */}
 
-                </div>
+        <div className="loan-stat-card">
+          <div className="loan-icon-box loan-icon-bg-gray">
+            <Users size={18} className="loan-icon-gray" />
+          </div>
 
+          <span className="loan-stat-label">Active Loan Staff</span>
 
-                {/* This Month Recovery */}
+          <h2 className="loan-stat-value">
+            {loanStats.activeLoanStaff}{" "}
+            <span className="loan-unit-text">members</span>
+          </h2>
+        </div>
+      </div>
 
-                <div className="loan-stat-card">
-
-                    <div className="loan-icon-box loan-icon-bg-gray">
-                        <TrendingUp
-                            size={18}
-                            className="loan-icon-gray"
-                        />
-                    </div>
-
-                    <span className="loan-stat-label">
-                        This Month's Recovery
-                    </span>
-
-                    <h2 className="loan-stat-value loan-text-green">
-                        Rs.{' '}
-                        {formatCurrency(
-                            loanStats.thisMonthRecovery
-                        )}
-                    </h2>
-
-                </div>
-
-
-                {/* Active Staff */}
-
-                <div className="loan-stat-card">
-
-                    <div className="loan-icon-box loan-icon-bg-gray">
-                        <Users
-                            size={18}
-                            className="loan-icon-gray"
-                        />
-                    </div>
-
-                    <span className="loan-stat-label">
-                        Active Loan Staff
-                    </span>
-
-                    <h2 className="loan-stat-value">
-                        {loanStats.activeLoanStaff}{' '}
-                        <span className="loan-unit-text">
-                            members
-                        </span>
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-            {/* =====================================================
+      {/* =====================================================
                 Transactions
             ===================================================== */}
 
-            <div className="loan-table-card">
+      <div className="loan-table-card">
+        {/* Table Header */}
 
-                {/* Table Header */}
+        <div className="loan-table-header">
+          <h3 className="loan-table-title">Recent Loan Transactions</h3>
 
-                <div className="loan-table-header">
+          <button className="loan-filter-btn" title="Filter Loans">
+            <Filter size={16} />
+          </button>
+        </div>
 
-                    <h3 className="loan-table-title">
-                        Recent Loan Transactions
-                    </h3>
+        {/* Table */}
 
-                    <button
-                        className="loan-filter-btn"
-                        title="Filter Loans"
+        <div className="loan-table-wrapper">
+          <table className="loan-table">
+            <thead>
+              <tr>
+                <th>DATE</th>
+                <th>STAFF NAME</th>
+                <th>TYPE</th>
+                <th>AMOUNT (RS.)</th>
+                <th>REMAINING BAL.</th>
+                <th>STATUS</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {currentTransactions.length > 0 ? (
+                currentTransactions.map((item) => (
+                  <tr key={item.id}>
+                    <td className="loan-text-muted">{item.date}</td>
+
+                    <td className="loan-font-bold">{item.staffName}</td>
+
+                    <td className="loan-text-muted">{item.type}</td>
+
+                    <td
+                      className={
+                        item.type === "Recovery"
+                          ? "loan-text-green loan-font-bold"
+                          : "loan-font-bold"
+                      }
                     >
-                        <Filter size={16} />
-                    </button>
+                      Rs. {formatCurrency(item.amount)}
+                    </td>
 
-                </div>
+                    <td className="loan-text-muted">
+                      Rs. {formatCurrency(item.remainingBal)}
+                    </td>
 
+                    <td>
+                      <span
+                        className={`loan-badge ${
+                          item.status === "Paid"
+                            ? "loan-badge-paid"
+                            : "loan-badge-active"
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </td>
 
-                {/* Table */}
+                    <td>
+                      <button className="loan-action-link" type="button">
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="loan-empty-state">
+                    No loan transactions found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-                <div className="loan-table-wrapper">
-
-                    <table className="loan-table">
-
-                        <thead>
-
-                            <tr>
-                                <th>DATE</th>
-                                <th>STAFF NAME</th>
-                                <th>TYPE</th>
-                                <th>AMOUNT (RS.)</th>
-                                <th>REMAINING BAL.</th>
-                                <th>STATUS</th>
-                                <th>ACTION</th>
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            {currentTransactions.length > 0 ? (
-
-                                currentTransactions.map(
-                                    (item) => (
-
-                                        <tr key={item.id}>
-
-                                            <td className="loan-text-muted">
-                                                {item.date}
-                                            </td>
-
-
-                                            <td className="loan-font-bold">
-                                                {item.staffName}
-                                            </td>
-
-
-                                            <td className="loan-text-muted">
-                                                {item.type}
-                                            </td>
-
-
-                                            <td
-                                                className={
-                                                    item.type === 'Recovery'
-                                                        ? 'loan-text-green loan-font-bold'
-                                                        : 'loan-font-bold'
-                                                }
-                                            >
-                                                Rs.{' '}
-                                                {formatCurrency(
-                                                    item.amount
-                                                )}
-                                            </td>
-
-
-                                            <td className="loan-text-muted">
-                                                Rs.{' '}
-                                                {formatCurrency(
-                                                    item.remainingBal
-                                                )}
-                                            </td>
-
-
-                                            <td>
-
-                                                <span
-                                                    className={`loan-badge ${item.status === 'Paid'
-                                                            ? 'loan-badge-paid'
-                                                            : 'loan-badge-active'
-                                                        }`}
-                                                >
-                                                    {item.status}
-                                                </span>
-
-                                            </td>
-
-
-                                            <td>
-
-                                                <button
-                                                    className="loan-action-link"
-                                                    type="button"
-                                                >
-                                                    View
-                                                </button>
-
-                                            </td>
-
-                                        </tr>
-
-                                    )
-                                )
-
-                            ) : (
-
-                                <tr>
-
-                                    <td
-                                        colSpan="7"
-                                        className="loan-empty-state"
-                                    >
-                                        No loan transactions found.
-                                    </td>
-
-                                </tr>
-
-                            )}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-
-                {/* =================================================
+        {/* =================================================
                     Pagination
                 ================================================= */}
 
-                {totalResults > 0 && (
+        {totalResults > 0 && (
+          <div className="loan-table-footer">
+            <span className="loan-pagination-info">
+              Showing <b>{startIndex + 1}</b> to <b>{endIndex}</b> of{" "}
+              <b>{totalResults}</b> entries
+            </span>
 
-                    <div className="loan-table-footer">
+            <div className="loan-pagination-controls">
+              {/* Previous */}
 
-                        <span className="loan-pagination-info">
+              <button
+                className="loan-page-btn loan-page-arrow"
+                disabled={currentPage === 1}
+                onClick={handlePreviousPage}
+                aria-label="Previous page"
+              >
+                <ChevronLeft size={15} />
+              </button>
 
-                            Showing{' '}
+              {/* Page Numbers */}
 
-                            <b>
-                                {startIndex + 1}
-                            </b>
+              {pageNumbers.map((page) => (
+                <button
+                  key={page}
+                  className={`loan-page-btn ${
+                    currentPage === page ? "loan-page-active" : ""
+                  }`}
+                  onClick={() => handlePageChange(page)}
+                >
+                  {page}
+                </button>
+              ))}
 
-                            {' '}to{' '}
+              {/* Next */}
 
-                            <b>
-                                {endIndex}
-                            </b>
-
-                            {' '}of{' '}
-
-                            <b>
-                                {totalResults}
-                            </b>
-
-                            {' '}entries
-
-                        </span>
-
-
-                        <div className="loan-pagination-controls">
-
-                            {/* Previous */}
-
-                            <button
-                                className="loan-page-btn loan-page-arrow"
-                                disabled={
-                                    currentPage === 1
-                                }
-                                onClick={
-                                    handlePreviousPage
-                                }
-                                aria-label="Previous page"
-                            >
-                                <ChevronLeft size={15} />
-                            </button>
-
-
-                            {/* Page Numbers */}
-
-                            {pageNumbers.map(
-                                (page) => (
-
-                                    <button
-                                        key={page}
-                                        className={`loan-page-btn ${currentPage === page
-                                                ? 'loan-page-active'
-                                                : ''
-                                            }`}
-                                        onClick={() =>
-                                            handlePageChange(
-                                                page
-                                            )
-                                        }
-                                    >
-                                        {page}
-                                    </button>
-
-                                )
-                            )}
-
-
-                            {/* Next */}
-
-                            <button
-                                className="loan-page-btn loan-page-arrow"
-                                disabled={
-                                    currentPage === totalPages
-                                }
-                                onClick={
-                                    handleNextPage
-                                }
-                                aria-label="Next page"
-                            >
-                                <ChevronRight size={15} />
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                )}
-
+              <button
+                className="loan-page-btn loan-page-arrow"
+                disabled={currentPage === totalPages}
+                onClick={handleNextPage}
+                aria-label="Next page"
+              >
+                <ChevronRight size={15} />
+              </button>
             </div>
+          </div>
+        )}
+      </div>
 
-            {/* Modal integration */}
-            <RecordLoanModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={handleSaveLoan}
-            />
-
-        </div>
-    );
+      {/* Modal integration */}
+      <RecordLoanModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveLoan}
+      />
+    </div>
+  );
 };
 
 export default Loans;

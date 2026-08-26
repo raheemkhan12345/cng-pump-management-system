@@ -1,0 +1,292 @@
+/* Modal Overlay */
+.erm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+/* Container Box */
+.erm-modal-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 540px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    animation: ermFadeIn 0.2s ease-out;
+}
+
+@keyframes ermFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Header */
+.erm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.erm-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.erm-close-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.erm-close-btn:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+/* Form Styling */
+.erm-form {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.erm-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.erm-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.erm-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* Input Fields */
+.erm-input {
+    width: 100%;
+    height: 44px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0 14px;
+    font-size: 14px;
+    color: #0f172a;
+    background-color: #f8fafc;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.erm-input:focus {
+    border-color: #10b981;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.erm-input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.erm-input-icon {
+    position: absolute;
+    right: 12px;
+    color: #64748b;
+    pointer-events: none;
+}
+
+/* Amount Input Prefix */
+.erm-amount-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.erm-currency-prefix {
+    position: absolute;
+    left: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.erm-amount-input {
+    padding-left: 45px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+/* Textarea */
+.erm-textarea {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #0f172a;
+    background-color: #f8fafc;
+    outline: none;
+    resize: none;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.erm-textarea:focus {
+    border-color: #10b981;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Payment Mode Grid */
+.erm-payment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.erm-payment-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.erm-payment-card:hover {
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+}
+
+.erm-payment-card.active {
+    border-color: #10b981;
+    background-color: #f0fdf4;
+}
+
+.erm-payment-card-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.erm-pm-icon-box {
+    color: #10b981;
+    display: flex;
+    align-items: center;
+}
+
+.erm-pm-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.erm-pm-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.erm-pm-sub {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.erm-check-icon {
+    color: #10b981;
+}
+
+/* Footer Buttons */
+.erm-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.erm-btn-cancel {
+    height: 42px;
+    padding: 0 20px;
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+    color: #334155;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.erm-btn-cancel:hover {
+    background-color: #f8fafc;
+}
+
+.erm-btn-submit {
+    height: 42px;
+    padding: 0 20px;
+    background-color: #0f172a;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.erm-btn-submit:hover {
+    background-color: #1e293b;
+}
+
+/* Responsive */
+@media (max-width: 540px) {
+
+    .erm-grid-2,
+    .erm-payment-grid {
+        grid-template-columns: 1fr;
+    }
+}

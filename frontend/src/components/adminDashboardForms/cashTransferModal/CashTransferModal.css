@@ -1,0 +1,254 @@
+/* Modal Overlay */
+.ct-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+/* Modal Box */
+.ct-modal {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 440px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    animation: ctModalFadeIn 0.2s ease-out;
+}
+
+@keyframes ctModalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Header */
+.ct-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.ct-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ct-header-icon-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background-color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #334155;
+}
+
+.ct-header-icon {
+    font-size: 14px;
+}
+
+.ct-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.ct-close-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.ct-close-btn:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+/* Form Body */
+.ct-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.ct-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ct-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.ct-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #0f172a;
+    background-color: #f8fafc;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.ct-input:focus {
+    border-color: #94a3b8;
+    background-color: #ffffff;
+}
+
+/* Transfer Type Selector */
+.ct-type-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.ct-type-btn {
+    height: 44px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ct-type-btn.active {
+    background-color: #dcfce7;
+    border-color: #86efac;
+    color: #14532d;
+}
+
+/* Amount Field Prefix */
+.ct-amount-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ct-currency-prefix {
+    position: absolute;
+    left: 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    pointer-events: none;
+}
+
+.ct-amount-input {
+    padding-left: 42px;
+}
+
+/* Info Box */
+.ct-info-box {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.ct-info-icon {
+    color: #64748b;
+    font-size: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.ct-info-text {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #64748b;
+}
+
+/* Footer */
+.ct-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.ct-btn-cancel {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.ct-btn-cancel:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+.ct-btn-submit {
+    height: 40px;
+    padding: 0 18px;
+    background-color: #1e293b;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.ct-btn-submit:hover {
+    background-color: #0f172a;
+}
+
+.ct-submit-icon {
+    font-size: 12px;
+}

@@ -34,24 +34,6 @@
     gap: 10px;
 }
 
-.loan-btn-history {
-    background-color: #ffffff;
-    border: 1px solid #cbd5e1;
-    color: #1e293b;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.loan-btn-history:hover {
-    background-color: #f1f5f9;
-}
 
 .loan-btn-primary {
     background-color: #055a36;

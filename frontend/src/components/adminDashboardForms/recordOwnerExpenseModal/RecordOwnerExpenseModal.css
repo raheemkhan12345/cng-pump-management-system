@@ -1,0 +1,309 @@
+/* Overlay Background */
+.roem-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+/* Modal Container Box */
+.roem-modal-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 520px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: roemFadeIn 0.2s ease-out;
+}
+
+@keyframes roemFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Header */
+.roem-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.roem-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.roem-header-icon-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background-color: #fef2f2;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.roem-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.roem-close-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.roem-close-btn:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+/* Form Layout */
+.roem-form {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.roem-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.roem-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.roem-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* Base Input & Select */
+.roem-input,
+.roem-select {
+    width: 100%;
+    height: 44px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0 14px;
+    font-size: 14px;
+    color: #0f172a;
+    background-color: #ffffff;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.roem-input:focus,
+.roem-select:focus {
+    border-color: #0f172a;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+.roem-input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.roem-input-icon {
+    position: absolute;
+    right: 12px;
+    color: #64748b;
+    pointer-events: none;
+}
+
+/* Amount Field Wrapper */
+.roem-amount-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.roem-prefix {
+    position: absolute;
+    left: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.roem-amount-input {
+    padding-left: 45px;
+    font-weight: 600;
+}
+
+/* Payment Mode Grid */
+.roem-payment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.roem-payment-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.roem-payment-card:hover {
+    border-color: #cbd5e1;
+}
+
+.roem-payment-card.active {
+    border-color: #10b981;
+    background-color: #f0fdf4;
+}
+
+.roem-payment-card-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.roem-pm-icon {
+    color: #10b981;
+    display: flex;
+    align-items: center;
+}
+
+.roem-pm-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.roem-pm-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.roem-pm-sub {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.roem-check-icon {
+    color: #10b981;
+}
+
+/* Textarea */
+.roem-textarea {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #0f172a;
+    background-color: #ffffff;
+    outline: none;
+    resize: none;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.roem-textarea:focus {
+    border-color: #0f172a;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+/* Footer Action Buttons */
+.roem-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.roem-btn-cancel {
+    height: 42px;
+    padding: 0 20px;
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+    color: #334155;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.roem-btn-cancel:hover {
+    background-color: #f8fafc;
+}
+
+.roem-btn-submit {
+    height: 42px;
+    padding: 0 20px;
+    background-color: #0f172a;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.roem-btn-submit:hover {
+    background-color: #1e293b;
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+
+    .roem-grid-2,
+    .roem-payment-grid {
+        grid-template-columns: 1fr;
+    }
+}

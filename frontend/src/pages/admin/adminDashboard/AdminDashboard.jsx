@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar, Plus } from 'lucide-react';
 import DashboardStats from './DashboardStats';
-import DashboardActionsOverview from './DashboardActionsOverview';
+
 import RecentTransactions from './RecentTransactions';
 import './AdminDashboard.css';
 
@@ -15,20 +15,17 @@ const AdminDashboard = () => {
           <span>Viewing reports for August 2026</span>
           <span className="dropdown-arrow">▾</span>
         </div>
-        <button className="btn-add-expense">
-          <Plus size={16} />
-          <span>Add new Expenses</span>
+        <button className="btn-add-superAdmin">
+          
+          <span>Back Super Admin Dashboard</span>
         </button>
       </div>
 
-      {/* 1. Stats Grid */}
+    
       <DashboardStats />
 
-      {/* 2. Quick Actions & Overview Cards */}
-      <DashboardActionsOverview />
-
       {/* 3. Transactions Table */}
-      <RecentTransactions />
+      <RecentTransactions /> 
     </div>
   );
 };
