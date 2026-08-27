@@ -63,7 +63,7 @@ const RecentTransactions = () => {
                             <th>AMOUNT</th>
                             <th>POOL</th>
                             <th>STATUS</th>
-                            <th>ACTIONS</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -83,11 +83,7 @@ const RecentTransactions = () => {
                                         <CheckCircle2 size={13} /> {tx.status}
                                     </span>
                                 </td>
-                                <td className="actions-cell">
-                                    <button className="action-btn">
-                                        <MoreVertical size={15} />
-                                    </button>
-                                </td>
+                                
                             </tr>
                         ))}
                     </tbody>

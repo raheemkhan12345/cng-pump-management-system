@@ -8,8 +8,11 @@ import {
   Filter,
   ChevronLeft,
   ChevronRight,
+  Pencil,
+  Trash2,
 } from "lucide-react";
-import RecordLoanModal from "../../../components/adminDashboardForms/addNewLoanModel/RecordLoanModel"; // Modal Component
+
+import RecordLoanModal from "../../../components/adminDashboardForms/addNewLoanModel/RecordLoanModel";
 import "./Loans.css";
 
 const Loans = () => {
@@ -155,6 +158,25 @@ const Loans = () => {
     };
 
     setLoanTransactions((prev) => [newEntry, ...prev]);
+
+    // New transaction added, so show first page
+    setCurrentPage(1);
+  };
+
+  // =========================================================
+  // Edit Loan Handler
+  // =========================================================
+
+  const handleEdit = (loan) => {
+    console.log("Edit Loan:", loan);
+  };
+
+  // =========================================================
+  // Delete Loan Handler
+  // =========================================================
+
+  const handleDelete = (loan) => {
+    console.log("Delete Loan:", loan);
   };
 
   // =========================================================
@@ -305,8 +327,8 @@ const Loans = () => {
   return (
     <div className="loan-page-container">
       {/* =====================================================
-                Header
-            ===================================================== */}
+          Header
+      ===================================================== */}
 
       <div className="loan-header-section">
         <div>
@@ -318,20 +340,21 @@ const Loans = () => {
         </div>
 
         <div className="loan-header-actions">
-
           <button
+            type="button"
             className="loan-btn-primary"
             onClick={() => setIsModalOpen(true)}
           >
             <Plus size={18} />
+
             <span>New Loan Application</span>
           </button>
         </div>
       </div>
 
       {/* =====================================================
-                Statistics
-            ===================================================== */}
+          Statistics
+      ===================================================== */}
 
       <div className="loan-stats-grid">
         {/* This Month Loan */}
@@ -395,8 +418,8 @@ const Loans = () => {
       </div>
 
       {/* =====================================================
-                Transactions
-            ===================================================== */}
+          Transactions
+      ===================================================== */}
 
       <div className="loan-table-card">
         {/* Table Header */}
@@ -404,7 +427,11 @@ const Loans = () => {
         <div className="loan-table-header">
           <h3 className="loan-table-title">Recent Loan Transactions</h3>
 
-          <button className="loan-filter-btn" title="Filter Loans">
+          <button
+            type="button"
+            className="loan-filter-btn"
+            title="Filter Loans"
+          >
             <Filter size={16} />
           </button>
         </div>
@@ -421,7 +448,7 @@ const Loans = () => {
                 <th>AMOUNT (RS.)</th>
                 <th>REMAINING BAL.</th>
                 <th>STATUS</th>
-                <th>ACTION</th>
+                <th>ACTIONS</th>
               </tr>
             </thead>
 
@@ -429,11 +456,19 @@ const Loans = () => {
               {currentTransactions.length > 0 ? (
                 currentTransactions.map((item) => (
                   <tr key={item.id}>
+                    {/* Date */}
+
                     <td className="loan-text-muted">{item.date}</td>
+
+                    {/* Staff Name */}
 
                     <td className="loan-font-bold">{item.staffName}</td>
 
+                    {/* Type */}
+
                     <td className="loan-text-muted">{item.type}</td>
+
+                    {/* Amount */}
 
                     <td
                       className={
@@ -445,9 +480,13 @@ const Loans = () => {
                       Rs. {formatCurrency(item.amount)}
                     </td>
 
+                    {/* Remaining Balance */}
+
                     <td className="loan-text-muted">
                       Rs. {formatCurrency(item.remainingBal)}
                     </td>
+
+                    {/* Status */}
 
                     <td>
                       <span
@@ -461,9 +500,33 @@ const Loans = () => {
                       </span>
                     </td>
 
-                    <td>
-                      <button className="loan-action-link" type="button">
-                        View
+                    {/* =================================================
+                          Actions
+                      ================================================= */}
+
+                    <td className="loan-actions-cell">
+                      {/* Edit */}
+
+                      <button
+                        type="button"
+                        className="loan-action-btn loan-edit-btn"
+                        title="Edit"
+                        aria-label={`Edit loan for ${item.staffName}`}
+                        onClick={() => handleEdit(item)}
+                      >
+                        <Pencil size={11} />
+                      </button>
+
+                      {/* Delete */}
+
+                      <button
+                        type="button"
+                        className="loan-action-btn loan-delete-btn"
+                        title="Delete"
+                        aria-label={`Delete loan for ${item.staffName}`}
+                        onClick={() => handleDelete(item)}
+                      >
+                        <Trash2 size={11} />
                       </button>
                     </td>
                   </tr>
@@ -480,8 +543,8 @@ const Loans = () => {
         </div>
 
         {/* =================================================
-                    Pagination
-                ================================================= */}
+            Pagination
+        ================================================= */}
 
         {totalResults > 0 && (
           <div className="loan-table-footer">
@@ -494,6 +557,7 @@ const Loans = () => {
               {/* Previous */}
 
               <button
+                type="button"
                 className="loan-page-btn loan-page-arrow"
                 disabled={currentPage === 1}
                 onClick={handlePreviousPage}
@@ -506,6 +570,7 @@ const Loans = () => {
 
               {pageNumbers.map((page) => (
                 <button
+                  type="button"
                   key={page}
                   className={`loan-page-btn ${
                     currentPage === page ? "loan-page-active" : ""
@@ -519,6 +584,7 @@ const Loans = () => {
               {/* Next */}
 
               <button
+                type="button"
                 className="loan-page-btn loan-page-arrow"
                 disabled={currentPage === totalPages}
                 onClick={handleNextPage}
@@ -531,7 +597,10 @@ const Loans = () => {
         )}
       </div>
 
-      {/* Modal integration */}
+      {/* =====================================================
+          Record Loan Modal
+      ===================================================== */}
+
       <RecordLoanModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

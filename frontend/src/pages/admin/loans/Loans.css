@@ -265,3 +265,71 @@
     color: #ffffff;
     border-color: #055a36;
 }
+
+/* =========================================================
+   LOAN TABLE ACTIONS
+========================================================= */
+
+.loan-actions-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    white-space: nowrap;
+}
+
+.loan-action-btn {
+    width: 18px;
+    height: 18px;
+
+    padding: 0;
+    margin: 0;
+
+    border: none;
+    outline: none;
+    background: transparent;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.loan-action-btn svg {
+    width: 11px;
+    height: 11px;
+}
+
+/* Edit */
+
+.loan-edit-btn {
+    color: #374151;
+}
+
+.loan-edit-btn:hover {
+    color: #2563eb;
+    transform: scale(1.15);
+}
+
+/* Delete */
+
+.loan-delete-btn {
+    color: #374151;
+}
+
+.loan-delete-btn:hover {
+    color: #dc2626;
+    transform: scale(1.15);
+}
+
+/* Keyboard Focus */
+
+.loan-action-btn:focus-visible {
+    outline: 2px solid #94a3b8;
+    outline-offset: 3px;
+}

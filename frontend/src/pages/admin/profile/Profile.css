@@ -1,0 +1,192 @@
+/* Component Outer Container */
+.profile-container {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Profile Hero Card */
+.profile-hero-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.avatar-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+}
+
+.profile-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    object-fit: cover;
+}
+
+.avatar-edit-btn {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    width: 26px;
+    height: 26px;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #374151;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s;
+}
+
+.avatar-edit-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.hero-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hero-name {
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.hero-role {
+    font-size: 15px;
+    color: #6b7280;
+    margin: 0 0 10px 0;
+}
+
+.hero-badges {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.badge-gray {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+.badge-green {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+/* Details Cards Grid */
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.details-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 20px;
+}
+
+.card-icon-box {
+    width: 38px;
+    height: 38px;
+    background-color: #dbeafe;
+    color: #2563eb;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.info-group label {
+    display: block;
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.info-group p {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.role-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #f3f4f6;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Responsive Grid Adjustments */
+@media (max-width: 900px) {
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .profile-hero-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

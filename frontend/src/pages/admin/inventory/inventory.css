@@ -1,0 +1,253 @@
+/* Container Layout */
+.inv-container {
+    padding: 24px 32px;
+    background-color: #f8fafc;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* Page Sub Header */
+.inv-top-bar {
+    margin-bottom: 24px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 16px;
+}
+
+.inv-page-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+}
+
+.inv-page-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0;
+}
+
+/* Inventory Section Header */
+.inv-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.inv-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+}
+
+.inv-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+
+.inv-add-btn {
+    background-color: #0f172a;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.inv-add-btn:hover {
+    background-color: #1e293b;
+}
+
+/* Card Container */
+.inv-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+/* Table Design */
+.inv-table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.inv-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
+
+.inv-table thead tr {
+    background-color: #1e293b;
+    color: #ffffff;
+}
+
+.inv-table th {
+    padding: 16px 20px;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+}
+
+.inv-table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.15s ease;
+}
+
+.inv-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.inv-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.inv-table td {
+    padding: 16px 20px;
+    color: #334155;
+    vertical-align: middle;
+}
+
+.inv-font-medium {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.inv-text-muted {
+    color: #64748b;
+}
+
+.inv-text-right {
+    text-align: right;
+}
+
+/* Quantity Badge */
+.inv-qty-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #f1f5f9;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.inv-qty-badge.low-stock {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+/* Actions */
+.inv-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.inv-action-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.inv-action-btn.edit:hover {
+    color: #0f172a;
+    background-color: #f1f5f9;
+}
+
+.inv-action-btn.delete:hover {
+    color: #ef4444;
+    background-color: #fef2f2;
+}
+
+/* Pagination Footer */
+.inv-pagination-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-top: 1px solid #f1f5f9;
+    background-color: #ffffff;
+}
+
+.inv-entries-info {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.inv-pagination {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.inv-page-btn {
+    height: 34px;
+    min-width: 34px;
+    padding: 0 10px;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    color: #334155;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.inv-page-btn:hover:not(:disabled):not(.active) {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.inv-page-btn.active {
+    background-color: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+}
+
+.inv-page-btn:disabled {
+    color: #cbd5e1;
+    cursor: not-allowed;
+    background-color: #ffffff;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .inv-header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .inv-pagination-wrapper {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+}

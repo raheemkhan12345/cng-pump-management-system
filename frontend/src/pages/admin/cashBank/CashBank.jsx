@@ -5,13 +5,9 @@ import {
   FaArrowUp,
   FaArrowDown,
   FaFilter,
-  FaEllipsisVertical,
-  FaGear,
-  FaArrowRightArrowLeft,
+  FaPen,
+  FaTrashCan,
 } from "react-icons/fa6";
-
-// import RecordNewSaleModal from "../../../components/adminDashboardForms/recordNewSaleForm/RecordNewSaleModel";
-// import AddNewExpenses from "../../../components/adminDashboardForms/addNewExpenseForm/AddNewExpenses";
 
 import "./CashBank.css";
 import CashTransferModal from "../../../components/adminDashboardForms/cashTransferModal/CashTransferModal";
@@ -21,10 +17,9 @@ const CashBank = () => {
   // Modal State
   // ==========================================
   const [showTransferModal, setShowTransferModal] = useState(false);
-  const [showAddExpense, setShowAddExpense] = useState(false);
 
   // ==========================================
-  // Transactions Data (Aligned with UI Image)
+  // Transactions Data
   // ==========================================
   const transactions = [
     {
@@ -81,66 +76,104 @@ const CashBank = () => {
     };
   }, []);
 
+  // ==========================================
   // Format Currency
+  // ==========================================
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-PK").format(amount);
   };
 
+  // ==========================================
   // Transaction Type Icon Renderer
+  // ==========================================
   const getTransactionIcon = (type) => {
     switch (type) {
       case "cash-to-bank":
         return <FaArrowUp className="cb-icon-up" />;
+
       case "bank-to-cash":
         return <FaArrowDown className="cb-icon-down" />;
+
       default:
         return null;
     }
   };
 
+  // ==========================================
+  // Edit Transaction
+  // ==========================================
+  const handleEdit = (transaction) => {
+    console.log("Edit transaction:", transaction);
+  };
+
+  // ==========================================
+  // Delete Transaction
+  // ==========================================
+  const handleDelete = (transaction) => {
+    console.log("Delete transaction:", transaction);
+  };
+
   return (
     <div className="cb-container">
+      {/* ==========================================
+          Main Content Area
+      ========================================== */}
 
-      {/* Main Content Area */}
       <div className="cb-content-wrapper">
-        {/* Page Title */}
+        {/* ==========================================
+            Page Title
+        ========================================== */}
+
         <div className="cb-title-section">
           <h1 className="cb-page-title">Cash & Bank Operations</h1>
+
           <p className="cb-page-subtitle">
             Manage station liquidity and bank transfers securely.
           </p>
         </div>
 
-        {/* Stat Cards */}
+        {/* ==========================================
+            Stat Cards
+        ========================================== */}
+
         <div className="cb-stats-grid">
           {/* Total Cash Card */}
+
           <div className="cb-stat-card">
             <div className="cb-stat-info">
               <span className="cb-stat-label">TOTAL CASH IN HAND</span>
+
               <h2 className="cb-stat-value">
                 Rs. {formatCurrency(balances.totalCash)}
               </h2>
             </div>
+
             <div className="cb-stat-icon-wrapper cb-bg-light-green">
               <FaMoneyBillWave className="cb-stat-icon-green" />
             </div>
           </div>
 
           {/* Total Bank Card */}
+
           <div className="cb-stat-card">
             <div className="cb-stat-info">
               <span className="cb-stat-label">TOTAL BANK BALANCE</span>
+
               <h2 className="cb-stat-value">
                 Rs. {formatCurrency(balances.totalBank)}
               </h2>
             </div>
+
             <div className="cb-stat-icon-wrapper cb-bg-light-gray">
               <FaBuildingColumns className="cb-stat-icon-gray" />
             </div>
           </div>
         </div>
 
-        {/* Transfer Cash Button */}
+        {/* ==========================================
+            Transfer Cash Button
+        ========================================== */}
+
         <div className="cb-transfer-action-wrap">
           <button
             type="button"
@@ -151,14 +184,24 @@ const CashBank = () => {
           </button>
         </div>
 
-        {/* Transactions Table Card */}
+        {/* ==========================================
+            Transactions Table Card
+        ========================================== */}
+
         <div className="cb-table-card">
+          {/* Table Header */}
+
           <div className="cb-table-header">
             <h3 className="cb-table-title">Cash & Bank Transactions</h3>
+
             <button type="button" className="cb-table-btn-icon" title="Filter">
               <FaFilter />
             </button>
           </div>
+
+          {/* ==========================================
+              Table
+          ========================================== */}
 
           <div className="cb-table-responsive">
             <table className="cb-table">
@@ -167,29 +210,58 @@ const CashBank = () => {
                   <th>Date</th>
                   <th>Type</th>
                   <th className="cb-text-right">Amount (Rs.)</th>
-                  <th className="cb-text-center">Action</th>
+                  <th className="cb-text-center">Actions</th>
                 </tr>
               </thead>
+
               <tbody>
                 {transactions.map((tx) => (
                   <tr key={tx.id}>
+                    {/* Date */}
+
                     <td className="cb-date-cell">{tx.date}</td>
+
+                    {/* Type */}
+
                     <td>
                       <div className="cb-type-cell">
                         {getTransactionIcon(tx.typeIcon)}
+
                         <span>{tx.type}</span>
                       </div>
                     </td>
+
+                    {/* Amount */}
+
                     <td className="cb-amount-cell cb-text-right">
                       {formatCurrency(tx.amount)}
                     </td>
-                    <td className="cb-text-center">
+
+                    {/* Actions */}
+
+                    <td className="cb-actions-cell">
+                      {/* Edit */}
+
                       <button
                         type="button"
-                        className="cb-btn-action-more"
-                        title="More actions"
+                        className="cb-action-btn cb-edit-btn"
+                        title="Edit"
+                        aria-label={`Edit ${tx.type} transaction`}
+                        onClick={() => handleEdit(tx)}
                       >
-                        <FaEllipsisVertical />
+                        <FaPen />
+                      </button>
+
+                      {/* Delete */}
+
+                      <button
+                        type="button"
+                        className="cb-action-btn cb-delete-btn"
+                        title="Delete"
+                        aria-label={`Delete ${tx.type} transaction`}
+                        onClick={() => handleDelete(tx)}
+                      >
+                        <FaTrashCan />
                       </button>
                     </td>
                   </tr>
@@ -197,6 +269,10 @@ const CashBank = () => {
               </tbody>
             </table>
           </div>
+
+          {/* ==========================================
+              Table Footer
+          ========================================== */}
 
           <div className="cb-table-footer">
             <button type="button" className="cb-btn-view-all">
@@ -206,12 +282,14 @@ const CashBank = () => {
         </div>
       </div>
 
-      {/* Modals */}
+      {/* ==========================================
+          Cash Transfer Modal
+      ========================================== */}
+
       <CashTransferModal
         isOpen={showTransferModal}
         onClose={() => setShowTransferModal(false)}
       />
-    
     </div>
   );
 };

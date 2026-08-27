@@ -244,6 +244,63 @@
     cursor: pointer;
 }
 
+/* ==========================================
+   ACTIONS
+========================================== */
+
+.cb-actions-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    white-space: nowrap;
+}
+
+.cb-action-btn {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cb-action-btn svg {
+    width: 11px;
+    height: 11px;
+}
+
+.cb-edit-btn {
+    color: #374151;
+}
+
+.cb-delete-btn {
+    color: #374151;
+}
+
+.cb-edit-btn:hover {
+    color: #2563eb;
+    transform: scale(1.15);
+}
+
+.cb-delete-btn:hover {
+    color: #dc2626;
+    transform: scale(1.15);
+}
+
+.cb-action-btn:focus-visible {
+    outline: 2px solid #94a3b8;
+    outline-offset: 3px;
+}
+
 /* Responsive Alignment */
 @media (max-width: 768px) {
     .cb-stats-grid {
