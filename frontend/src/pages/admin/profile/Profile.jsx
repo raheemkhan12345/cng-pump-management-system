@@ -14,16 +14,6 @@ const Profile = () => {
     <div className="profile-container">
       {/* Top Hero Banner Card */}
       <div className="profile-hero-card">
-        <div className="avatar-wrapper">
-          <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256"
-            alt="Muhammad Bilal"
-            className="profile-avatar"
-          />
-          <button className="avatar-edit-btn" title="Edit Avatar" type="button">
-            <Pencil size={13} />
-          </button>
-        </div>
 
         <div className="hero-details">
           <h2 className="hero-name">Muhammad Bilal</h2>

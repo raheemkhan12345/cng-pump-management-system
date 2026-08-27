@@ -1,220 +1,265 @@
-import { createContext, useContext, useState } from 'react';
-import { superAdminLogin } from '../services/authApi';
+import { createContext, useContext, useState } from "react";
 
-// Export AuthContext for direct useContext(AuthContext) usage
+import { superAdminLogin, adminLogin } from "../services/authApi";
+
+// Export AuthContext
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-
-  // ==========================================
-  // LocalStorage User
-  // ==========================================
+  // =========================================================
+  // LOCAL STORAGE USER
+  // =========================================================
 
   const [user, setUser] = useState(() => {
     try {
-      const savedUser = localStorage.getItem('cng_user');
+      const savedUser = localStorage.getItem("cng_user");
 
-      return savedUser
-        ? JSON.parse(savedUser)
-        : null;
-
-    } catch {
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (error) {
+      console.error("Failed to load saved user:", error);
       return null;
     }
   });
 
-  // ==========================================
-  // Login
-  // ==========================================
+  // =========================================================
+  // LOGIN
+  // =========================================================
 
   const login = async (email, password) => {
+    const normalizedEmail = email.trim().toLowerCase();
 
-    // ==========================================
+    // =======================================================
     // SUPER ADMIN LOGIN
-    // ==========================================
+    // =======================================================
 
-    const isSuperAdmin =
-      email.trim().toLowerCase() === 'superadmin@gmail.com';
+    const isSuperAdmin = normalizedEmail === "superadmin@gmail.com";
 
-    if (isSuperAdmin) {
+    try {
+      let response;
 
-      try {
+      // =====================================================
+      // CALL CORRESPONDING API
+      // =====================================================
 
-        console.log('Calling Super Admin API...');
+      if (isSuperAdmin) {
+        console.log("Calling Super Admin Login API...");
 
-        const response = await superAdminLogin(
-          email,
-          password
+        response = await superAdminLogin(email.trim(), password);
+      } else {
+        console.log("Calling Admin Login API...");
+
+        response = await adminLogin(email.trim(), password);
+      }
+
+      console.log("Login API Response:", response);
+
+      // =====================================================
+      // CHECK API SUCCESS
+      // =====================================================
+
+      if (!response?.success) {
+        throw new Error(
+          response?.message || response?.error || "Login failed.",
         );
+      }
 
-        console.log(
-          'Super Admin Login Response:',
-          response
+      // =====================================================
+      // GET TOKEN
+      // =====================================================
+
+      const token =
+        response?.token ||
+        response?.accessToken ||
+        response?.data?.token ||
+        response?.data?.accessToken ||
+        response?.data?.data?.token ||
+        null;
+
+      if (!token) {
+        throw new Error(
+          "Login successful but authentication token was not received.",
         );
+      }
 
-        // ==========================================
-        // Check API Success
-        // ==========================================
+      // =====================================================
+      // GET USER DATA
+      // =====================================================
 
-        if (!response?.success) {
-          throw new Error(
-            response?.message ||
-            'Super Admin login failed.'
-          );
-        }
+      /*
+        Backend response different structures ko handle
+        karne ke liye multiple possibilities check kar rahe hain.
+      */
 
-        // ==========================================
-        // Get Token
-        // ==========================================
+      const apiUser =
+        response?.user ||
+        response?.admin ||
+        response?.data?.user ||
+        response?.data?.admin ||
+        response?.data?.data ||
+        null;
 
-        const token =
-          response.token ||
-          response.accessToken ||
-          response.data?.token ||
-          response.data?.accessToken ||
-          null;
+      // =====================================================
+      // SUPER ADMIN USER
+      // =====================================================
 
-        if (!token) {
-          throw new Error(
-            'Login successful but token was not received.'
-          );
-        }
-
-        // ==========================================
-        // Backend Currently Doesn't Return User
-        // ==========================================
-        // So we create the frontend user object.
-
+      if (isSuperAdmin) {
         const userData = {
-          id: 'super_1',
-          email: email,
-          name: 'Super Admin',
-          role: 'SUPER_ADMIN',
-          pumpName: '',
-          pumpAddress: '',
-          avatar:
-            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150'
+          id: apiUser?._id || apiUser?.id || "super_1",
+
+          email: apiUser?.email || email.trim(),
+
+          name: apiUser?.name || apiUser?.fullName || "Super Admin",
+
+          role: apiUser?.role || "SUPER_ADMIN",
+
+          pumpName: apiUser?.pumpName || "",
+
+          pumpAddress: apiUser?.pumpAddress || "",
+
+          
         };
 
-        // ==========================================
-        // Save Token
-        // ==========================================
+        // ===================================================
+        // VALIDATE ROLE
+        // ===================================================
 
-        localStorage.setItem(
-          'cng_token',
-          token
-        );
+        if (userData.role !== "SUPER_ADMIN") {
+          throw new Error("This account is not authorized as Super Admin.");
+        }
 
-        // ==========================================
-        // Save User
-        // ==========================================
+        // ===================================================
+        // SAVE TOKEN
+        // ===================================================
 
-        localStorage.setItem(
-          'cng_user',
-          JSON.stringify(userData)
-        );
+        localStorage.setItem("cng_token", token);
 
-        // ==========================================
-        // Update State
-        // ==========================================
+        // ===================================================
+        // SAVE USER
+        // ===================================================
+
+        localStorage.setItem("cng_user", JSON.stringify(userData));
+
+        // ===================================================
+        // UPDATE STATE
+        // ===================================================
 
         setUser(userData);
 
-        console.log(
-          'Super Admin Logged In:',
-          userData
-        );
+        console.log("Super Admin Logged In:", userData);
 
         return userData;
-
-      } catch (error) {
-
-        console.error(
-          'Super Admin Login Error:',
-          error
-        );
-
-        const message =
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          error.message ||
-          'Super Admin login failed.';
-
-        throw new Error(message);
       }
+
+      // =====================================================
+      // ADMIN USER
+      // =====================================================
+
+      const userData = {
+        id: apiUser?._id || apiUser?.id || "admin_1",
+
+        email: apiUser?.email || email.trim(),
+
+        name: apiUser?.name || apiUser?.fullName || "Admin",
+
+        role: apiUser?.role || "ADMIN",
+
+        pumpName:
+          apiUser?.pumpName ||
+          apiUser?.stationName ||
+          apiUser?.pump?.name ||
+          "",
+
+        pumpAddress:
+          apiUser?.pumpAddress ||
+          apiUser?.stationAddress ||
+          apiUser?.pump?.address ||
+          "",
+
+
+      };
+
+      // =====================================================
+      // VALIDATE ADMIN ROLE
+      // =====================================================
+
+      if (userData.role !== "ADMIN") {
+        throw new Error("This account is not authorized as Admin.");
+      }
+
+      // =====================================================
+      // SAVE TOKEN
+      // =====================================================
+
+      localStorage.setItem("cng_token", token);
+
+      // =====================================================
+      // SAVE USER
+      // =====================================================
+
+      localStorage.setItem("cng_user", JSON.stringify(userData));
+
+      // =====================================================
+      // UPDATE STATE
+      // =====================================================
+
+      setUser(userData);
+
+      console.log("Admin Logged In:", userData);
+
+      return userData;
+    } catch (error) {
+      // =====================================================
+      // API ERROR HANDLING
+      // =====================================================
+
+      console.error("Login Error:", error);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.response?.data?.errors?.[0]?.message ||
+        error?.message ||
+        "Invalid email or password.";
+
+      throw new Error(message);
     }
-
-    // ==========================================
-    // ADMIN DUMMY LOGIN
-    // ==========================================
-
-    const adminUser = {
-      id: 'admin_1',
-      email,
-      name: 'Muhammad Bilal',
-      role: 'ADMIN',
-      pumpName: 'CNG Pump 01',
-      pumpAddress: 'Mingora, Swat',
-      avatar:
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150'
-    };
-
-    setUser(adminUser);
-
-    localStorage.setItem(
-      'cng_user',
-      JSON.stringify(adminUser)
-    );
-
-    return adminUser;
   };
 
-  // ==========================================
-  // Logout
-  // ==========================================
+  // =========================================================
+  // LOGOUT
+  // =========================================================
 
   const logout = () => {
-
     setUser(null);
 
-    localStorage.removeItem(
-      'cng_user'
-    );
-
-    localStorage.removeItem(
-      'cng_token'
-    );
+    localStorage.removeItem("cng_user");
+    localStorage.removeItem("cng_token");
   };
 
-  // ==========================================
-  // Update User
-  // ==========================================
+  // =========================================================
+  // UPDATE USER
+  // =========================================================
 
   const updateUser = (updatedFields) => {
-
     setUser((prevUser) => {
-
       if (!prevUser) {
         return null;
       }
 
       const newUser = {
         ...prevUser,
-        ...updatedFields
+        ...updatedFields,
       };
 
-      localStorage.setItem(
-        'cng_user',
-        JSON.stringify(newUser)
-      );
+      localStorage.setItem("cng_user", JSON.stringify(newUser));
 
       return newUser;
     });
   };
 
-  // ==========================================
-  // Context
-  // ==========================================
+  // =========================================================
+  // CONTEXT
+  // =========================================================
 
   return (
     <AuthContext.Provider
@@ -222,7 +267,7 @@ export const AuthProvider = ({ children }) => {
         user,
         login,
         logout,
-        updateUser
+        updateUser,
       }}
     >
       {children}
@@ -230,19 +275,16 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// ==========================================
-// Custom Hook
-// ==========================================
+// =========================================================
+// CUSTOM HOOK
+// =========================================================
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
-
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error(
-      'useAuth must be used within an AuthProvider'
-    );
+    throw new Error("useAuth must be used within an AuthProvider");
   }
 
   return context;

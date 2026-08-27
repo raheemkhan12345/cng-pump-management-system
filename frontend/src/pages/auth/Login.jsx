@@ -6,39 +6,37 @@ import { Eye, EyeOff, User, Lock } from "lucide-react";
 import "./Login.css";
 
 const Login = () => {
-  // ==========================================
-  // Form States
-  // ==========================================
+  // =========================================================
+  // FORM STATES
+  // =========================================================
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const [rememberMe, setRememberMe] = useState(false);
-
   const [error, setError] = useState("");
 
-  // ==========================================
-  // Auth Context
-  // ==========================================
+  // =========================================================
+  // AUTH CONTEXT
+  // =========================================================
 
   const { login, isLoading } = useAuth();
 
   const navigate = useNavigate();
 
-  // ==========================================
-  // Handle Login
-  // ==========================================
+  // =========================================================
+  // HANDLE LOGIN
+  // =========================================================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setError("");
 
-    // ==========================================
-    // Basic Validation
-    // ==========================================
+    // =======================================================
+    // VALIDATION
+    // =======================================================
 
     if (!email.trim()) {
       setError("Please enter your email.");
@@ -51,52 +49,27 @@ const Login = () => {
     }
 
     try {
-      // ==========================================
-      // Login
-      // ==========================================
+      // =====================================================
+      // LOGIN API
+      // =====================================================
 
-      /*
-       * IMPORTANT:
-       *
-       * AuthContext ka login() direct userData
-       * return karta hai.
-       *
-       * Isliye:
-       *
-       * const user = await login(...)
-       *
-       * use karna hai.
-       *
-       * result?.user nahi.
-       */
+      const loggedInUser = await login(email.trim(), password);
 
-      const user = await login(email.trim(), password);
+      console.log("Login Result:", loggedInUser);
 
-      console.log("Login Result:", user);
+      // =====================================================
+      // VALIDATE LOGIN USER
+      // =====================================================
 
-      // ==========================================
-      // Validate User
-      // ==========================================
-
-      if (!user) {
+      if (!loggedInUser) {
         throw new Error("User information was not returned by the server.");
       }
 
-      // ==========================================
-      // Remember Me
-      // ==========================================
+      // =====================================================
+      // ROLE BASED NAVIGATION
+      // =====================================================
 
-      if (rememberMe) {
-        localStorage.setItem("cng_remember_me", "true");
-      } else {
-        localStorage.removeItem("cng_remember_me");
-      }
-
-      // ==========================================
-      // Role Based Navigation
-      // ==========================================
-
-      if (user.role === "SUPER_ADMIN") {
+      if (loggedInUser.role === "SUPER_ADMIN") {
         console.log("Redirecting to Super Admin Dashboard");
 
         navigate("/super-admin/dashboard", {
@@ -106,11 +79,11 @@ const Login = () => {
         return;
       }
 
-      // ==========================================
-      // Admin
-      // ==========================================
+      // =====================================================
+      // ADMIN
+      // =====================================================
 
-      if (user.role === "ADMIN") {
+      if (loggedInUser.role === "ADMIN") {
         console.log("Redirecting to Admin Dashboard");
 
         navigate("/admin/dashboard", {
@@ -120,24 +93,28 @@ const Login = () => {
         return;
       }
 
-      // ==========================================
-      // Invalid Role
-      // ==========================================
+      // =====================================================
+      // INVALID ROLE
+      // =====================================================
 
       setError("Your account does not have a valid dashboard role.");
     } catch (error) {
       console.error("Login failed:", error);
 
-      setError(error.message || "Invalid email or password.");
+      setError(error?.message || "Invalid email or password.");
     }
   };
+
+  // =========================================================
+  // UI
+  // =========================================================
 
   return (
     <div className="login-wrapper">
       <div className="login-card">
-        {/* ==========================================
-                    Brand Logo
-                ========================================== */}
+        {/* ===================================================
+            BRAND LOGO
+        =================================================== */}
 
         <div className="login-logo">
           <div className="logo-icon-wrap">
@@ -147,13 +124,24 @@ const Login = () => {
           </div>
         </div>
 
+        {/* ===================================================
+            TITLE
+        =================================================== */}
+
         <h2 className="login-title">Station Admin Login</h2>
 
         <p className="login-subtitle">
           Enter your credentials to access your dashboard
         </p>
 
+        {/* ===================================================
+            FORM
+        =================================================== */}
+
         <form onSubmit={handleSubmit} className="login-form">
+          {/* =================================================
+              EMAIL
+          ================================================= */}
 
           <div className="form-group">
             <label className="form-label" htmlFor="email-input">
@@ -167,7 +155,7 @@ const Login = () => {
                 id="email-input"
                 type="email"
                 className="form-input"
-                placeholder="e.g. superadmin@gmail.com"
+                placeholder="e.g. admin@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="username"
@@ -176,6 +164,10 @@ const Login = () => {
               />
             </div>
           </div>
+
+          {/* =================================================
+              PASSWORD
+          ================================================= */}
 
           <div className="form-group">
             <label className="form-label" htmlFor="password-input">
@@ -197,12 +189,14 @@ const Login = () => {
                 required
               />
 
-              {/* Show / Hide Password */}
+              {/* ===========================================
+                  SHOW / HIDE PASSWORD
+              =========================================== */}
 
               <button
                 type="button"
                 className="toggle-password-btn"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword((prev) => !prev)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 disabled={isLoading}
               >
@@ -211,36 +205,34 @@ const Login = () => {
             </div>
           </div>
 
-          {/* ==========================================
-                        Error Message
-                    ========================================== */}
+          {/* =================================================
+              ERROR
+          ================================================= */}
 
           {error && <div className="login-error">{error}</div>}
 
-          <div className="form-options">
-            <label className="remember-checkbox">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                disabled={isLoading}
-              />
-
-              <span>Remember Me</span>
-            </label>
-          </div>
-
+          {/* =================================================
+              SUBMIT
+          ================================================= */}
 
           <button type="submit" className="submit-btn" disabled={isLoading}>
             {isLoading ? "Signing In..." : "Sign In"}
           </button>
         </form>
 
+        {/* ===================================================
+            HELP
+        =================================================== */}
+
         <p className="help-text">
           Need help accessing your account?{" "}
           <a href="#support">Contact Support</a>
         </p>
       </div>
+
+      {/* =====================================================
+          FOOTER
+      ===================================================== */}
 
       <footer className="login-footer">
         <div>© 2026 Industrial Integrity Systems. All rights reserved.</div>
