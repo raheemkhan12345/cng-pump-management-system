@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
+
 import {
   FaArrowLeft,
-  FaDownload,
   FaScaleBalanced,
   FaMoneyBillWave,
   FaFilter,
@@ -11,158 +12,222 @@ import {
   FaPen,
   FaTrashCan,
 } from "react-icons/fa6";
+
+import { getAllSales, updateSale } from "../../../services/adminApis/salesApi";
+
+import EditSaleModal from "../../../components/adminDashboardForms/EditSaleModal/EditSaleModal";
+
 import "./SalesReport.css";
 
 const SalesReport = () => {
   const navigate = useNavigate();
 
-  // ==========================================
-  // State
-  // ==========================================
+  // =========================================================
+  // STATES
+  // =========================================================
 
   const [activeTab, setActiveTab] = useState("Monthly");
+
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [transactions, setTransactions] = useState([]);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [error, setError] = useState("");
+
+  // =========================================================
+  // EDIT MODAL STATES
+  // =========================================================
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const ITEMS_PER_PAGE = 5;
 
-  // ==========================================
-  // Transactions Data
-  // ==========================================
+  // =========================================================
+  // FETCH ALL SALES
+  // =========================================================
 
-  const transactions = [
-    {
-      id: 1,
-      date: "2026-08-23",
-      receiptNo: "23-08-2026",
-      type: "Daily Summary",
-      attendant: "Admin",
-      salesKg: 4250,
-      totalAmount: 1275000,
-      status: "Completed",
-    },
-    {
-      id: 2,
-      date: "2026-08-22",
-      receiptNo: "22-08-2026",
-      type: "Daily Summary",
-      attendant: "Admin",
-      salesKg: 4120,
-      totalAmount: 1236000,
-      status: "Completed",
-    },
-    {
-      id: 3,
-      date: "2026-08-21",
-      receiptNo: "21-08-2026",
-      type: "Daily Summary",
-      attendant: "Admin",
-      salesKg: 4380,
-      totalAmount: 1314000,
-      status: "Completed",
-    },
-    {
-      id: 4,
-      date: "2026-08-20",
-      receiptNo: "20-08-2026",
-      type: "Daily Summary",
-      attendant: "Admin",
-      salesKg: 4050,
-      totalAmount: 1215000,
-      status: "Completed",
-    },
-    {
-      id: 5,
-      date: "2026-08-19",
-      receiptNo: "19-08-2026",
-      type: "Daily Summary",
-      attendant: "Admin",
-      salesKg: 4310,
-      totalAmount: 1293000,
-      status: "Completed",
-    },
-    {
-      id: 6,
-      date: "2026-08-18",
-      receiptNo: "18-08-2026",
-      type: "Daily Summary",
-      attendant: "Admin",
-      salesKg: 4180,
-      totalAmount: 1254000,
-      status: "Completed",
-    },
-    {
-      id: 7,
-      date: "2026-08-17",
-      receiptNo: "17-08-2026",
-      type: "Daily Summary",
-      attendant: "Admin",
-      salesKg: 4220,
-      totalAmount: 1266000,
-      status: "Completed",
-    },
-    {
-      id: 8,
-      date: "2026-08-10",
-      receiptNo: "10-08-2026",
-      type: "Daily Summary",
-      attendant: "Admin",
-      salesKg: 3900,
-      totalAmount: 1170000,
-      status: "Completed",
-    },
-    {
-      id: 9,
-      date: "2026-08-05",
-      receiptNo: "05-08-2026",
-      type: "Daily Summary",
-      attendant: "Admin",
-      salesKg: 4100,
-      totalAmount: 1230000,
-      status: "Completed",
-    },
-    {
-      id: 10,
-      date: "2026-07-30",
-      receiptNo: "30-07-2026",
-      type: "Daily Summary",
-      attendant: "Admin",
-      salesKg: 4000,
-      totalAmount: 1200000,
-      status: "Completed",
-    },
-    {
-      id: 11,
-      date: "2026-07-25",
-      receiptNo: "25-07-2026",
-      type: "Daily Summary",
-      attendant: "Admin",
-      salesKg: 3850,
-      totalAmount: 1155000,
-      status: "Completed",
-    },
-  ];
+  const fetchSales = useCallback(async () => {
+    try {
+      setIsLoading(true);
 
-  // ==========================================
-  // Format Currency
-  // ==========================================
+      setError("");
+
+      // =====================================================
+      // GET API
+      // =====================================================
+
+      const response = await getAllSales();
+
+      console.log("Sales Report API Response:", response);
+
+      // =====================================================
+      // EXTRACT SALES ARRAY
+      // =====================================================
+
+      let sales = [];
+
+      if (Array.isArray(response)) {
+        sales = response;
+      } else if (Array.isArray(response?.data)) {
+        sales = response.data;
+      } else if (Array.isArray(response?.sales)) {
+        sales = response.sales;
+      } else if (Array.isArray(response?.data?.sales)) {
+        sales = response.data.sales;
+      } else if (Array.isArray(response?.data?.data)) {
+        sales = response.data.data;
+      }
+
+      console.log("Sales Report Sales Array:", sales);
+
+      // =====================================================
+      // NORMALIZE DATA
+      // =====================================================
+
+      const formattedSales = sales.map((sale, index) => {
+        const saleDate = sale?.date ? String(sale.date).slice(0, 10) : "";
+
+        return {
+          id: sale?._id || sale?.id || `sale-${index}`,
+
+          date: saleDate,
+
+          notes: sale?.notes || sale?.remarks || sale?.detail || "",
+
+          salesKg:
+            Number(sale?.cngVolume || sale?.salesKg || sale?.volume || 0) || 0,
+
+          totalAmount: Number(sale?.amount || sale?.totalAmount || 0) || 0,
+
+          paymentMethod: sale?.paymentMethod || sale?.paymentMode || "cash",
+
+          status: sale?.status || "Completed",
+
+          rawData: sale,
+        };
+      });
+
+      // =====================================================
+      // SORT NEWEST FIRST
+      // =====================================================
+
+      formattedSales.sort((a, b) => {
+        return new Date(`${b.date}T00:00:00`) - new Date(`${a.date}T00:00:00`);
+      });
+
+      setTransactions(formattedSales);
+    } catch (error) {
+      console.error("Failed to fetch sales report:", error);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to load sales report.";
+
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // =========================================================
+  // INITIAL LOAD
+  // =========================================================
+
+  useEffect(() => {
+    fetchSales();
+  }, [fetchSales]);
+
+  // =========================================================
+  // FORMAT CURRENCY
+  // =========================================================
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-PK").format(amount);
+    return new Intl.NumberFormat("en-PK").format(Number(amount) || 0);
   };
 
-  // ==========================================
-  // Filter Transactions
-  // ==========================================
+  // =========================================================
+  // FORMAT DATE
+  // =========================================================
+
+  const formatDate = (date) => {
+    if (!date) return "-";
+
+    const [year, month, day] = String(date).slice(0, 10).split("-");
+
+    if (!year || !month || !day) {
+      return date;
+    }
+
+    return `${day}-${month}-${year}`;
+  };
+
+  // =========================================================
+  // FORMAT PAYMENT METHOD
+  // =========================================================
+
+  const formatPaymentMethod = (paymentMethod) => {
+    const method = String(paymentMethod || "")
+      .trim()
+      .toLowerCase();
+
+    if (
+      method === "bank" ||
+      method === "bank transfer" ||
+      method === "bank_transfer"
+    ) {
+      return "Bank";
+    }
+
+    return "Cash";
+  };
+
+  // =========================================================
+  // PAYMENT CLASS
+  // =========================================================
+
+  const getPaymentClass = (paymentMethod) => {
+    const method = String(paymentMethod || "")
+      .trim()
+      .toLowerCase();
+
+    if (
+      method === "bank" ||
+      method === "bank transfer" ||
+      method === "bank_transfer"
+    ) {
+      return "sr-payment-bank";
+    }
+
+    return "sr-payment-cash";
+  };
+
+  // =========================================================
+  // FILTER TRANSACTIONS
+  // =========================================================
 
   const filteredTransactions = useMemo(() => {
     const today = new Date();
 
+    today.setHours(0, 0, 0, 0);
+
     return transactions.filter((transaction) => {
+      if (!transaction.date) {
+        return false;
+      }
+
       const transactionDate = new Date(`${transaction.date}T00:00:00`);
 
-      // ==========================================
-      // Daily
-      // ==========================================
+      // =====================================================
+      // DAILY
+      // =====================================================
 
       if (activeTab === "Daily") {
         return (
@@ -172,9 +237,9 @@ const SalesReport = () => {
         );
       }
 
-      // ==========================================
-      // Weekly
-      // ==========================================
+      // =====================================================
+      // WEEKLY
+      // =====================================================
 
       if (activeTab === "Weekly") {
         const startOfWeek = new Date(today);
@@ -194,9 +259,9 @@ const SalesReport = () => {
         return transactionDate >= startOfWeek && transactionDate <= endOfWeek;
       }
 
-      // ==========================================
-      // Monthly
-      // ==========================================
+      // =====================================================
+      // MONTHLY
+      // =====================================================
 
       if (activeTab === "Monthly") {
         return (
@@ -209,20 +274,18 @@ const SalesReport = () => {
     });
   }, [transactions, activeTab]);
 
-  // ==========================================
-  // Calculate Report Stats
-  // ==========================================
+  // =========================================================
+  // REPORT STATS
+  // =========================================================
 
   const reportStats = useMemo(() => {
-    const totalKgSold = filteredTransactions.reduce(
-      (total, transaction) => total + transaction.salesKg,
-      0,
-    );
+    const totalKgSold = filteredTransactions.reduce((total, transaction) => {
+      return total + (Number(transaction.salesKg) || 0);
+    }, 0);
 
-    const grossRevenue = filteredTransactions.reduce(
-      (total, transaction) => total + transaction.totalAmount,
-      0,
-    );
+    const grossRevenue = filteredTransactions.reduce((total, transaction) => {
+      return total + (Number(transaction.totalAmount) || 0);
+    }, 0);
 
     return {
       totalKgSold,
@@ -230,9 +293,9 @@ const SalesReport = () => {
     };
   }, [filteredTransactions]);
 
-  // ==========================================
-  // Pagination
-  // ==========================================
+  // =========================================================
+  // PAGINATION
+  // =========================================================
 
   const totalResults = filteredTransactions.length;
 
@@ -244,35 +307,36 @@ const SalesReport = () => {
 
   const currentTransactions = filteredTransactions.slice(startIndex, endIndex);
 
-  // ==========================================
-  // Page Numbers
-  // ==========================================
+  // =========================================================
+  // PAGE NUMBERS
+  // =========================================================
 
   const pageNumbers = Array.from(
     { length: totalPages },
     (_, index) => index + 1,
   );
 
-  // ==========================================
-  // Navigation
-  // ==========================================
+  // =========================================================
+  // BACK
+  // =========================================================
 
   const handleBack = () => {
     navigate(-1);
   };
 
-  // ==========================================
-  // Tab Change
-  // ==========================================
+  // =========================================================
+  // TAB CHANGE
+  // =========================================================
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
+
     setCurrentPage(1);
   };
 
-  // ==========================================
-  // Pagination Handlers
-  // ==========================================
+  // =========================================================
+  // PREVIOUS PAGE
+  // =========================================================
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
@@ -280,46 +344,185 @@ const SalesReport = () => {
     }
   };
 
+  // =========================================================
+  // NEXT PAGE
+  // =========================================================
+
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage((prev) => prev + 1);
     }
   };
 
+  // =========================================================
+  // PAGE CHANGE
+  // =========================================================
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
-  // ==========================================
-  // Edit Handler
-  // ==========================================
+  // =========================================================
+  // OPEN EDIT MODAL
+  // =========================================================
 
   const handleEdit = (item) => {
-    console.log("Edit transaction:", item);
+    console.log("Selected Sale For Edit:", item);
+
+    setSelectedTransaction(item);
+
+    setIsEditModalOpen(true);
   };
 
-  // ==========================================
-  // Delete Handler
-  // ==========================================
+  // =========================================================
+  // CLOSE EDIT MODAL
+  // =========================================================
+
+  const handleCloseEditModal = () => {
+    if (isUpdating) {
+      return;
+    }
+
+    setIsEditModalOpen(false);
+
+    setSelectedTransaction(null);
+  };
+
+  // =========================================================
+  // SAVE EDITED SALE
+  // =========================================================
+
+  const handleSaveModal = async (updatedData) => {
+    try {
+      if (!updatedData?.id) {
+        console.error("Sale ID missing:", updatedData);
+
+        return;
+      }
+
+      setIsUpdating(true);
+
+      console.log("Updating Sale ID:", updatedData.id);
+
+      // =====================================================
+      // PUT REQUEST BODY
+      // =====================================================
+
+      const saleData = {
+        date: updatedData.date,
+
+        cngVolume: Number(updatedData.cngVolume),
+
+        amount: Number(updatedData.amount),
+
+        paymentMethod: updatedData.paymentMethod,
+
+        notes: updatedData.notes || "",
+      };
+
+      console.log("Update Sale Request:", saleData);
+
+      // =====================================================
+      // PUT API
+      // =====================================================
+
+      const response = await updateSale(updatedData.id, saleData);
+
+      console.log("Update Sale API Response:", response);
+
+      // =====================================================
+      // CLOSE MODAL
+      // =====================================================
+
+      setIsEditModalOpen(false);
+
+      setSelectedTransaction(null);
+
+      // =====================================================
+      // REFRESH DATA FROM BACKEND
+      // =====================================================
+
+      await fetchSales();
+
+      // =====================================================
+      // RESET PAGE
+      // =====================================================
+
+      setCurrentPage(1);
+    } catch (error) {
+      console.error("Update Sale Error:", error);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to update sale.";
+
+      alert(message);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // =========================================================
+  // DELETE
+  // =========================================================
 
   const handleDelete = (item) => {
     console.log("Delete transaction:", item);
+
+    // DELETE API baad mein yahan integrate kar sakte ho.
   };
+
+  // =========================================================
+  // LOADING
+  // =========================================================
+
+  if (isLoading) {
+    return (
+      <div className="sr-page-container">
+        <div className="sr-loading">Loading sales report...</div>
+      </div>
+    );
+  }
+
+  // =========================================================
+  // ERROR
+  // =========================================================
+
+  if (error) {
+    return (
+      <div className="sr-page-container">
+        <div className="sr-error">
+          <p>{error}</p>
+
+          <button type="button" onClick={fetchSales}>
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================
+  // UI
+  // =========================================================
 
   return (
     <div className="sr-page-container">
-      {/* ==========================================
-                Back Navigation
-            ========================================== */}
+      {/* ===================================================
+          BACK BUTTON
+      =================================================== */}
 
       <button type="button" className="sr-back-btn" onClick={handleBack}>
         <FaArrowLeft />
+
         <span>Back</span>
       </button>
 
-      {/* ==========================================
-                Header
-            ========================================== */}
+      {/* ===================================================
+          HEADER
+      =================================================== */}
 
       <div className="sr-header-section">
         <div>
@@ -329,16 +532,11 @@ const SalesReport = () => {
             Comprehensive overview of CNG sales and revenue.
           </p>
         </div>
-
-        <button type="button" className="sr-btn-export">
-          <FaDownload />
-          <span>Export PDF</span>
-        </button>
       </div>
 
-      {/* ==========================================
-                Daily / Weekly / Monthly Tabs
-            ========================================== */}
+      {/* ===================================================
+          TABS
+      =================================================== */}
 
       <div className="sr-filter-tabs-container">
         {["Daily", "Weekly", "Monthly"].map((tab) => (
@@ -353,14 +551,12 @@ const SalesReport = () => {
         ))}
       </div>
 
-      {/* ==========================================
-                Overview Cards
-            ========================================== */}
+      {/* ===================================================
+          OVERVIEW CARDS
+      =================================================== */}
 
       <div className="sr-stats-grid">
-        {/* ==========================================
-                    Total KG Sold
-                ========================================== */}
+        {/* TOTAL KG */}
 
         <div className="sr-stat-card">
           <div className="sr-card-content">
@@ -382,9 +578,7 @@ const SalesReport = () => {
           </div>
         </div>
 
-        {/* ==========================================
-                    Gross Revenue
-                ========================================== */}
+        {/* GROSS REVENUE */}
 
         <div className="sr-stat-card">
           <div className="sr-card-content">
@@ -406,14 +600,12 @@ const SalesReport = () => {
         </div>
       </div>
 
-      {/* ==========================================
-                Transaction Details
-            ========================================== */}
+      {/* ===================================================
+          TABLE
+      =================================================== */}
 
       <div className="sr-table-card">
-        {/* ==========================================
-                    Table Header
-                ========================================== */}
+        {/* TABLE HEADER */}
 
         <div className="sr-table-header">
           <h3 className="sr-table-title">Transaction Details</h3>
@@ -427,20 +619,22 @@ const SalesReport = () => {
           </button>
         </div>
 
-        {/* ==========================================
-                    Table
-                ========================================== */}
+        {/* TABLE */}
 
         <div className="sr-table-wrapper">
           <table className="sr-data-table">
             <thead>
               <tr>
-                <th>RECEIPT NO.</th>
-                <th>TYPE</th>
-                <th>ATTENDANT</th>
+                <th>DATE</th>
+
+                <th>REMARKS</th>
+
                 <th>SALES (KG)</th>
+
                 <th>TOTAL AMOUNT</th>
+
                 <th>STATUS</th>
+
                 <th>ACTIONS</th>
               </tr>
             </thead>
@@ -449,58 +643,74 @@ const SalesReport = () => {
               {currentTransactions.length > 0 ? (
                 currentTransactions.map((item) => (
                   <tr key={item.id}>
-                    {/* Receipt Number */}
-
-                    <td className="sr-font-semibold">{item.receiptNo}</td>
-
-                    {/* Type */}
-
-                    <td className="sr-text-muted">{item.type}</td>
-
-                    {/* Attendant */}
-
-                    <td className="sr-text-muted">{item.attendant}</td>
-
-                    {/* Sales KG */}
+                    {/* DATE */}
 
                     <td className="sr-font-semibold">
-                      {formatCurrency(item.salesKg)}
+                      {formatDate(item.date)}
                     </td>
 
-                    {/* Total Amount */}
+                    {/* REMARKS */}
+
+                    <td className="sr-text-muted">
+                      {item.notes || "Daily Summary"}
+                    </td>
+
+                    {/* SALES KG */}
+
+                    <td className="sr-font-semibold">
+                      {Number(item.salesKg || 0).toLocaleString("en-PK", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+
+                    {/* AMOUNT + PAYMENT */}
 
                     <td className="sr-font-bold">
-                      Rs. {formatCurrency(item.totalAmount)}
+                      <div className="sr-amount-wrapper">
+                        <span>Rs. {formatCurrency(item.totalAmount)}</span>
+
+                        <span
+                          className={`sr-payment-badge ${getPaymentClass(
+                            item.paymentMethod,
+                          )}`}
+                        >
+                          {formatPaymentMethod(item.paymentMethod)}
+                        </span>
+                      </div>
                     </td>
 
-                    {/* Status */}
+                    {/* STATUS */}
 
                     <td>
                       <span className="sr-badge-completed">{item.status}</span>
                     </td>
 
-                    {/* Actions */}
+                    {/* ACTIONS */}
 
                     <td className="sr-actions-cell">
-                      {/* Edit */}
+                      {/* EDIT */}
 
                       <button
                         type="button"
                         className="sr-action-btn sr-edit-btn"
                         title="Edit"
-                        aria-label={`Edit transaction ${item.receiptNo}`}
+                        aria-label={`Edit transaction ${formatDate(item.date)}`}
                         onClick={() => handleEdit(item)}
+                        disabled={isUpdating}
                       >
                         <FaPen />
                       </button>
 
-                      {/* Delete */}
+                      {/* DELETE */}
 
                       <button
                         type="button"
                         className="sr-action-btn sr-delete-btn"
                         title="Delete"
-                        aria-label={`Delete transaction ${item.receiptNo}`}
+                        aria-label={`Delete transaction ${formatDate(
+                          item.date,
+                        )}`}
                         onClick={() => handleDelete(item)}
                       >
                         <FaTrashCan />
@@ -510,7 +720,7 @@ const SalesReport = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="sr-empty-state">
+                  <td colSpan="6" className="sr-empty-state">
                     No sales found for {activeTab.toLowerCase()} period.
                   </td>
                 </tr>
@@ -519,9 +729,9 @@ const SalesReport = () => {
           </table>
         </div>
 
-        {/* ==========================================
-                    Pagination
-                ========================================== */}
+        {/* =================================================
+            PAGINATION
+        ================================================= */}
 
         {totalResults > 0 && (
           <div className="sr-pagination-footer">
@@ -534,19 +744,18 @@ const SalesReport = () => {
             </span>
 
             <div className="sr-pagination-controls">
-              {/* Previous */}
+              {/* PREVIOUS */}
 
               <button
                 type="button"
                 className="sr-page-arrow"
                 disabled={currentPage === 1}
                 onClick={handlePreviousPage}
-                aria-label="Previous page"
               >
                 <FaChevronLeft />
               </button>
 
-              {/* Page Numbers */}
+              {/* PAGE NUMBERS */}
 
               {pageNumbers.map((page) => (
                 <button
@@ -561,14 +770,13 @@ const SalesReport = () => {
                 </button>
               ))}
 
-              {/* Next */}
+              {/* NEXT */}
 
               <button
                 type="button"
                 className="sr-page-arrow"
                 disabled={currentPage === totalPages}
                 onClick={handleNextPage}
-                aria-label="Next page"
               >
                 <FaChevronRight />
               </button>
@@ -576,6 +784,18 @@ const SalesReport = () => {
           </div>
         )}
       </div>
+
+      {/* ===================================================
+          EDIT SALE MODAL
+      =================================================== */}
+
+      <EditSaleModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onSave={handleSaveModal}
+        initialData={selectedTransaction}
+        isSaving={isUpdating}
+      />
     </div>
   );
 };

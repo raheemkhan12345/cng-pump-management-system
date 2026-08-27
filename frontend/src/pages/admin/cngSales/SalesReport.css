@@ -461,6 +461,46 @@
     color: #64748b;
 }
 
+/* =========================================================
+   AMOUNT + PAYMENT METHOD
+========================================================= */
+
+.sr-amount-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.sr-payment-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 2px 8px;
+
+    border-radius: 4px;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    line-height: 1.2;
+}
+
+/* Cash */
+
+.sr-payment-cash {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+/* Bank */
+
+.sr-payment-bank {
+    background: #fecdd3;
+    color: #be123c;
+}
+
 
 /* =========================================================
    Status Badge
