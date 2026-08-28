@@ -12,6 +12,7 @@ import {
 import {
   getCashBank,
   createCashBankTransfer,
+  deleteCashBankTransaction,
 } from "../../../services/adminApis/cashBankApi";
 
 import CashTransferModal from "../../../components/adminDashboardForms/cashTransferModal/CashTransferModal";
@@ -333,9 +334,59 @@ const CashBank = () => {
   // DELETE TRANSACTION
   // =========================================================
 
-  const handleDelete = (transaction) => {
-    console.log("Delete Cash & Bank transaction:", transaction);
-  };
+
+const handleDelete = async (transaction) => {
+  const transactionId = transaction?.id;
+
+  if (!transactionId) {
+    alert("Transaction ID is missing.");
+    return;
+  }
+
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this transaction?",
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    setError("");
+
+    console.log(
+      "Deleting Cash & Bank transaction:",
+      transactionId,
+    );
+
+    const response = await deleteCashBankTransaction(transactionId);
+
+    console.log("Delete Cash & Bank Response:", response);
+
+    setTransactions((currentTransactions) =>
+      currentTransactions.filter(
+        (tx) => tx.id !== transactionId,
+      ),
+    );
+
+    alert("Transaction deleted successfully.");
+  } catch (error) {
+    console.error(
+      "Failed to delete Cash & Bank transaction:",
+      error,
+    );
+
+    const message =
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||
+      error?.message ||
+      "Failed to delete Cash & Bank transaction.";
+
+    alert(message);
+  }
+};
+
+
 
   // =========================================================
   // VISIBLE TRANSACTIONS

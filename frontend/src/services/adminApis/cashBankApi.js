@@ -16,3 +16,11 @@ export const createCashBankTransfer = async (transferData) => {
   const response = await axiosInstance.post("/cashBank/transfer", transferData);
   return response.data;
 };
+
+// DELETE CASH AND BANK TRANSFER DETAIL.
+
+export const deleteCashBankTransaction = async (id) => {
+  const response = await axiosInstance.delete(`/cashBank/deleteTransaction/${id}`);
+
+  return response.data;
+};
