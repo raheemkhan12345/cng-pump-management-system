@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import {
-  History,
   Plus,
   Landmark,
   TrendingUp,
@@ -37,16 +36,14 @@ const Loans = () => {
       type: "Loan Given",
       amount: 10000,
       remainingBal: 45000,
-      status: "Active",
     },
     {
       id: 2,
       date: "18-08-2026",
       staffName: "Noman Ali",
-      type: "Recovery",
+      type: "Loan Received",
       amount: 5000,
       remainingBal: 0,
-      status: "Paid",
     },
     {
       id: 3,
@@ -55,25 +52,22 @@ const Loans = () => {
       type: "Loan Given",
       amount: 5000,
       remainingBal: 15000,
-      status: "Active",
     },
     {
       id: 4,
       date: "12-08-2026",
       staffName: "Sajid Khan",
-      type: "Recovery",
+      type: "Loan Received",
       amount: 10000,
       remainingBal: 120000,
-      status: "Active",
     },
     {
       id: 5,
       date: "10-08-2026",
       staffName: "Ali Raza",
-      type: "Recovery",
+      type: "Loan Received",
       amount: 15000,
       remainingBal: 35000,
-      status: "Active",
     },
     {
       id: 6,
@@ -82,16 +76,14 @@ const Loans = () => {
       type: "Loan Given",
       amount: 20000,
       remainingBal: 20000,
-      status: "Active",
     },
     {
       id: 7,
       date: "05-08-2026",
       staffName: "Usman Khan",
-      type: "Recovery",
+      type: "Loan Received",
       amount: 8000,
       remainingBal: 12000,
-      status: "Active",
     },
     {
       id: 8,
@@ -100,7 +92,6 @@ const Loans = () => {
       type: "Loan Given",
       amount: 15000,
       remainingBal: 15000,
-      status: "Active",
     },
     {
       id: 9,
@@ -109,25 +100,22 @@ const Loans = () => {
       type: "Loan Given",
       amount: 12000,
       remainingBal: 12000,
-      status: "Active",
     },
     {
       id: 10,
       date: "28-07-2026",
       staffName: "Sajid Khan",
-      type: "Recovery",
+      type: "Loan Received",
       amount: 7000,
       remainingBal: 130000,
-      status: "Active",
     },
     {
       id: 11,
       date: "25-07-2026",
       staffName: "Ali Raza",
-      type: "Recovery",
+      type: "Loan Received",
       amount: 10000,
       remainingBal: 25000,
-      status: "Active",
     },
     {
       id: 12,
@@ -136,9 +124,12 @@ const Loans = () => {
       type: "Loan Given",
       amount: 25000,
       remainingBal: 25000,
-      status: "Active",
     },
   ]);
+
+  const getLoanStatus = (remainingBal) => {
+    return Number(remainingBal) <= 0 ? "Paid" : "Active";
+  };
 
   // =========================================================
   // Save New Loan Handler
@@ -147,20 +138,26 @@ const Loans = () => {
   const handleSaveLoan = (newLoanData) => {
     const formattedDate = newLoanData.date.split("-").reverse().join("-");
 
+    const loanAmount = Number(newLoanData.amount);
+
     const newEntry = {
       id: Date.now(),
       date: formattedDate,
       staffName: newLoanData.personName,
       type: newLoanData.loanType,
-      amount: Number(newLoanData.amount),
-      remainingBal: Number(newLoanData.amount),
-      status: newLoanData.status,
+      amount: loanAmount,
+
+      // New loan starts with full amount remaining.
+      remainingBal: loanAmount,
     };
 
     setLoanTransactions((prev) => [newEntry, ...prev]);
 
-    // New transaction added, so show first page
+    // New transaction added, so show first page.
     setCurrentPage(1);
+
+    // Close modal after successful save.
+    setIsModalOpen(false);
   };
 
   // =========================================================
@@ -184,7 +181,7 @@ const Loans = () => {
   // =========================================================
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-PK").format(amount);
+    return new Intl.NumberFormat("en-PK").format(Number(amount) || 0);
   };
 
   // =========================================================
@@ -201,9 +198,9 @@ const Loans = () => {
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
 
-    // -----------------------------------------
+    // =======================================================
     // This Month Loan
-    // -----------------------------------------
+    // =======================================================
 
     const thisMonthLoan = loanTransactions
       .filter((transaction) => {
@@ -220,19 +217,25 @@ const Loans = () => {
           transactionDate.getFullYear() === currentYear
         );
       })
-      .reduce((total, transaction) => total + transaction.amount, 0);
+      .reduce(
+        (total, transaction) => total + Number(transaction.amount || 0),
+        0,
+      );
 
-    // -----------------------------------------
+    // =======================================================
     // Total Loans Given
-    // -----------------------------------------
+    // =======================================================
 
     const totalLoansGiven = loanTransactions
       .filter((transaction) => transaction.type === "Loan Given")
-      .reduce((total, transaction) => total + transaction.amount, 0);
+      .reduce(
+        (total, transaction) => total + Number(transaction.amount || 0),
+        0,
+      );
 
-    // -----------------------------------------
+    // =======================================================
     // This Month Recovery
-    // -----------------------------------------
+    // =======================================================
 
     const thisMonthRecovery = loanTransactions
       .filter((transaction) => {
@@ -249,15 +252,19 @@ const Loans = () => {
           transactionDate.getFullYear() === currentYear
         );
       })
-      .reduce((total, transaction) => total + transaction.amount, 0);
+      .reduce(
+        (total, transaction) => total + Number(transaction.amount || 0),
+        0,
+      );
 
-    // -----------------------------------------
+    // =======================================================
     // Active Loan Staff
-    // -----------------------------------------
+    // =======================================================
+    // A staff member is active only when remaining balance > 0.
 
     const activeStaff = new Set(
       loanTransactions
-        .filter((transaction) => transaction.remainingBal > 0)
+        .filter((transaction) => Number(transaction.remainingBal) > 0)
         .map((transaction) => transaction.staffName),
     );
 
@@ -443,7 +450,7 @@ const Loans = () => {
             <thead>
               <tr>
                 <th>DATE</th>
-                <th>STAFF NAME</th>
+                <th>NAME</th>
                 <th>TYPE</th>
                 <th>AMOUNT (RS.)</th>
                 <th>REMAINING BAL.</th>
@@ -454,83 +461,92 @@ const Loans = () => {
 
             <tbody>
               {currentTransactions.length > 0 ? (
-                currentTransactions.map((item) => (
-                  <tr key={item.id}>
-                    {/* Date */}
+                currentTransactions.map((item) => {
+                  // =================================================
+                  // Status is calculated from remaining balance.
+                  // No manual status/dropdown is required.
+                  // =================================================
 
-                    <td className="loan-text-muted">{item.date}</td>
+                  const status = getLoanStatus(item.remainingBal);
 
-                    {/* Staff Name */}
+                  return (
+                    <tr key={item.id}>
+                      {/* Date */}
 
-                    <td className="loan-font-bold">{item.staffName}</td>
+                      <td className="loan-text-muted">{item.date}</td>
 
-                    {/* Type */}
+                      {/* Staff Name */}
 
-                    <td className="loan-text-muted">{item.type}</td>
+                      <td className="loan-font-bold">{item.staffName}</td>
 
-                    {/* Amount */}
+                      {/* Type */}
 
-                    <td
-                      className={
-                        item.type === "Recovery"
-                          ? "loan-text-green loan-font-bold"
-                          : "loan-font-bold"
-                      }
-                    >
-                      Rs. {formatCurrency(item.amount)}
-                    </td>
+                      <td className="loan-text-muted">{item.type}</td>
 
-                    {/* Remaining Balance */}
+                      {/* Amount */}
 
-                    <td className="loan-text-muted">
-                      Rs. {formatCurrency(item.remainingBal)}
-                    </td>
-
-                    {/* Status */}
-
-                    <td>
-                      <span
-                        className={`loan-badge ${
-                          item.status === "Paid"
-                            ? "loan-badge-paid"
-                            : "loan-badge-active"
-                        }`}
+                      <td
+                        className={
+                          item.type === "Recovery"
+                            ? "loan-text-green loan-font-bold"
+                            : "loan-font-bold"
+                        }
                       >
-                        {item.status}
-                      </span>
-                    </td>
+                        Rs. {formatCurrency(item.amount)}
+                      </td>
 
-                    {/* =================================================
+                      {/* Remaining Balance */}
+
+                      <td className="loan-text-muted">
+                        Rs. {formatCurrency(item.remainingBal)}
+                      </td>
+
+                      {/* Status */}
+
+                      <td>
+                        <span
+                          className={`loan-badge ${
+                            status === "Paid"
+                              ? "loan-badge-paid"
+                              : "loan-badge-active"
+                          }`}
+                        >
+                          {status}
+                        </span>
+                      </td>
+
+                      {/* =================================================
                           Actions
                       ================================================= */}
 
-                    <td className="loan-actions-cell">
-                      {/* Edit */}
+                      <td className="loan-actions-cell">
+                        {/* Edit */}
 
-                      <button
-                        type="button"
-                        className="loan-action-btn loan-edit-btn"
-                        title="Edit"
-                        aria-label={`Edit loan for ${item.staffName}`}
-                        onClick={() => handleEdit(item)}
-                      >
-                        <Pencil size={11} />
-                      </button>
+                        <button
+                          type="button"
+                          className="loan-action-btn loan-edit-btn"
+                          title="Edit"
+                          aria-label={`Edit loan for ${item.staffName}`}
+                          onClick={() => handleEdit(item)}
+                        >
+                          <Pencil size={11} />
+                        </button>
 
-                      {/* Delete */}
+                        {/* Delete */}
 
-                      <button
-                        type="button"
-                        className="loan-action-btn loan-delete-btn"
-                        title="Delete"
-                        aria-label={`Delete loan for ${item.staffName}`}
-                        onClick={() => handleDelete(item)}
-                      >
-                        <Trash2 size={11} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                        <button
+                          type="button"
+                          className="loan-action-btn loan-delete-btn"
+                          title="Delete"
+                          aria-label={`Delete loan for ${item.staffName}`}
+                          onClick={() => handleDelete(item)}
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
                   <td colSpan="7" className="loan-empty-state">
