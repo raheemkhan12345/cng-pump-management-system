@@ -495,7 +495,7 @@
 }
 
 .cb-text-right {
-    text-align: right !important;
+    text-align: center !important;
 }
 
 .cb-text-center {
@@ -565,19 +565,12 @@
     height: 11px;
 }
 
-.cb-edit-btn {
-    color: #374151;
-}
 
 .cb-delete-btn {
     color: #374151;
 }
 
-.cb-edit-btn:hover {
-    color: #2563eb;
 
-    transform: scale(1.15);
-}
 
 .cb-delete-btn:hover {
     color: #dc2626;

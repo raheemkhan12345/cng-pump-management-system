@@ -330,14 +330,6 @@ const CashBank = () => {
   };
 
   // =========================================================
-  // EDIT TRANSACTION
-  // =========================================================
-
-  const handleEdit = (transaction) => {
-    console.log("Edit Cash & Bank transaction:", transaction);
-  };
-
-  // =========================================================
   // DELETE TRANSACTION
   // =========================================================
 
@@ -497,16 +489,6 @@ const CashBank = () => {
                       <td className="cb-actions-cell">
                         <button
                           type="button"
-                          className="cb-action-btn cb-edit-btn"
-                          title="Edit"
-                          aria-label={`Edit ${tx.type} transaction`}
-                          onClick={() => handleEdit(tx)}
-                        >
-                          <FaPen />
-                        </button>
-
-                        <button
-                          type="button"
                           className="cb-action-btn cb-delete-btn"
                           title="Delete"
                           aria-label={`Delete ${tx.type} transaction`}
@@ -527,16 +509,6 @@ const CashBank = () => {
               </tbody>
             </table>
           </div>
-
-          {/* TABLE FOOTER */}
-
-          {transactions.length > 5 && (
-            <div className="cb-table-footer">
-              <button type="button" className="cb-btn-view-all">
-                View All Transactions &rsaquo;
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
