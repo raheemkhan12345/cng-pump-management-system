@@ -476,7 +476,7 @@ const SuperAdminDashboard = () => {
 
                       <td>
                         <span
-                          className={`badge ${String(admin.status)
+                          className={`sup-badge ${String(admin.status)
                             .toLowerCase()
                             .replace(/\s+/g, "-")}`}
                         >

@@ -328,7 +328,7 @@ tr:last-child td {
    STATUS BADGE
 ========================================================= */
 
-.badge {
+.sup-badge {
   display: inline-flex;
   align-items: center;
   padding: 3px 9px;
@@ -338,12 +338,12 @@ tr:last-child td {
   white-space: nowrap;
 }
 
-.badge.active {
+.sup-badge.active {
   background-color: var(--status-active-bg);
   color: var(--status-active-text);
 }
 
-.badge.inactive {
+.sup-badge.inactive {
   background-color: var(--status-inactive-bg);
   color: var(--status-inactive-text);
 }
