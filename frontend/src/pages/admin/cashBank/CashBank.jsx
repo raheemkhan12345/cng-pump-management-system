@@ -1,91 +1,287 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  FaMoneyBillWave,
-  FaBuildingColumns,
-  FaArrowUp,
   FaArrowDown,
+  FaArrowUp,
+  FaBuildingColumns,
   FaFilter,
+  FaMoneyBillWave,
   FaPen,
   FaTrashCan,
 } from "react-icons/fa6";
 
-import "./CashBank.css";
+import { getCashBank } from "../../../services/adminApis/cashBankApi";
 import CashTransferModal from "../../../components/adminDashboardForms/cashTransferModal/CashTransferModal";
 
+import "./CashBank.css";
+
 const CashBank = () => {
-  // ==========================================
-  // Modal State
-  // ==========================================
-  const [showTransferModal, setShowTransferModal] = useState(false);
+  // =========================================================
+  // CONSTANTS
+  // =========================================================
 
-  // ==========================================
-  // Transactions Data
-  // ==========================================
-  const transactions = [
-    {
-      id: 1,
-      date: "20-08-2026",
-      type: "Cash to Bank",
-      typeIcon: "cash-to-bank",
-      amount: 50000,
-      cashChange: -50000,
-      bankChange: 50000,
-    },
-    {
-      id: 2,
-      date: "19-08-2026",
-      type: "Bank to Cash",
-      typeIcon: "bank-to-cash",
-      amount: 120000,
-      cashChange: 120000,
-      bankChange: -120000,
-    },
-    {
-      id: 3,
-      date: "17-08-2026",
-      type: "Bank to Cash",
-      typeIcon: "bank-to-cash",
-      amount: 25000,
-      cashChange: 25000,
-      bankChange: -25000,
-    },
-    {
-      id: 4,
-      date: "15-08-2026",
-      type: "Cash to Bank",
-      typeIcon: "cash-to-bank",
-      amount: 85400,
-      cashChange: -85400,
-      bankChange: 85400,
-    },
-  ];
-
-  // ==========================================
-  // Initial Balances
-  // ==========================================
-  const initialCashBalance = 245500;
-  const initialBankBalance = 680000;
-
-  // ==========================================
-  // Calculate Balances
-  // ==========================================
-  const balances = useMemo(() => {
-    return {
-      totalCash: initialCashBalance,
-      totalBank: initialBankBalance,
-    };
-  }, []);
-
-  // ==========================================
-  // Format Currency
-  // ==========================================
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-PK").format(amount);
+  const EMPTY_BALANCES = {
+    totalCash: 0,
+    totalBank: 0,
   };
 
-  // ==========================================
-  // Transaction Type Icon Renderer
-  // ==========================================
+  // =========================================================
+  // STATES
+  // =========================================================
+
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+  const [balances, setBalances] = useState(EMPTY_BALANCES);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // =========================================================
+  // FETCH CASH & BANK DATA
+  // =========================================================
+
+  const fetchCashBankData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError("");
+
+      const response = await getCashBank();
+
+      console.log("Cash Bank API Response:", response);
+
+      const apiData = response?.data ?? response ?? {};
+
+      console.log("Cash Bank API Data:", apiData);
+
+      // =====================================================
+      // BALANCES
+      // =====================================================
+
+      const balanceData = apiData?.balance ?? {};
+
+      console.log("Cash Bank Balance:", balanceData);
+
+      const totalCash =
+        Number(
+          balanceData?.cashInHand ??
+            apiData?.cashInHand ??
+            apiData?.totalCash ??
+            apiData?.cashBalance ??
+            apiData?.cash ??
+            apiData?.totalCashBalance ??
+            0,
+        ) || 0;
+
+      const totalBank =
+        Number(
+          balanceData?.bankBalance ??
+            apiData?.bankBalance ??
+            apiData?.totalBank ??
+            apiData?.bank ??
+            apiData?.totalBankBalance ??
+            0,
+        ) || 0;
+
+      // =====================================================
+      // TRANSACTIONS
+      // =====================================================
+
+      let transactionData = [];
+
+      if (Array.isArray(apiData?.transactions)) {
+        transactionData = apiData.transactions;
+      } else if (Array.isArray(apiData?.data)) {
+        transactionData = apiData.data;
+      } else if (Array.isArray(apiData?.cashBankTransactions)) {
+        transactionData = apiData.cashBankTransactions;
+      } else if (Array.isArray(response?.transactions)) {
+        transactionData = response.transactions;
+      } else if (Array.isArray(response?.data?.transactions)) {
+        transactionData = response.data.transactions;
+      }
+
+      console.log("Cash Bank Transactions:", transactionData);
+
+      // =====================================================
+      // NORMALIZE TRANSACTIONS
+      // =====================================================
+
+      const formattedTransactions = transactionData.map(
+        (transaction, index) => {
+          const rawType = String(
+            transaction?.type ||
+              transaction?.transactionType ||
+              transaction?.transferType ||
+              "",
+          )
+            .trim()
+            .toLowerCase();
+
+          let type = "Cash to Bank";
+          let typeIcon = "cash-to-bank";
+
+          if (
+            rawType.includes("bank to cash") ||
+            rawType.includes("bank-to-cash") ||
+            rawType.includes("bank_to_cash") ||
+            rawType === "banktocash"
+          ) {
+            type = "Bank to Cash";
+            typeIcon = "bank-to-cash";
+          } else if (
+            rawType.includes("cash to bank") ||
+            rawType.includes("cash-to-bank") ||
+            rawType.includes("cash_to_bank") ||
+            rawType === "cashtobank"
+          ) {
+            type = "Cash to Bank";
+            typeIcon = "cash-to-bank";
+          }
+
+          const amount =
+            Number(
+              transaction?.amount ??
+                transaction?.transferAmount ??
+                transaction?.value ??
+                transaction?.totalAmount ??
+                0,
+            ) || 0;
+
+          return {
+            id:
+              transaction?._id ||
+              transaction?.id ||
+              `cash-bank-${index}`,
+
+            date:
+              transaction?.date ||
+              transaction?.createdAt ||
+              transaction?.transactionDate ||
+              "",
+
+            type,
+            typeIcon,
+            amount,
+
+            cashChange:
+              Number(
+                transaction?.cashChange ??
+                  transaction?.cashAmount ??
+                  0,
+              ) || 0,
+
+            bankChange:
+              Number(
+                transaction?.bankChange ??
+                  transaction?.bankAmount ??
+                  0,
+              ) || 0,
+
+            remarks:
+              transaction?.remarks ||
+              transaction?.notes ||
+              transaction?.description ||
+              "",
+
+            rawData: transaction,
+          };
+        },
+      );
+
+      // =====================================================
+      // SORT NEWEST FIRST
+      // =====================================================
+
+      formattedTransactions.sort((a, b) => {
+        const dateA = new Date(a.date || 0);
+        const dateB = new Date(b.date || 0);
+
+        return dateB - dateA;
+      });
+
+      // =====================================================
+      // UPDATE STATES
+      // =====================================================
+
+      setBalances({
+        totalCash,
+        totalBank,
+      });
+
+      setTransactions(formattedTransactions);
+
+      console.log("Final Cash Balance:", totalCash);
+      console.log("Final Bank Balance:", totalBank);
+      console.log(
+        "Final Cash & Bank Transactions:",
+        formattedTransactions,
+      );
+    } catch (error) {
+      console.error("Failed to fetch Cash & Bank data:", error);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to load Cash & Bank data.";
+
+      setError(message);
+      setBalances(EMPTY_BALANCES);
+      setTransactions([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // =========================================================
+  // INITIAL LOAD
+  // =========================================================
+
+  useEffect(() => {
+    fetchCashBankData();
+  }, [fetchCashBankData]);
+
+  // =========================================================
+  // FORMAT CURRENCY
+  // =========================================================
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-PK").format(Number(amount) || 0);
+  };
+
+  // =========================================================
+  // FORMAT DATE
+  // =========================================================
+
+  const formatDate = (date) => {
+    if (!date) return "-";
+
+    const dateObject = new Date(date);
+
+    if (Number.isNaN(dateObject.getTime())) {
+      const dateString = String(date).slice(0, 10);
+      const parts = dateString.split("-");
+
+      if (parts.length === 3) {
+        if (parts[0].length === 4) {
+          return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+
+        return dateString;
+      }
+
+      return date;
+    }
+
+    const day = String(dateObject.getDate()).padStart(2, "0");
+    const month = String(dateObject.getMonth() + 1).padStart(2, "0");
+    const year = dateObject.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
+
+  // =========================================================
+  // TRANSACTION ICON
+  // =========================================================
+
   const getTransactionIcon = (type) => {
     switch (type) {
       case "cash-to-bank":
@@ -99,49 +295,95 @@ const CashBank = () => {
     }
   };
 
-  // ==========================================
-  // Edit Transaction
-  // ==========================================
+  // =========================================================
+  // EDIT TRANSACTION
+  // =========================================================
+
   const handleEdit = (transaction) => {
-    console.log("Edit transaction:", transaction);
+    console.log("Edit Cash & Bank transaction:", transaction);
   };
 
-  // ==========================================
-  // Delete Transaction
-  // ==========================================
+  // =========================================================
+  // DELETE TRANSACTION
+  // =========================================================
+
   const handleDelete = (transaction) => {
-    console.log("Delete transaction:", transaction);
+    console.log("Delete Cash & Bank transaction:", transaction);
   };
+
+  // =========================================================
+  // VISIBLE TRANSACTIONS
+  // =========================================================
+
+  const visibleTransactions = useMemo(() => {
+    return transactions.slice(0, 5);
+  }, [transactions]);
+
+  // =========================================================
+  // LOADING STATE
+  // =========================================================
+
+  if (isLoading) {
+    return (
+      <div className="cb-container">
+        <div className="cb-content-wrapper">
+          <div className="cb-loading">
+            Loading Cash & Bank data...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================
+  // ERROR STATE
+  // =========================================================
+
+  if (error) {
+    return (
+      <div className="cb-container">
+        <div className="cb-content-wrapper">
+          <div className="cb-error">
+            <p>{error}</p>
+
+            <button type="button" onClick={fetchCashBankData}>
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================
+  // UI
+  // =========================================================
 
   return (
     <div className="cb-container">
-      {/* ==========================================
-          Main Content Area
-      ========================================== */}
-
       <div className="cb-content-wrapper">
-        {/* ==========================================
-            Page Title
-        ========================================== */}
+        {/* PAGE TITLE */}
 
         <div className="cb-title-section">
-          <h1 className="cb-page-title">Cash & Bank Operations</h1>
+          <h1 className="cb-page-title">
+            Cash & Bank Operations
+          </h1>
 
           <p className="cb-page-subtitle">
             Manage station liquidity and bank transfers securely.
           </p>
         </div>
 
-        {/* ==========================================
-            Stat Cards
-        ========================================== */}
+        {/* STAT CARDS */}
 
         <div className="cb-stats-grid">
-          {/* Total Cash Card */}
+          {/* TOTAL CASH */}
 
           <div className="cb-stat-card">
             <div className="cb-stat-info">
-              <span className="cb-stat-label">TOTAL CASH IN HAND</span>
+              <span className="cb-stat-label">
+                TOTAL CASH IN HAND
+              </span>
 
               <h2 className="cb-stat-value">
                 Rs. {formatCurrency(balances.totalCash)}
@@ -153,11 +395,13 @@ const CashBank = () => {
             </div>
           </div>
 
-          {/* Total Bank Card */}
+          {/* TOTAL BANK */}
 
           <div className="cb-stat-card">
             <div className="cb-stat-info">
-              <span className="cb-stat-label">TOTAL BANK BALANCE</span>
+              <span className="cb-stat-label">
+                TOTAL BANK BALANCE
+              </span>
 
               <h2 className="cb-stat-value">
                 Rs. {formatCurrency(balances.totalBank)}
@@ -170,9 +414,7 @@ const CashBank = () => {
           </div>
         </div>
 
-        {/* ==========================================
-            Transfer Cash Button
-        ========================================== */}
+        {/* TRANSFER CASH */}
 
         <div className="cb-transfer-action-wrap">
           <button
@@ -184,24 +426,22 @@ const CashBank = () => {
           </button>
         </div>
 
-        {/* ==========================================
-            Transactions Table Card
-        ========================================== */}
+        {/* TRANSACTIONS TABLE */}
 
         <div className="cb-table-card">
-          {/* Table Header */}
-
           <div className="cb-table-header">
-            <h3 className="cb-table-title">Cash & Bank Transactions</h3>
+            <h3 className="cb-table-title">
+              Cash & Bank Transactions
+            </h3>
 
-            <button type="button" className="cb-table-btn-icon" title="Filter">
+            <button
+              type="button"
+              className="cb-table-btn-icon"
+              title="Filter"
+            >
               <FaFilter />
             </button>
           </div>
-
-          {/* ==========================================
-              Table
-          ========================================== */}
 
           <div className="cb-table-responsive">
             <table className="cb-table">
@@ -209,82 +449,87 @@ const CashBank = () => {
                 <tr>
                   <th>Date</th>
                   <th>Type</th>
-                  <th className="cb-text-right">Amount (Rs.)</th>
-                  <th className="cb-text-center">Actions</th>
+                  <th className="cb-text-right">
+                    Amount (Rs.)
+                  </th>
+                  <th className="cb-text-center">
+                    Actions
+                  </th>
                 </tr>
               </thead>
 
               <tbody>
-                {transactions.map((tx) => (
-                  <tr key={tx.id}>
-                    {/* Date */}
+                {visibleTransactions.length > 0 ? (
+                  visibleTransactions.map((tx) => (
+                    <tr key={tx.id}>
+                      <td className="cb-date-cell">
+                        {formatDate(tx.date)}
+                      </td>
 
-                    <td className="cb-date-cell">{tx.date}</td>
+                      <td>
+                        <div className="cb-type-cell">
+                          {getTransactionIcon(tx.typeIcon)}
+                          <span>{tx.type}</span>
+                        </div>
+                      </td>
 
-                    {/* Type */}
+                      <td className="cb-amount-cell cb-text-right">
+                        {formatCurrency(tx.amount)}
+                      </td>
 
-                    <td>
-                      <div className="cb-type-cell">
-                        {getTransactionIcon(tx.typeIcon)}
+                      <td className="cb-actions-cell">
+                        <button
+                          type="button"
+                          className="cb-action-btn cb-edit-btn"
+                          title="Edit"
+                          aria-label={`Edit ${tx.type} transaction`}
+                          onClick={() => handleEdit(tx)}
+                        >
+                          <FaPen />
+                        </button>
 
-                        <span>{tx.type}</span>
-                      </div>
-                    </td>
-
-                    {/* Amount */}
-
-                    <td className="cb-amount-cell cb-text-right">
-                      {formatCurrency(tx.amount)}
-                    </td>
-
-                    {/* Actions */}
-
-                    <td className="cb-actions-cell">
-                      {/* Edit */}
-
-                      <button
-                        type="button"
-                        className="cb-action-btn cb-edit-btn"
-                        title="Edit"
-                        aria-label={`Edit ${tx.type} transaction`}
-                        onClick={() => handleEdit(tx)}
-                      >
-                        <FaPen />
-                      </button>
-
-                      {/* Delete */}
-
-                      <button
-                        type="button"
-                        className="cb-action-btn cb-delete-btn"
-                        title="Delete"
-                        aria-label={`Delete ${tx.type} transaction`}
-                        onClick={() => handleDelete(tx)}
-                      >
-                        <FaTrashCan />
-                      </button>
+                        <button
+                          type="button"
+                          className="cb-action-btn cb-delete-btn"
+                          title="Delete"
+                          aria-label={`Delete ${tx.type} transaction`}
+                          onClick={() => handleDelete(tx)}
+                        >
+                          <FaTrashCan />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="4"
+                      className="cb-empty-state"
+                    >
+                      No Cash & Bank transactions found.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
 
-          {/* ==========================================
-              Table Footer
-          ========================================== */}
+          {/* TABLE FOOTER */}
 
-          <div className="cb-table-footer">
-            <button type="button" className="cb-btn-view-all">
-              View All Transactions &rsaquo;
-            </button>
-          </div>
+          {transactions.length > 5 && (
+            <div className="cb-table-footer">
+              <button
+                type="button"
+                className="cb-btn-view-all"
+              >
+                View All Transactions &rsaquo;
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ==========================================
-          Cash Transfer Modal
-      ========================================== */}
+      {/* CASH TRANSFER MODAL */}
 
       <CashTransferModal
         isOpen={showTransferModal}
@@ -295,3 +540,4 @@ const CashBank = () => {
 };
 
 export default CashBank;
+
