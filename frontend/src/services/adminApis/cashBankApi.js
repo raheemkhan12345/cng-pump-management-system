@@ -9,3 +9,10 @@ export const getCashBank = async () => {
 
   return response.data;
 };
+
+// CREATE CASH & BANK TRANSFER
+
+export const createCashBankTransfer = async (transferData) => {
+  const response = await axiosInstance.post("/cashBank/transfer", transferData);
+  return response.data;
+};

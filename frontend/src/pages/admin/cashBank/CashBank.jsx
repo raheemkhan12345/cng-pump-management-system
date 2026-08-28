@@ -9,7 +9,11 @@ import {
   FaTrashCan,
 } from "react-icons/fa6";
 
-import { getCashBank } from "../../../services/adminApis/cashBankApi";
+import {
+  getCashBank,
+  createCashBankTransfer,
+} from "../../../services/adminApis/cashBankApi";
+
 import CashTransferModal from "../../../components/adminDashboardForms/cashTransferModal/CashTransferModal";
 
 import "./CashBank.css";
@@ -32,6 +36,7 @@ const CashBank = () => {
   const [transactions, setTransactions] = useState([]);
   const [balances, setBalances] = useState(EMPTY_BALANCES);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   // =========================================================
@@ -146,10 +151,7 @@ const CashBank = () => {
             ) || 0;
 
           return {
-            id:
-              transaction?._id ||
-              transaction?.id ||
-              `cash-bank-${index}`,
+            id: transaction?._id || transaction?.id || `cash-bank-${index}`,
 
             date:
               transaction?.date ||
@@ -162,18 +164,12 @@ const CashBank = () => {
             amount,
 
             cashChange:
-              Number(
-                transaction?.cashChange ??
-                  transaction?.cashAmount ??
-                  0,
-              ) || 0,
+              Number(transaction?.cashChange ?? transaction?.cashAmount ?? 0) ||
+              0,
 
             bankChange:
-              Number(
-                transaction?.bankChange ??
-                  transaction?.bankAmount ??
-                  0,
-              ) || 0,
+              Number(transaction?.bankChange ?? transaction?.bankAmount ?? 0) ||
+              0,
 
             remarks:
               transaction?.remarks ||
@@ -210,10 +206,7 @@ const CashBank = () => {
 
       console.log("Final Cash Balance:", totalCash);
       console.log("Final Bank Balance:", totalBank);
-      console.log(
-        "Final Cash & Bank Transactions:",
-        formattedTransactions,
-      );
+      console.log("Final Cash & Bank Transactions:", formattedTransactions);
     } catch (error) {
       console.error("Failed to fetch Cash & Bank data:", error);
 
@@ -230,6 +223,47 @@ const CashBank = () => {
       setIsLoading(false);
     }
   }, []);
+
+  // =========================================================
+  // CREATE CASH & BANK TRANSFER
+  // =========================================================
+
+  const handleTransferSubmit = async (formData) => {
+    try {
+      setIsSubmitting(true);
+      setError("");
+
+      console.log("Cash Bank Transfer Payload:", formData);
+
+      const response = await createCashBankTransfer(formData);
+
+      console.log("Cash Bank Transfer Response:", response);
+
+      // =====================================================
+      // REFRESH DATA AFTER SUCCESSFUL TRANSFER
+      // =====================================================
+
+      await fetchCashBankData();
+
+      // =====================================================
+      // CLOSE MODAL
+      // =====================================================
+
+      setShowTransferModal(false);
+    } catch (error) {
+      console.error("Failed to create Cash & Bank transfer:", error);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to create Cash & Bank transfer.";
+
+      alert(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // =========================================================
   // INITIAL LOAD
@@ -327,9 +361,7 @@ const CashBank = () => {
     return (
       <div className="cb-container">
         <div className="cb-content-wrapper">
-          <div className="cb-loading">
-            Loading Cash & Bank data...
-          </div>
+          <div className="cb-loading">Loading Cash & Bank data...</div>
         </div>
       </div>
     );
@@ -365,9 +397,7 @@ const CashBank = () => {
         {/* PAGE TITLE */}
 
         <div className="cb-title-section">
-          <h1 className="cb-page-title">
-            Cash & Bank Operations
-          </h1>
+          <h1 className="cb-page-title">Cash & Bank Operations</h1>
 
           <p className="cb-page-subtitle">
             Manage station liquidity and bank transfers securely.
@@ -381,9 +411,7 @@ const CashBank = () => {
 
           <div className="cb-stat-card">
             <div className="cb-stat-info">
-              <span className="cb-stat-label">
-                TOTAL CASH IN HAND
-              </span>
+              <span className="cb-stat-label">TOTAL CASH IN HAND</span>
 
               <h2 className="cb-stat-value">
                 Rs. {formatCurrency(balances.totalCash)}
@@ -399,9 +427,7 @@ const CashBank = () => {
 
           <div className="cb-stat-card">
             <div className="cb-stat-info">
-              <span className="cb-stat-label">
-                TOTAL BANK BALANCE
-              </span>
+              <span className="cb-stat-label">TOTAL BANK BALANCE</span>
 
               <h2 className="cb-stat-value">
                 Rs. {formatCurrency(balances.totalBank)}
@@ -430,15 +456,9 @@ const CashBank = () => {
 
         <div className="cb-table-card">
           <div className="cb-table-header">
-            <h3 className="cb-table-title">
-              Cash & Bank Transactions
-            </h3>
+            <h3 className="cb-table-title">Cash & Bank Transactions</h3>
 
-            <button
-              type="button"
-              className="cb-table-btn-icon"
-              title="Filter"
-            >
+            <button type="button" className="cb-table-btn-icon" title="Filter">
               <FaFilter />
             </button>
           </div>
@@ -448,13 +468,12 @@ const CashBank = () => {
               <thead>
                 <tr>
                   <th>Date</th>
+
                   <th>Type</th>
-                  <th className="cb-text-right">
-                    Amount (Rs.)
-                  </th>
-                  <th className="cb-text-center">
-                    Actions
-                  </th>
+
+                  <th className="cb-text-right">Amount (Rs.)</th>
+
+                  <th className="cb-text-center">Actions</th>
                 </tr>
               </thead>
 
@@ -462,9 +481,7 @@ const CashBank = () => {
                 {visibleTransactions.length > 0 ? (
                   visibleTransactions.map((tx) => (
                     <tr key={tx.id}>
-                      <td className="cb-date-cell">
-                        {formatDate(tx.date)}
-                      </td>
+                      <td className="cb-date-cell">{formatDate(tx.date)}</td>
 
                       <td>
                         <div className="cb-type-cell">
@@ -502,10 +519,7 @@ const CashBank = () => {
                   ))
                 ) : (
                   <tr>
-                    <td
-                      colSpan="4"
-                      className="cb-empty-state"
-                    >
+                    <td colSpan="4" className="cb-empty-state">
                       No Cash & Bank transactions found.
                     </td>
                   </tr>
@@ -518,10 +532,7 @@ const CashBank = () => {
 
           {transactions.length > 5 && (
             <div className="cb-table-footer">
-              <button
-                type="button"
-                className="cb-btn-view-all"
-              >
+              <button type="button" className="cb-btn-view-all">
                 View All Transactions &rsaquo;
               </button>
             </div>
@@ -534,10 +545,11 @@ const CashBank = () => {
       <CashTransferModal
         isOpen={showTransferModal}
         onClose={() => setShowTransferModal(false)}
+        onSubmit={handleTransferSubmit}
+        isSubmitting={isSubmitting}
       />
     </div>
   );
 };
 
 export default CashBank;
-
