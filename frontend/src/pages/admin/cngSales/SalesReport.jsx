@@ -13,7 +13,11 @@ import {
   FaTrashCan,
 } from "react-icons/fa6";
 
-import { getAllSales, updateSale } from "../../../services/adminApis/salesApi";
+import {
+  getAllSales,
+  updateSale,
+  deleteSale,
+} from "../../../services/adminApis/salesApi";
 
 import EditSaleModal from "../../../components/adminDashboardForms/EditSaleModal/EditSaleModal";
 
@@ -21,6 +25,12 @@ import "./SalesReport.css";
 
 const SalesReport = () => {
   const navigate = useNavigate();
+
+  // =========================================================
+  // CONSTANTS
+  // =========================================================
+
+  const ITEMS_PER_PAGE = 5;
 
   // =========================================================
   // STATES
@@ -37,7 +47,7 @@ const SalesReport = () => {
   const [error, setError] = useState("");
 
   // =========================================================
-  // EDIT MODAL STATES
+  // EDIT STATES
   // =========================================================
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -46,21 +56,20 @@ const SalesReport = () => {
 
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const ITEMS_PER_PAGE = 5;
+  // =========================================================
+  // DELETE STATES
+  // =========================================================
+
+  const [deletingSaleId, setDeletingSaleId] = useState(null);
 
   // =========================================================
-  // FETCH ALL SALES
+  // FETCH SALES
   // =========================================================
 
   const fetchSales = useCallback(async () => {
     try {
       setIsLoading(true);
-
       setError("");
-
-      // =====================================================
-      // GET API
-      // =====================================================
 
       const response = await getAllSales();
 
@@ -101,9 +110,9 @@ const SalesReport = () => {
           notes: sale?.notes || sale?.remarks || sale?.detail || "",
 
           salesKg:
-            Number(sale?.cngVolume || sale?.salesKg || sale?.volume || 0) || 0,
+            Number(sale?.cngVolume ?? sale?.salesKg ?? sale?.volume ?? 0) || 0,
 
-          totalAmount: Number(sale?.amount || sale?.totalAmount || 0) || 0,
+          totalAmount: Number(sale?.amount ?? sale?.totalAmount ?? 0) || 0,
 
           paymentMethod: sale?.paymentMethod || sale?.paymentMode || "cash",
 
@@ -158,7 +167,9 @@ const SalesReport = () => {
   // =========================================================
 
   const formatDate = (date) => {
-    if (!date) return "-";
+    if (!date) {
+      return "-";
+    }
 
     const [year, month, day] = String(date).slice(0, 10).split("-");
 
@@ -330,7 +341,6 @@ const SalesReport = () => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-
     setCurrentPage(1);
   };
 
@@ -340,7 +350,7 @@ const SalesReport = () => {
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
+      setCurrentPage((prevPage) => prevPage - 1);
     }
   };
 
@@ -350,7 +360,7 @@ const SalesReport = () => {
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage((prev) => prev + 1);
+      setCurrentPage((prevPage) => prevPage + 1);
     }
   };
 
@@ -397,6 +407,8 @@ const SalesReport = () => {
       if (!updatedData?.id) {
         console.error("Sale ID missing:", updatedData);
 
+        alert("Sale ID is missing.");
+
         return;
       }
 
@@ -439,7 +451,7 @@ const SalesReport = () => {
       setSelectedTransaction(null);
 
       // =====================================================
-      // REFRESH DATA FROM BACKEND
+      // REFRESH SALES
       // =====================================================
 
       await fetchSales();
@@ -465,13 +477,82 @@ const SalesReport = () => {
   };
 
   // =========================================================
-  // DELETE
+  // DELETE SALE
   // =========================================================
 
-  const handleDelete = (item) => {
-    console.log("Delete transaction:", item);
+  const handleDelete = async (item) => {
+    if (!item?.id) {
+      console.error("Sale ID missing:", item);
 
-    // DELETE API baad mein yahan integrate kar sakte ho.
+      alert("Sale ID is missing.");
+
+      return;
+    }
+
+    // =======================================================
+    // CONFIRM DELETE
+    // =======================================================
+
+    const isConfirmed = window.confirm(
+      `Are you sure you want to delete this sale record?\n\nDate: ${formatDate(
+        item.date,
+      )}\nSales: ${Number(item.salesKg || 0).toLocaleString("en-PK", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })} KG\nAmount: Rs. ${formatCurrency(item.totalAmount)}`,
+    );
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    try {
+      setDeletingSaleId(item.id);
+
+      console.log("Deleting Sale ID:", item.id);
+
+      // =====================================================
+      // DELETE API
+      // =====================================================
+
+      const response = await deleteSale(item.id);
+
+      console.log("Delete Sale API Response:", response);
+
+      // =====================================================
+      // REMOVE FROM LOCAL STATE
+      // =====================================================
+
+      setTransactions((prevTransactions) =>
+        prevTransactions.filter((transaction) => transaction.id !== item.id),
+      );
+
+      // =====================================================
+      // CALCULATE VALID PAGE AFTER DELETE
+      // =====================================================
+
+      const remainingResults = totalResults - 1;
+
+      const newTotalPages = Math.ceil(remainingResults / ITEMS_PER_PAGE);
+
+      if (newTotalPages > 0 && currentPage > newTotalPages) {
+        setCurrentPage(newTotalPages);
+      }
+
+      console.log("Sale deleted successfully.");
+    } catch (error) {
+      console.error("Delete Sale Error:", error);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to delete sale.";
+
+      alert(message);
+    } finally {
+      setDeletingSaleId(null);
+    }
   };
 
   // =========================================================
@@ -626,15 +707,10 @@ const SalesReport = () => {
             <thead>
               <tr>
                 <th>DATE</th>
-
                 <th>REMARKS</th>
-
                 <th>SALES (KG)</th>
-
                 <th>TOTAL AMOUNT</th>
-
                 <th>STATUS</th>
-
                 <th>ACTIONS</th>
               </tr>
             </thead>
@@ -664,7 +740,7 @@ const SalesReport = () => {
                       })}
                     </td>
 
-                    {/* AMOUNT + PAYMENT */}
+                    {/* AMOUNT */}
 
                     <td className="sr-font-bold">
                       <div className="sr-amount-wrapper">
@@ -697,7 +773,7 @@ const SalesReport = () => {
                         title="Edit"
                         aria-label={`Edit transaction ${formatDate(item.date)}`}
                         onClick={() => handleEdit(item)}
-                        disabled={isUpdating}
+                        disabled={isUpdating || deletingSaleId !== null}
                       >
                         <FaPen />
                       </button>
@@ -712,8 +788,16 @@ const SalesReport = () => {
                           item.date,
                         )}`}
                         onClick={() => handleDelete(item)}
+                        disabled={deletingSaleId !== null || isUpdating}
                       >
-                        <FaTrashCan />
+                        {deletingSaleId === item.id ? (
+                          <span
+                            className="sr-delete-spinner"
+                            aria-label="Deleting"
+                          />
+                        ) : (
+                          <FaTrashCan />
+                        )}
                       </button>
                     </td>
                   </tr>

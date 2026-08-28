@@ -25,3 +25,9 @@ export const updateSale = async (id, saleData) => {
 
   return response.data;
 };
+
+export const deleteSale = async (id) => {
+  const response = await axiosInstance.delete(`/sales/deleteSale/${id}`);
+
+  return response.data;
+};
