@@ -12,10 +12,7 @@ export const createAdmin = async (adminData) => {
 
     console.log("Create Admin Data:", adminData);
 
-    const response = await axiosInstance.post(
-      "/admins/createAdmin",
-      adminData,
-    );
+    const response = await axiosInstance.post("/admins/createAdmin", adminData);
 
     console.log("Create Admin API Response:", response.data);
 
@@ -67,20 +64,6 @@ export const getAllAdmins = async () => {
    UPDATE ADMIN / PUMP
 ========================================== */
 
-/*
- * Backend Route:
- *
- * PUT /api/v1/admins/updateAdmin/:id
- *
- * Example:
- *
- * updateAdmin(
- *   "6a8c1e1bd831a01677895860",
- *   {
- *     pumpName: "New Pump Name"
- *   }
- * )
- */
 
 export const updateAdmin = async (adminId, updateData) => {
   try {
@@ -136,20 +119,6 @@ export const updateAdmin = async (adminId, updateData) => {
 /* ==========================================
    DELETE ADMIN / PUMP
 ========================================== */
-
-/*
- * Backend Route:
- *
- * DELETE /api/v1/admins/deleteAdmin/:id
- *
- * Example:
- *
- * deleteAdmin("6a8c1e1bd831a01677895860")
- *
- * Final URL:
- *
- * /api/v1/admins/deleteAdmin/6a8c1e1bd831a01677895860
- */
 
 export const deleteAdmin = async (adminId) => {
   try {
