@@ -19,6 +19,7 @@ import {
   createLoan,
   getAllLoans,
   updateLoan,
+  deleteLoan,
 } from "../../../services/adminApis/loanApi";
 
 import "./Loans.css";
@@ -64,16 +65,6 @@ const Loans = () => {
 
   // =========================================================
   // PAYMENT TYPE HELPERS
-  // =========================================================
-  //
-  // Frontend:
-  //   cash
-  //   bank
-  //
-  // Backend:
-  //   cash
-  //   bank transfer
-  //
   // =========================================================
 
   const convertPaymentModeToApi = (paymentMode) => {
@@ -226,7 +217,10 @@ const Loans = () => {
 
       setLoanTransactions(formattedLoans);
 
-      // Reset pagination
+      // =====================================================
+      // RESET PAGINATION
+      // =====================================================
+
       setCurrentPage(1);
     } catch (error) {
       console.error("Failed to fetch loans:", error);
@@ -273,6 +267,7 @@ const Loans = () => {
         !newLoanData?.amount
       ) {
         console.error("Invalid loan form data:", newLoanData);
+
         return;
       }
 
@@ -303,6 +298,7 @@ const Loans = () => {
       console.log("==========================================");
       console.log("CREATE LOAN PAYLOAD");
       console.log("==========================================");
+
       console.log(JSON.stringify(payload, null, 2));
 
       // =====================================================
@@ -332,8 +328,11 @@ const Loans = () => {
       console.error("==========================================");
 
       console.error("Axios Error:", error);
+
       console.error("Status:", error?.response?.status);
+
       console.error("API Error Response:", error?.response?.data);
+
       console.error("API Error Message:", error?.response?.data?.message);
     } finally {
       setIsSubmitting(false);
@@ -353,13 +352,6 @@ const Loans = () => {
 
     // =====================================================
     // CONVERT TABLE DATE
-    //
-    // Table:
-    // 31-08-2026
-    //
-    // Input:
-    // 2026-08-31
-    // =====================================================
 
     let editDate = new Date().toISOString().split("T")[0];
 
@@ -423,6 +415,7 @@ const Loans = () => {
 
       if (!selectedLoan?.id) {
         console.error("Update Loan Error: Loan ID is missing.");
+
         return;
       }
 
@@ -438,6 +431,7 @@ const Loans = () => {
         !updatedLoanData?.paymentMode
       ) {
         console.error("Invalid update loan form data:", updatedLoanData);
+
         return;
       }
 
@@ -457,25 +451,15 @@ const Loans = () => {
 
         amount: Number(updatedLoanData.amount),
 
-        // IMPORTANT:
-        //
         // Frontend:
-        //   cash
-        //   bank
+        // cash / bank
         //
         // Backend:
-        //   cash
-        //   bank transfer
-        //
-        // This fixes:
-        // "payment type must be cash or bank transfer"
-        //
+        // cash / bank transfer
         paymentType: convertPaymentModeToApi(updatedLoanData.paymentMode),
       };
 
-      console.log("==========================================");
       console.log("UPDATE LOAN");
-      console.log("==========================================");
 
       console.log("Update Loan ID:", selectedLoan.id);
 
@@ -519,10 +503,20 @@ const Loans = () => {
 
       console.error("Update Loan API Error Response:", error?.response?.data);
 
-      console.error(
-        "Update Loan API Error Message:",
-        error?.response?.data?.message,
-      );
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.response?.data?.msg ||
+        error?.message ||
+        "Failed to update loan. Please try again.";
+
+      console.error("Update Loan API Error Message:", errorMessage);
+
+      // ==========================================
+      // SHOW BACKEND ERROR TO USER
+      // ==========================================
+
+      alert(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -546,10 +540,80 @@ const Loans = () => {
   // DELETE LOAN
   // =========================================================
 
-  const handleDelete = (loan) => {
-    console.log("Delete Loan:", loan);
+  const handleDelete = async (loan) => {
+    // =====================================================
+    // PREVENT DUPLICATE REQUEST
+    // =====================================================
 
-    // Delete API baad mein integrate hogi.
+    if (isSubmitting) {
+      return;
+    }
+
+    // =====================================================
+    // VALIDATE LOAN ID
+    // =====================================================
+
+    if (!loan?.id) {
+      console.error("Delete Loan Error: Loan ID is missing.");
+
+      return;
+    }
+
+    // =====================================================
+    // CONFIRM DELETE
+    // =====================================================
+
+    const shouldDelete = window.confirm(
+      `Are you sure you want to delete the loan record for "${loan.staffName}"?`,
+    );
+
+    if (!shouldDelete) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      // =====================================================
+      // DELETE API LOGS
+      // =====================================================
+      console.log("DELETE LOAN");
+
+      console.log("Delete Loan ID:", loan.id);
+
+      console.log("Delete Loan Name:", loan.staffName);
+
+      // =====================================================
+      // DELETE API
+      // =====================================================
+
+      const response = await deleteLoan(loan.id);
+
+      console.log("Delete Loan API Response:", response);
+
+      // =====================================================
+      // REFRESH LOANS
+      // =====================================================
+
+      await fetchLoans();
+
+      console.log("Loan deleted successfully.");
+    } catch (error) {
+      console.error("DELETE LOAN FAILED");
+
+      console.error("Axios Error:", error);
+
+      console.error("Delete Loan Status:", error?.response?.status);
+
+      console.error("Delete Loan API Error Response:", error?.response?.data);
+
+      console.error(
+        "Delete Loan API Error Message:",
+        error?.response?.data?.message,
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // =========================================================

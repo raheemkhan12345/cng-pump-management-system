@@ -19,3 +19,11 @@ export const getAllLoans = async () => {
 export const updateLoan = async (id, payload) => {
   return await axiosInstance.put(`/loans/updateLoan/${id}`, payload);
 };
+
+export const deleteLoan = async (id) => {
+  if (!id) {
+    throw new Error("Loan ID is required.");
+  }
+  const response = await axiosInstance.delete(`/loans/deleteLoan/${id}`);
+  return response.data;
+};
