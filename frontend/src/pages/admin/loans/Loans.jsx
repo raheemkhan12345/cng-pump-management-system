@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+
 import {
   Plus,
   Landmark,
@@ -12,172 +13,547 @@ import {
 } from "lucide-react";
 
 import RecordLoanModal from "../../../components/adminDashboardForms/addNewLoanModel/RecordLoanModel";
+import EditLoanModal from "../../../components/adminDashboardForms/editLoanModal/EditLoanModal";
+
+import {
+  createLoan,
+  getAllLoans,
+  updateLoan,
+} from "../../../services/adminApis/loanApi";
+
 import "./Loans.css";
 
 const Loans = () => {
   // =========================================================
-  // State
+  // CONSTANTS
   // =========================================================
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const ITEMS_PER_PAGE = 5;
 
+  const EMPTY_LOAN_STATS = {
+    thisMonthLoan: 0,
+    totalLoansGiven: 0,
+    thisMonthRecovery: 0,
+    activeLoanStaff: 0,
+  };
+
   // =========================================================
-  // Loan Transactions Data
+  // STATE
   // =========================================================
 
-  const [loanTransactions, setLoanTransactions] = useState([
-    {
-      id: 1,
-      date: "19-08-2026",
-      staffName: "Ali Raza",
-      type: "Loan Given",
-      amount: 10000,
-      remainingBal: 45000,
-    },
-    {
-      id: 2,
-      date: "18-08-2026",
-      staffName: "Noman Ali",
-      type: "Loan Received",
-      amount: 5000,
-      remainingBal: 0,
-    },
-    {
-      id: 3,
-      date: "15-08-2026",
-      staffName: "Muhammad Usman",
-      type: "Loan Given",
-      amount: 5000,
-      remainingBal: 15000,
-    },
-    {
-      id: 4,
-      date: "12-08-2026",
-      staffName: "Sajid Khan",
-      type: "Loan Received",
-      amount: 10000,
-      remainingBal: 120000,
-    },
-    {
-      id: 5,
-      date: "10-08-2026",
-      staffName: "Ali Raza",
-      type: "Loan Received",
-      amount: 15000,
-      remainingBal: 35000,
-    },
-    {
-      id: 6,
-      date: "08-08-2026",
-      staffName: "Bilal Ahmad",
-      type: "Loan Given",
-      amount: 20000,
-      remainingBal: 20000,
-    },
-    {
-      id: 7,
-      date: "05-08-2026",
-      staffName: "Usman Khan",
-      type: "Loan Received",
-      amount: 8000,
-      remainingBal: 12000,
-    },
-    {
-      id: 8,
-      date: "03-08-2026",
-      staffName: "Hamza Ali",
-      type: "Loan Given",
-      amount: 15000,
-      remainingBal: 15000,
-    },
-    {
-      id: 9,
-      date: "30-07-2026",
-      staffName: "Noman Ali",
-      type: "Loan Given",
-      amount: 12000,
-      remainingBal: 12000,
-    },
-    {
-      id: 10,
-      date: "28-07-2026",
-      staffName: "Sajid Khan",
-      type: "Loan Received",
-      amount: 7000,
-      remainingBal: 130000,
-    },
-    {
-      id: 11,
-      date: "25-07-2026",
-      staffName: "Ali Raza",
-      type: "Loan Received",
-      amount: 10000,
-      remainingBal: 25000,
-    },
-    {
-      id: 12,
-      date: "22-07-2026",
-      staffName: "Bilal Ahmad",
-      type: "Loan Given",
-      amount: 25000,
-      remainingBal: 25000,
-    },
-  ]);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Create Modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Edit Modal
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Selected loan for editing
+  const [selectedLoan, setSelectedLoan] = useState(null);
+
+  // API states
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // =========================================================
+  // LOAN TRANSACTIONS
+  // =========================================================
+
+  const [loanTransactions, setLoanTransactions] = useState([]);
+
+  // =========================================================
+  // PAYMENT TYPE HELPERS
+  // =========================================================
+  //
+  // Frontend:
+  //   cash
+  //   bank
+  //
+  // Backend:
+  //   cash
+  //   bank transfer
+  //
+  // =========================================================
+
+  const convertPaymentModeToApi = (paymentMode) => {
+    return paymentMode === "bank" ? "bank transfer" : "cash";
+  };
+
+  const convertPaymentTypeToFrontend = (paymentType) => {
+    if (
+      paymentType === "bank transfer" ||
+      paymentType === "bank_transfer" ||
+      paymentType === "bank"
+    ) {
+      return "bank";
+    }
+
+    return "cash";
+  };
+
+  // =========================================================
+  // GET ALL LOANS
+  // =========================================================
+
+  const fetchLoans = async () => {
+    try {
+      setIsLoading(true);
+
+      const response = await getAllLoans();
+
+      console.log("Get All Loans API Response:", response);
+
+      // =====================================================
+      // FIND API DATA
+      // =====================================================
+
+      const apiData = response?.data ?? response ?? {};
+
+      // =====================================================
+      // SUPPORT COMMON RESPONSE STRUCTURES
+      // =====================================================
+
+      const loansArray = Array.isArray(apiData)
+        ? apiData
+        : Array.isArray(apiData?.loans)
+          ? apiData.loans
+          : Array.isArray(apiData?.data)
+            ? apiData.data
+            : Array.isArray(response?.loans)
+              ? response.loans
+              : [];
+
+      console.log("Loans API Data:", loansArray);
+
+      // =====================================================
+      // FORMAT API DATA
+      // =====================================================
+
+      const formattedLoans = loansArray.map((loan, index) => {
+        // ---------------------------------------------------
+        // ID
+        // ---------------------------------------------------
+
+        const loanId = loan?._id || loan?.id || `loan-${index}-${Date.now()}`;
+
+        // ---------------------------------------------------
+        // DATE
+        // ---------------------------------------------------
+
+        let formattedDate = "-";
+
+        if (loan?.date) {
+          const rawDate = String(loan.date).split("T")[0];
+
+          const dateParts = rawDate.split("-");
+
+          if (dateParts.length === 3) {
+            formattedDate = dateParts.reverse().join("-");
+          } else {
+            formattedDate = rawDate;
+          }
+        }
+
+        // ---------------------------------------------------
+        // LOAN TYPE
+        // ---------------------------------------------------
+
+        let formattedLoanType = "-";
+
+        if (loan?.loanType === "loan_given") {
+          formattedLoanType = "Loan Given";
+        } else if (loan?.loanType === "loan_received") {
+          formattedLoanType = "Loan Received";
+        } else if (loan?.loanType) {
+          formattedLoanType = loan.loanType;
+        }
+
+        // ---------------------------------------------------
+        // NAME
+        // ---------------------------------------------------
+
+        const personName =
+          loan?.name || loan?.personName || loan?.staffName || "-";
+
+        // ---------------------------------------------------
+        // AMOUNT
+        // ---------------------------------------------------
+
+        const amount = Number(loan?.amount) || 0;
+
+        // ---------------------------------------------------
+        // REMAINING BALANCE
+        // ---------------------------------------------------
+
+        const remainingBalance = Number(
+          loan?.remainingBal ??
+            loan?.remainingBalance ??
+            loan?.balance ??
+            amount,
+        );
+
+        // ---------------------------------------------------
+        // PAYMENT TYPE
+        // ---------------------------------------------------
+
+        const paymentMode = convertPaymentTypeToFrontend(loan?.paymentType);
+
+        // ---------------------------------------------------
+        // RETURN FORMATTED OBJECT
+        // ---------------------------------------------------
+
+        return {
+          // Table data
+          id: loanId,
+          date: formattedDate,
+          staffName: personName,
+          type: formattedLoanType,
+          amount,
+          remainingBal: remainingBalance,
+
+          // Edit form data
+          loanType:
+            loan?.loanType === "loan_received" ? "loan_received" : "loan_given",
+
+          personName,
+
+          paymentMode,
+        };
+      });
+
+      console.log("Formatted Loans:", formattedLoans);
+
+      setLoanTransactions(formattedLoans);
+
+      // Reset pagination
+      setCurrentPage(1);
+    } catch (error) {
+      console.error("Failed to fetch loans:", error);
+
+      console.error("Get All Loans API Error Response:", error?.response?.data);
+
+      setLoanTransactions([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // =========================================================
+  // FETCH LOANS ON PAGE LOAD
+  // =========================================================
+
+  useEffect(() => {
+    fetchLoans();
+  }, []);
+
+  // =========================================================
+  // LOAN STATUS
+  // =========================================================
 
   const getLoanStatus = (remainingBal) => {
     return Number(remainingBal) <= 0 ? "Paid" : "Active";
   };
 
   // =========================================================
-  // Save New Loan Handler
+  // CREATE NEW LOAN
   // =========================================================
 
-  const handleSaveLoan = (newLoanData) => {
-    const formattedDate = newLoanData.date.split("-").reverse().join("-");
+  const handleSaveLoan = async (newLoanData) => {
+    try {
+      setIsSubmitting(true);
 
-    const loanAmount = Number(newLoanData.amount);
+      // =====================================================
+      // VALIDATE FORM DATA
+      // =====================================================
 
-    const newEntry = {
-      id: Date.now(),
-      date: formattedDate,
-      staffName: newLoanData.personName,
-      type: newLoanData.loanType,
-      amount: loanAmount,
+      if (
+        !newLoanData?.date ||
+        !newLoanData?.personName?.trim() ||
+        !newLoanData?.amount
+      ) {
+        console.error("Invalid loan form data:", newLoanData);
+        return;
+      }
 
-      // New loan starts with full amount remaining.
-      remainingBal: loanAmount,
-    };
+      // =====================================================
+      // CREATE PAYLOAD
+      // =====================================================
 
-    setLoanTransactions((prev) => [newEntry, ...prev]);
+      const payload = {
+        date: newLoanData.date,
 
-    // New transaction added, so show first page.
-    setCurrentPage(1);
+        loanType:
+          newLoanData.loanType === "loan_given"
+            ? "loan_given"
+            : "loan_received",
 
-    // Close modal after successful save.
-    setIsModalOpen(false);
+        name: newLoanData.personName.trim(),
+
+        amount: Number(newLoanData.amount),
+
+        // Frontend:
+        // cash / bank
+        //
+        // Backend:
+        // cash / bank transfer
+        paymentType: convertPaymentModeToApi(newLoanData.paymentMode),
+      };
+
+      console.log("==========================================");
+      console.log("CREATE LOAN PAYLOAD");
+      console.log("==========================================");
+      console.log(JSON.stringify(payload, null, 2));
+
+      // =====================================================
+      // CREATE API
+      // =====================================================
+
+      const response = await createLoan(payload);
+
+      console.log("Create Loan API Response:", response);
+
+      // =====================================================
+      // REFRESH LOANS
+      // =====================================================
+
+      await fetchLoans();
+
+      // =====================================================
+      // CLOSE MODAL
+      // =====================================================
+
+      setIsModalOpen(false);
+
+      console.log("Loan created successfully.");
+    } catch (error) {
+      console.error("==========================================");
+      console.error("CREATE LOAN FAILED");
+      console.error("==========================================");
+
+      console.error("Axios Error:", error);
+      console.error("Status:", error?.response?.status);
+      console.error("API Error Response:", error?.response?.data);
+      console.error("API Error Message:", error?.response?.data?.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // =========================================================
-  // Edit Loan Handler
+  // OPEN EDIT MODAL
   // =========================================================
 
   const handleEdit = (loan) => {
-    console.log("Edit Loan:", loan);
+    if (isSubmitting) {
+      return;
+    }
+
+    console.log("Selected Loan For Edit:", loan);
+
+    // =====================================================
+    // CONVERT TABLE DATE
+    //
+    // Table:
+    // 31-08-2026
+    //
+    // Input:
+    // 2026-08-31
+    // =====================================================
+
+    let editDate = new Date().toISOString().split("T")[0];
+
+    if (loan?.date && loan.date !== "-") {
+      const dateParts = loan.date.split("-");
+
+      if (dateParts.length === 3) {
+        editDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+      }
+    }
+
+    // =====================================================
+    // SET SELECTED LOAN
+    // =====================================================
+
+    const selectedLoanData = {
+      id: loan.id,
+
+      date: editDate,
+
+      loanType:
+        loan.loanType ||
+        (loan.type === "Loan Received" ? "loan_received" : "loan_given"),
+
+      personName: loan.personName || loan.staffName || "",
+
+      amount: loan.amount ?? "",
+
+      // Frontend only:
+      // cash / bank
+      paymentMode:
+        loan.paymentMode === "bank transfer" ||
+        loan.paymentMode === "bank_transfer" ||
+        loan.paymentMode === "bank"
+          ? "bank"
+          : "cash",
+    };
+
+    console.log("Selected Loan Data For Edit Modal:", selectedLoanData);
+
+    setSelectedLoan(selectedLoanData);
+
+    // =====================================================
+    // OPEN EDIT MODAL
+    // =====================================================
+
+    setIsEditModalOpen(true);
   };
 
   // =========================================================
-  // Delete Loan Handler
+  // UPDATE LOAN
+  // =========================================================
+
+  const handleUpdateLoan = async (updatedLoanData) => {
+    try {
+      setIsSubmitting(true);
+
+      // =====================================================
+      // VALIDATE LOAN ID
+      // =====================================================
+
+      if (!selectedLoan?.id) {
+        console.error("Update Loan Error: Loan ID is missing.");
+        return;
+      }
+
+      // =====================================================
+      // VALIDATE FORM DATA
+      // =====================================================
+
+      if (
+        !updatedLoanData?.date ||
+        !updatedLoanData?.personName?.trim() ||
+        !updatedLoanData?.amount ||
+        !updatedLoanData?.loanType ||
+        !updatedLoanData?.paymentMode
+      ) {
+        console.error("Invalid update loan form data:", updatedLoanData);
+        return;
+      }
+
+      // =====================================================
+      // UPDATE PAYLOAD
+      // =====================================================
+
+      const payload = {
+        date: updatedLoanData.date,
+
+        loanType:
+          updatedLoanData.loanType === "loan_given"
+            ? "loan_given"
+            : "loan_received",
+
+        name: updatedLoanData.personName.trim(),
+
+        amount: Number(updatedLoanData.amount),
+
+        // IMPORTANT:
+        //
+        // Frontend:
+        //   cash
+        //   bank
+        //
+        // Backend:
+        //   cash
+        //   bank transfer
+        //
+        // This fixes:
+        // "payment type must be cash or bank transfer"
+        //
+        paymentType: convertPaymentModeToApi(updatedLoanData.paymentMode),
+      };
+
+      console.log("==========================================");
+      console.log("UPDATE LOAN");
+      console.log("==========================================");
+
+      console.log("Update Loan ID:", selectedLoan.id);
+
+      console.log("Frontend Payment Mode:", updatedLoanData.paymentMode);
+
+      console.log("Backend Payment Type:", payload.paymentType);
+
+      console.log("Update Loan Payload:", JSON.stringify(payload, null, 2));
+
+      // =====================================================
+      // UPDATE API
+      // =====================================================
+
+      const response = await updateLoan(selectedLoan.id, payload);
+
+      console.log("Update Loan API Response:", response);
+
+      // =====================================================
+      // REFRESH LOANS
+      // =====================================================
+
+      await fetchLoans();
+
+      // =====================================================
+      // CLOSE EDIT MODAL
+      // =====================================================
+
+      setIsEditModalOpen(false);
+
+      setSelectedLoan(null);
+
+      console.log("Loan updated successfully.");
+    } catch (error) {
+      console.error("==========================================");
+      console.error("UPDATE LOAN FAILED");
+      console.error("==========================================");
+
+      console.error("Axios Error:", error);
+
+      console.error("Update Loan Status:", error?.response?.status);
+
+      console.error("Update Loan API Error Response:", error?.response?.data);
+
+      console.error(
+        "Update Loan API Error Message:",
+        error?.response?.data?.message,
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // =========================================================
+  // CLOSE EDIT MODAL
+  // =========================================================
+
+  const handleCloseEditModal = () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsEditModalOpen(false);
+
+    setSelectedLoan(null);
+  };
+
+  // =========================================================
+  // DELETE LOAN
   // =========================================================
 
   const handleDelete = (loan) => {
     console.log("Delete Loan:", loan);
+
+    // Delete API baad mein integrate hogi.
   };
 
   // =========================================================
-  // Currency Formatter
+  // CURRENCY FORMATTER
   // =========================================================
 
   const formatCurrency = (amount) => {
@@ -185,21 +561,18 @@ const Loans = () => {
   };
 
   // =========================================================
-  // Current Date
-  // =========================================================
-
-  const today = new Date();
-
-  // =========================================================
-  // Loan Statistics
+  // LOAN STATISTICS
   // =========================================================
 
   const loanStats = useMemo(() => {
+    const today = new Date();
+
     const currentMonth = today.getMonth();
+
     const currentYear = today.getFullYear();
 
     // =======================================================
-    // This Month Loan
+    // THIS MONTH LOAN
     // =======================================================
 
     const thisMonthLoan = loanTransactions
@@ -208,8 +581,18 @@ const Loans = () => {
           return false;
         }
 
+        if (!transaction.date || transaction.date === "-") {
+          return false;
+        }
+
+        const dateParts = transaction.date.split("-");
+
+        if (dateParts.length !== 3) {
+          return false;
+        }
+
         const transactionDate = new Date(
-          `${transaction.date.split("-").reverse().join("-")}T00:00:00`,
+          `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00`,
         );
 
         return (
@@ -223,7 +606,7 @@ const Loans = () => {
       );
 
     // =======================================================
-    // Total Loans Given
+    // TOTAL LOANS GIVEN
     // =======================================================
 
     const totalLoansGiven = loanTransactions
@@ -234,17 +617,27 @@ const Loans = () => {
       );
 
     // =======================================================
-    // This Month Recovery
+    // THIS MONTH LOAN RECEIVED
     // =======================================================
 
     const thisMonthRecovery = loanTransactions
       .filter((transaction) => {
-        if (transaction.type !== "Recovery") {
+        if (transaction.type !== "Loan Received") {
+          return false;
+        }
+
+        if (!transaction.date || transaction.date === "-") {
+          return false;
+        }
+
+        const dateParts = transaction.date.split("-");
+
+        if (dateParts.length !== 3) {
           return false;
         }
 
         const transactionDate = new Date(
-          `${transaction.date.split("-").reverse().join("-")}T00:00:00`,
+          `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00`,
         );
 
         return (
@@ -258,9 +651,8 @@ const Loans = () => {
       );
 
     // =======================================================
-    // Active Loan Staff
+    // ACTIVE LOAN STAFF
     // =======================================================
-    // A staff member is active only when remaining balance > 0.
 
     const activeStaff = new Set(
       loanTransactions
@@ -269,15 +661,20 @@ const Loans = () => {
     );
 
     return {
+      ...EMPTY_LOAN_STATS,
+
       thisMonthLoan,
+
       totalLoansGiven,
+
       thisMonthRecovery,
+
       activeLoanStaff: activeStaff.size,
     };
   }, [loanTransactions]);
 
   // =========================================================
-  // Pagination
+  // PAGINATION
   // =========================================================
 
   const totalResults = loanTransactions.length;
@@ -291,7 +688,7 @@ const Loans = () => {
   const currentTransactions = loanTransactions.slice(startIndex, endIndex);
 
   // =========================================================
-  // Page Numbers
+  // PAGE NUMBERS
   // =========================================================
 
   const pageNumbers = Array.from(
@@ -300,7 +697,7 @@ const Loans = () => {
   );
 
   // =========================================================
-  // Previous Page
+  // PREVIOUS PAGE
   // =========================================================
 
   const handlePreviousPage = () => {
@@ -310,7 +707,7 @@ const Loans = () => {
   };
 
   // =========================================================
-  // Next Page
+  // NEXT PAGE
   // =========================================================
 
   const handleNextPage = () => {
@@ -320,7 +717,7 @@ const Loans = () => {
   };
 
   // =========================================================
-  // Page Change
+  // PAGE CHANGE
   // =========================================================
 
   const handlePageChange = (page) => {
@@ -328,13 +725,37 @@ const Loans = () => {
   };
 
   // =========================================================
-  // Render
+  // OPEN CREATE MODAL
+  // =========================================================
+
+  const handleOpenModal = () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsModalOpen(true);
+  };
+
+  // =========================================================
+  // CLOSE CREATE MODAL
+  // =========================================================
+
+  const handleCloseModal = () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsModalOpen(false);
+  };
+
+  // =========================================================
+  // RENDER
   // =========================================================
 
   return (
     <div className="loan-page-container">
       {/* =====================================================
-          Header
+          HEADER
       ===================================================== */}
 
       <div className="loan-header-section">
@@ -350,7 +771,8 @@ const Loans = () => {
           <button
             type="button"
             className="loan-btn-primary"
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleOpenModal}
+            disabled={isSubmitting}
           >
             <Plus size={18} />
 
@@ -360,11 +782,11 @@ const Loans = () => {
       </div>
 
       {/* =====================================================
-          Statistics
+          STATISTICS
       ===================================================== */}
 
       <div className="loan-stats-grid">
-        {/* This Month Loan */}
+        {/* THIS MONTH LOAN */}
 
         <div className="loan-stat-card">
           <div className="loan-icon-box loan-icon-bg-gray">
@@ -378,7 +800,7 @@ const Loans = () => {
           </h2>
         </div>
 
-        {/* Total Loans Given */}
+        {/* TOTAL LOANS GIVEN */}
 
         <div className="loan-stat-card">
           <div className="loan-icon-box loan-icon-bg-gray">
@@ -394,21 +816,21 @@ const Loans = () => {
           <span className="loan-stat-sub">Current outstanding</span>
         </div>
 
-        {/* This Month Recovery */}
+        {/* THIS MONTH LOAN RECEIVED */}
 
         <div className="loan-stat-card">
           <div className="loan-icon-box loan-icon-bg-gray">
             <TrendingUp size={18} className="loan-icon-gray" />
           </div>
 
-          <span className="loan-stat-label">This Month's Recovery</span>
+          <span className="loan-stat-label">This Month's Loan Received</span>
 
           <h2 className="loan-stat-value loan-text-green">
             Rs. {formatCurrency(loanStats.thisMonthRecovery)}
           </h2>
         </div>
 
-        {/* Active Staff */}
+        {/* ACTIVE STAFF */}
 
         <div className="loan-stat-card">
           <div className="loan-icon-box loan-icon-bg-gray">
@@ -425,11 +847,11 @@ const Loans = () => {
       </div>
 
       {/* =====================================================
-          Transactions
+          TRANSACTIONS
       ===================================================== */}
 
       <div className="loan-table-card">
-        {/* Table Header */}
+        {/* TABLE HEADER */}
 
         <div className="loan-table-header">
           <h3 className="loan-table-title">Recent Loan Transactions</h3>
@@ -443,7 +865,7 @@ const Loans = () => {
           </button>
         </div>
 
-        {/* Table */}
+        {/* TABLE */}
 
         <div className="loan-table-wrapper">
           <table className="loan-table">
@@ -460,34 +882,35 @@ const Loans = () => {
             </thead>
 
             <tbody>
-              {currentTransactions.length > 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td colSpan="7" className="loan-empty-state">
+                    Loading loans...
+                  </td>
+                </tr>
+              ) : currentTransactions.length > 0 ? (
                 currentTransactions.map((item) => {
-                  // =================================================
-                  // Status is calculated from remaining balance.
-                  // No manual status/dropdown is required.
-                  // =================================================
-
                   const status = getLoanStatus(item.remainingBal);
 
                   return (
                     <tr key={item.id}>
-                      {/* Date */}
+                      {/* DATE */}
 
                       <td className="loan-text-muted">{item.date}</td>
 
-                      {/* Staff Name */}
+                      {/* NAME */}
 
                       <td className="loan-font-bold">{item.staffName}</td>
 
-                      {/* Type */}
+                      {/* TYPE */}
 
                       <td className="loan-text-muted">{item.type}</td>
 
-                      {/* Amount */}
+                      {/* AMOUNT */}
 
                       <td
                         className={
-                          item.type === "Recovery"
+                          item.type === "Loan Received"
                             ? "loan-text-green loan-font-bold"
                             : "loan-font-bold"
                         }
@@ -495,13 +918,13 @@ const Loans = () => {
                         Rs. {formatCurrency(item.amount)}
                       </td>
 
-                      {/* Remaining Balance */}
+                      {/* REMAINING BALANCE */}
 
                       <td className="loan-text-muted">
                         Rs. {formatCurrency(item.remainingBal)}
                       </td>
 
-                      {/* Status */}
+                      {/* STATUS */}
 
                       <td>
                         <span
@@ -515,12 +938,10 @@ const Loans = () => {
                         </span>
                       </td>
 
-                      {/* =================================================
-                          Actions
-                      ================================================= */}
+                      {/* ACTIONS */}
 
                       <td className="loan-actions-cell">
-                        {/* Edit */}
+                        {/* EDIT */}
 
                         <button
                           type="button"
@@ -528,11 +949,12 @@ const Loans = () => {
                           title="Edit"
                           aria-label={`Edit loan for ${item.staffName}`}
                           onClick={() => handleEdit(item)}
+                          disabled={isSubmitting}
                         >
                           <Pencil size={11} />
                         </button>
 
-                        {/* Delete */}
+                        {/* DELETE */}
 
                         <button
                           type="button"
@@ -540,6 +962,7 @@ const Loans = () => {
                           title="Delete"
                           aria-label={`Delete loan for ${item.staffName}`}
                           onClick={() => handleDelete(item)}
+                          disabled={isSubmitting}
                         >
                           <Trash2 size={11} />
                         </button>
@@ -559,7 +982,7 @@ const Loans = () => {
         </div>
 
         {/* =================================================
-            Pagination
+            PAGINATION
         ================================================= */}
 
         {totalResults > 0 && (
@@ -570,7 +993,7 @@ const Loans = () => {
             </span>
 
             <div className="loan-pagination-controls">
-              {/* Previous */}
+              {/* PREVIOUS */}
 
               <button
                 type="button"
@@ -582,7 +1005,7 @@ const Loans = () => {
                 <ChevronLeft size={15} />
               </button>
 
-              {/* Page Numbers */}
+              {/* PAGE NUMBERS */}
 
               {pageNumbers.map((page) => (
                 <button
@@ -597,7 +1020,7 @@ const Loans = () => {
                 </button>
               ))}
 
-              {/* Next */}
+              {/* NEXT */}
 
               <button
                 type="button"
@@ -614,13 +1037,26 @@ const Loans = () => {
       </div>
 
       {/* =====================================================
-          Record Loan Modal
+          CREATE LOAN MODAL
       ===================================================== */}
 
       <RecordLoanModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
         onSave={handleSaveLoan}
+        isSubmitting={isSubmitting}
+      />
+
+      {/* =====================================================
+          EDIT LOAN MODAL
+      ===================================================== */}
+
+      <EditLoanModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onSave={handleUpdateLoan}
+        isSubmitting={isSubmitting}
+        initialData={selectedLoan}
       />
     </div>
   );

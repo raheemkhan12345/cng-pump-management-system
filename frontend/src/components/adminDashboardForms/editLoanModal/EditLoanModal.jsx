@@ -1,11 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, Calendar, User, Wallet, Landmark, Save } from "lucide-react";
 
-import "./RecordLoanModel.css";
+import "./EditLoanModal.css";
 
-const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
+const EditLoanModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  isSubmitting,
+  initialData,
+}) => {
   // =========================================================
-  // DEFAULT FORM
+  // DEFAULT FORM DATA
   // =========================================================
 
   const getDefaultFormData = () => ({
@@ -23,15 +29,56 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
   const [formData, setFormData] = useState(getDefaultFormData());
 
   // =========================================================
+  // LOAD SELECTED LOAN DATA
+  // =========================================================
+
+  useEffect(() => {
+    if (initialData && isOpen) {
+      setFormData({
+        date: initialData.date || new Date().toISOString().split("T")[0],
+
+        loanType: initialData.loanType || "loan_given",
+
+        personName: initialData.personName || "",
+
+        amount: initialData.amount ?? "",
+
+        // Frontend always uses:
+        // cash / bank
+        paymentMode: initialData.paymentMode === "bank" ? "bank" : "cash",
+      });
+    }
+
+    if (!isOpen) {
+      setFormData(getDefaultFormData());
+    }
+  }, [initialData, isOpen]);
+
+  // =========================================================
   // HANDLE INPUT CHANGE
   // =========================================================
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleChange = (event) => {
+    const { name, value } = event.target;
 
-    setFormData((prev) => ({
-      ...prev,
+    setFormData((previousData) => ({
+      ...previousData,
       [name]: value,
+    }));
+  };
+
+  // =========================================================
+  // SELECT PAYMENT MODE
+  // =========================================================
+
+  const handlePaymentModeChange = (paymentMode) => {
+    if (isSubmitting) {
+      return;
+    }
+
+    setFormData((previousData) => ({
+      ...previousData,
+      paymentMode,
     }));
   };
 
@@ -39,24 +86,44 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
   // HANDLE SUBMIT
   // =========================================================
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
-    if (!formData.date || !formData.personName.trim() || !formData.amount) {
+    // -------------------------------------------------------
+    // VALIDATION
+    // -------------------------------------------------------
+
+    if (!formData.date) {
       return;
     }
 
-    if (onSave) {
-      onSave(formData);
+    if (!formData.personName.trim()) {
+      return;
     }
-  };
 
-  // =========================================================
-  // RESET FORM
-  // =========================================================
+    if (!formData.amount || Number(formData.amount) <= 0) {
+      return;
+    }
 
-  const resetForm = () => {
-    setFormData(getDefaultFormData());
+    if (!formData.loanType) {
+      return;
+    }
+
+    if (!formData.paymentMode) {
+      return;
+    }
+
+    // -------------------------------------------------------
+    // SEND DATA TO PARENT
+    // -------------------------------------------------------
+
+    if (onSave) {
+      onSave({
+        ...formData,
+        personName: formData.personName.trim(),
+        amount: Number(formData.amount),
+      });
+    }
   };
 
   // =========================================================
@@ -64,9 +131,10 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
   // =========================================================
 
   const handleClose = () => {
-    if (isSubmitting) return;
+    if (isSubmitting) {
+      return;
+    }
 
-    resetForm();
     onClose();
   };
 
@@ -74,25 +142,27 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
   // MODAL STATE
   // =========================================================
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   // =========================================================
   // RENDER
   // =========================================================
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
-        {/* =====================================================
+    <div className="elm-overlay">
+      <div className="elm-container">
+        {/* ===================================================
             HEADER
-        ===================================================== */}
+        =================================================== */}
 
-        <div className="modal-header">
-          <h2>Record New Loan</h2>
+        <div className="elm-header">
+          <h2>Edit Loan Record</h2>
 
           <button
             type="button"
-            className="modal-close-btn"
+            className="elm-close-btn"
             onClick={handleClose}
             aria-label="Close modal"
             disabled={isSubmitting}
@@ -101,23 +171,24 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
           </button>
         </div>
 
-        {/* =====================================================
+        {/* ===================================================
             FORM
-        ===================================================== */}
+        =================================================== */}
 
-        <form onSubmit={handleSubmit} className="modal-body">
-          <div className="form-grid">
+        <form onSubmit={handleSubmit} className="elm-body">
+          <div className="elm-form-grid">
             {/* =================================================
                 DATE
             ================================================= */}
 
-            <div className="form-group">
-              <label>DATE</label>
+            <div className="elm-form-group">
+              <label htmlFor="edit-loan-date">DATE</label>
 
-              <div className="input-with-icon">
-                <Calendar size={18} className="input-icon" />
+              <div className="elm-input-with-icon">
+                <Calendar size={18} className="elm-input-icon" />
 
                 <input
+                  id="edit-loan-date"
                   type="date"
                   name="date"
                   value={formData.date}
@@ -132,31 +203,34 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
                 LOAN TYPE
             ================================================= */}
 
-            <div className="form-group">
-              <label>LOAN TYPE</label>
+            <div className="elm-form-group">
+              <label htmlFor="edit-loan-type">LOAN TYPE</label>
 
               <select
+                id="edit-loan-type"
                 name="loanType"
                 value={formData.loanType}
                 onChange={handleChange}
                 disabled={isSubmitting}
               >
                 <option value="loan_given">Loan Given</option>
+
                 <option value="loan_received">Loan Received</option>
               </select>
             </div>
 
             {/* =================================================
-                PERSON / COMPANY
+                NAME
             ================================================= */}
 
-            <div className="form-group">
-              <label>NAME</label>
+            <div className="elm-form-group">
+              <label htmlFor="edit-loan-name">NAME</label>
 
-              <div className="input-with-icon">
-                <User size={18} className="input-icon" />
+              <div className="elm-input-with-icon">
+                <User size={18} className="elm-input-icon" />
 
                 <input
+                  id="edit-loan-name"
                   type="text"
                   name="personName"
                   placeholder="Enter name ..."
@@ -172,19 +246,21 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
                 AMOUNT
             ================================================= */}
 
-            <div className="form-group">
-              <label>AMOUNT (PKR)</label>
+            <div className="elm-form-group">
+              <label htmlFor="edit-loan-amount">AMOUNT (PKR)</label>
 
-              <div className="amount-input-box">
-                <span className="currency-prefix">Rs.</span>
+              <div className="elm-amount-box">
+                <span className="elm-currency-prefix">Rs.</span>
 
                 <input
+                  id="edit-loan-amount"
                   type="number"
                   name="amount"
                   placeholder="0.00"
                   value={formData.amount}
                   onChange={handleChange}
                   min="1"
+                  step="1"
                   required
                   disabled={isSubmitting}
                 />
@@ -192,55 +268,53 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
             </div>
 
             {/* =================================================
-                PAYMENT MODE / POOL
+                PAYMENT MODE
             ================================================= */}
 
-            <div className="form-group full-width">
+            <div className="elm-form-group elm-full-width">
               <label>PAYMENT MODE / POOL</label>
 
-              <div className="payment-options">
-                {/* CASH */}
+              <div className="elm-payment-options">
+                {/* =================================================
+                    CASH
+                ================================================= */}
 
                 <button
                   type="button"
-                  className={`payment-card ${
-                    formData.paymentMode === "cash" ? "selected" : ""
+                  className={`elm-payment-card ${
+                    formData.paymentMode === "cash" ? "elm-selected" : ""
                   }`}
-                  onClick={() =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      paymentMode: "cash",
-                    }))
-                  }
+                  onClick={() => handlePaymentModeChange("cash")}
                   disabled={isSubmitting}
+                  aria-pressed={formData.paymentMode === "cash"}
                 >
                   <Wallet size={20} />
 
                   <div>
                     <strong>Cash Account</strong>
+
                     <p>Hand Pool</p>
                   </div>
                 </button>
 
-                {/* BANK */}
+                {/* =================================================
+                    BANK
+                ================================================= */}
 
                 <button
                   type="button"
-                  className={`payment-card ${
-                    formData.paymentMode === "bank" ? "selected" : ""
+                  className={`elm-payment-card ${
+                    formData.paymentMode === "bank" ? "elm-selected" : ""
                   }`}
-                  onClick={() =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      paymentMode: "bank",
-                    }))
-                  }
+                  onClick={() => handlePaymentModeChange("bank")}
                   disabled={isSubmitting}
+                  aria-pressed={formData.paymentMode === "bank"}
                 >
                   <Landmark size={20} />
 
                   <div>
                     <strong>Bank Account</strong>
+
                     <p>Reserve Pool</p>
                   </div>
                 </button>
@@ -248,28 +322,32 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
             </div>
           </div>
 
-          {/* =====================================================
-              FOOTER ACTIONS
-          ===================================================== */}
+          {/* ===================================================
+              FOOTER
+          =================================================== */}
 
-          <div className="modal-footer">
+          <div className="elm-footer">
+            {/* CANCEL */}
+
             <button
               type="button"
-              className="btn-cancel"
+              className="elm-btn-cancel"
               onClick={handleClose}
               disabled={isSubmitting}
             >
               Cancel
             </button>
 
+            {/* UPDATE */}
+
             <button
               type="submit"
-              className="btn-submit"
+              className="elm-btn-submit"
               disabled={isSubmitting}
             >
               <Save size={16} />
 
-              {isSubmitting ? "Recording..." : "Record Loan"}
+              {isSubmitting ? "Updating..." : "Update Loan"}
             </button>
           </div>
         </form>
@@ -278,4 +356,4 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
   );
 };
 
-export default RecordLoanModal;
+export default EditLoanModal;

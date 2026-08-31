@@ -1,0 +1,220 @@
+.elm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.elm-container {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 550px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.elm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
+}
+
+.elm-header h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.elm-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.elm-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.elm-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.elm-full-width {
+    grid-column: span 2;
+}
+
+.elm-form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 6px;
+    letter-spacing: 0.05em;
+}
+
+.elm-input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.elm-input-icon {
+    position: absolute;
+    left: 12px;
+    color: #9ca3af;
+}
+
+.elm-input-with-icon input,
+.elm-form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    outline: none;
+}
+
+.elm-input-with-icon input {
+    padding-left: 38px;
+}
+
+.elm-amount-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.elm-currency-prefix {
+    background: #f3f4f6;
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    color: #374151;
+    font-weight: 500;
+    border-right: 1px solid #d1d5db;
+}
+
+.elm-amount-box input {
+    border: none;
+    padding: 10px 12px;
+    width: 100%;
+    outline: none;
+}
+
+.elm-payment-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.elm-payment-card {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    background: #fff;
+    transition: all 0.2s ease;
+}
+
+.elm-payment-card p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.elm-payment-card strong {
+    font-size: 0.875rem;
+    display: block;
+}
+
+.elm-payment-card.elm-selected {
+    border-color: #047857;
+    background-color: #ecfdf5;
+    color: #047857;
+}
+
+.elm-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.elm-btn-cancel {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.elm-btn-submit {
+    padding: 8px 16px;
+    background: #047857;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+/* Responsive Styles */
+@media (max-width: 640px) {
+    .elm-overlay {
+        padding: 10px;
+    }
+
+    .elm-body {
+        padding: 16px;
+    }
+
+    .elm-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .elm-full-width {
+        grid-column: span 1;
+    }
+
+    .elm-payment-options {
+        grid-template-columns: 1fr;
+    }
+
+    .elm-footer {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    .elm-btn-cancel,
+    .elm-btn-submit {
+        width: 100%;
+        justify-content: center;
+    }
+}
