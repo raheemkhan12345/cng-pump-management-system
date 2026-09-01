@@ -45,7 +45,7 @@ const EditLoanModal = ({
 
         // Frontend always uses:
         // cash / bank
-        paymentMode: initialData.paymentMode === "bank" ? "bank" : "cash",
+        paymentMode: initialData.paymentMode === "bank transfer" ? "bank" : "cash",
       });
     }
 

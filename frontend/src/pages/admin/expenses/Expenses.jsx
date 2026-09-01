@@ -17,6 +17,7 @@ import {
 
 import AddNewExpenses from "../../../components/adminDashboardForms/addNewExpenseForm/AddNewExpenses";
 import "./Expenses.css";
+
 import ExpenseRecoveryModal from "../../../components/adminDashboardForms/expenseRecoveryModal/ExpenseRecoveryModal";
 import AddDieselExpenseModal from "../../../components/adminDashboardForms/addDieselExpenseModal/AddDieselExpenseModal";
 import RecordOwnerExpenseModal from "../../../components/adminDashboardForms/recordOwnerExpenseModal/RecordOwnerExpenseModal";
@@ -37,6 +38,8 @@ const Expenses = () => {
   // Expense Stats
   // ==========================================
 
+  // Temporary hard-coded data.
+  // GET Expense API will be integrated later.
   const expenseStats = {
     todayExpenses: "38,500",
     monthExpenses: "412,000",
@@ -48,6 +51,8 @@ const Expenses = () => {
   // Recent Expenses
   // ==========================================
 
+  // Temporary hard-coded data.
+  // GET Expense API will be integrated later.
   const recentExpenses = [
     {
       id: 1,
@@ -92,6 +97,17 @@ const Expenses = () => {
   ];
 
   // ==========================================
+  // Expense Successfully Added
+  // ==========================================
+
+  const handleExpenseSuccess = (expenseResponse) => {
+    console.log("========================================");
+    console.log("Expense added successfully!");
+    console.log("Expense Response:", expenseResponse);
+    console.log("========================================");
+  };
+
+  // ==========================================
   // Edit Expense
   // ==========================================
 
@@ -106,6 +122,8 @@ const Expenses = () => {
   const handleDelete = (expense) => {
     console.log("Delete Expense:", expense);
   };
+
+  
 
   return (
     <div className="exp-page-container">
@@ -129,6 +147,7 @@ const Expenses = () => {
             onClick={() => setIsAddOwnerModalOpen(true)}
           >
             <PlusCircle size={18} />
+
             <span>Add Owners</span>
           </button>
         </div>
@@ -215,6 +234,7 @@ const Expenses = () => {
               onClick={() => setIsModalOpen(true)}
             >
               <PlusCircle size={18} />
+
               <span>Add New Expense</span>
             </button>
 
@@ -224,6 +244,7 @@ const Expenses = () => {
               onClick={() => setIsRecoveryModalOpen(true)}
             >
               <PlusCircle size={18} />
+
               <span>Add Recovery Expense</span>
             </button>
 
@@ -233,6 +254,7 @@ const Expenses = () => {
               onClick={() => setIsOwnerExpenseModalOpen(true)}
             >
               <Layers size={18} />
+
               <span>View Expense Categories</span>
             </button>
           </div>
@@ -246,6 +268,7 @@ const Expenses = () => {
               onClick={() => setIsDieselModalOpen(true)}
             >
               <PlusCircle size={18} />
+
               <span>Diesel Expense</span>
             </button>
 
@@ -255,6 +278,7 @@ const Expenses = () => {
               onClick={() => setIsOwnerExpenseModalOpen(true)}
             >
               <PlusCircle size={18} />
+
               <span>Add Owner Expense</span>
             </button>
           </div>
@@ -265,13 +289,12 @@ const Expenses = () => {
         ========================================== */}
 
         <div className="exp-table-card">
-          {/* Table Header */}
-
           <div className="exp-table-header">
             <h3 className="exp-table-title">Recent Expenses</h3>
 
             <button type="button" className="exp-btn-view-all">
               <span>View All</span>
+
               <ArrowRight size={16} />
             </button>
           </div>
@@ -344,12 +367,10 @@ const Expenses = () => {
                         </span>
                       </td>
 
-                      {/* ==========================================
-                          Actions
-                      ========================================== */}
+                      {/* Actions */}
 
                       <td className="exp-actions-cell">
-                        {/* Edit Button */}
+                        {/* Edit */}
 
                         <button
                           type="button"
@@ -361,7 +382,7 @@ const Expenses = () => {
                           <Pencil size={11} />
                         </button>
 
-                        {/* Delete Button */}
+                        {/* Delete */}
 
                         <button
                           type="button"
@@ -389,6 +410,7 @@ const Expenses = () => {
       <AddNewExpenses
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onSuccess={handleExpenseSuccess}
       />
 
       {/* ==========================================
