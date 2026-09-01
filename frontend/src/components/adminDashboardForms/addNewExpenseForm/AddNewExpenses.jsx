@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   X,
   Calendar,
@@ -8,7 +8,10 @@ import {
   Banknote,
 } from "lucide-react";
 
-import { createExpense } from "../../../services/adminApis/expenseApi";
+import {
+  createExpense,
+  getExpenseCategories,
+} from "../../../services/adminApis/expenseApi";
 
 import "./AddNewExpenses.css";
 
@@ -22,20 +25,70 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
   });
 
   const [amount, setAmount] = useState("");
-
   const [category, setCategory] = useState("");
-
   const [paymentMode, setPaymentMode] = useState("cash");
-
   const [status, setStatus] = useState("Paid");
-
   const [remarks, setRemarks] = useState("");
 
   // =========================================================
-  // SUBMIT LOADING
+  // CATEGORY STATES
+  // =========================================================
+
+  const [categories, setCategories] = useState([]);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
+
+  // =========================================================
+  // SUBMIT STATE
   // =========================================================
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // =========================================================
+  // GET EXPENSE CATEGORIES
+  // =========================================================
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchCategories = async () => {
+      try {
+        setIsCategoriesLoading(true);
+
+        const response = await getExpenseCategories();
+
+        console.log("========================================");
+        console.log("Expense Categories API Response:", response);
+        console.log("========================================");
+
+        // Backend response:
+        // {
+        //   success: true,
+        //   count: 5,
+        //   expenseCategories: [...]
+        // }
+
+        const categoryData = response?.expenseCategories || [];
+
+        setCategories(categoryData);
+
+        console.log("Expense Categories:", categoryData);
+      } catch (error) {
+        console.log("========================================");
+        console.log("Failed to fetch expense categories.");
+        console.log("Category Error:", error);
+        console.log("Status:", error.response?.status);
+        console.log("Server Response:", error.response?.data);
+        console.log("Response Message:", error.response?.data?.message);
+        console.log("========================================");
+
+        setCategories([]);
+      } finally {
+        setIsCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, [isOpen]);
 
   // =========================================================
   // RESET FORM
@@ -69,7 +122,7 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
     event.preventDefault();
 
     // =======================================================
-    // BASIC VALIDATION
+    // VALIDATION
     // =======================================================
 
     if (!date) {
@@ -83,7 +136,7 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
     }
 
     if (!category) {
-      console.error("Expense Error: Category is required.");
+      console.error("Expense Error: Please select an expense category.");
       return;
     }
 
@@ -107,13 +160,15 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
       remarks,
     };
 
+    console.log("========================================");
     console.log("Expense API Request:", expenseData);
+    console.log("========================================");
 
     try {
       setIsSubmitting(true);
 
       // =====================================================
-      // API CALL
+      // CREATE EXPENSE API
       // =====================================================
 
       const response = await createExpense(expenseData);
@@ -127,7 +182,7 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
       console.log("Expense Response:", response);
       console.log("========================================");
 
-      // Parent ko response bhejna
+      // Parent ko response send
       if (onSuccess) {
         onSuccess(response);
       }
@@ -142,16 +197,14 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
       // ERROR
       // =====================================================
 
-      console.error("========================================");
-      console.error("Failed to add expense.");
-      console.error("Expense Error:", error);
-
-      if (error?.response) {
-        console.error("Status:", error.response.status);
-        console.error("Server Response:", error.response.data);
-      }
-
-      console.error("========================================");
+      console.log("========================================");
+      console.log("Failed to add expense.");
+      console.log("Expense Error:", error);
+      console.log("Status:", error.response?.status);
+      console.log("Server Response:", error.response?.data);
+      console.log("Response Message:", error.response?.data?.message);
+      console.log("Response Error:", error.response?.data?.error);
+      console.log("========================================");
     } finally {
       setIsSubmitting(false);
     }
@@ -200,10 +253,6 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
         =================================================== */}
 
         <form onSubmit={handleSubmit}>
-          {/* =================================================
-              BODY
-          ================================================= */}
-
           <div className="ane-modal-body">
             {/* =================================================
                 DATE & AMOUNT
@@ -259,18 +308,19 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                 className="ane-select"
                 value={category}
                 onChange={(event) => setCategory(event.target.value)}
+                disabled={isCategoriesLoading || isSubmitting}
               >
                 <option value="" disabled>
-                  Select a category...
+                  {isCategoriesLoading
+                    ? "Loading categories..."
+                    : "Select a category..."}
                 </option>
 
-                <option value="68a123456789abcdef123456">Utility</option>
-
-                <option value="supplies">Supplies</option>
-
-                <option value="maintenance">Maintenance</option>
-
-                <option value="staff">Staff</option>
+                {categories.map((item) => (
+                  <option key={item._id} value={item._id}>
+                    {item.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -288,7 +338,11 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                   className={`ane-payment-card ${
                     paymentMode === "cash" ? "ane-active" : ""
                   }`}
-                  onClick={() => setPaymentMode("cash")}
+                  onClick={() => {
+                    if (!isSubmitting) {
+                      setPaymentMode("cash");
+                    }
+                  }}
                 >
                   <div className="ane-card-left">
                     <CreditCard size={20} className="ane-card-icon" />
@@ -311,7 +365,11 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                   className={`ane-payment-card ${
                     paymentMode === "bank" ? "ane-active" : ""
                   }`}
-                  onClick={() => setPaymentMode("bank")}
+                  onClick={() => {
+                    if (!isSubmitting) {
+                      setPaymentMode("bank");
+                    }
+                  }}
                 >
                   <div className="ane-card-left">
                     <Building2 size={20} className="ane-card-icon" />
@@ -341,6 +399,7 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                 className="ane-select"
                 value={status}
                 onChange={(event) => setStatus(event.target.value)}
+                disabled={isSubmitting}
               >
                 <option value="Paid">Paid</option>
 
@@ -361,6 +420,7 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                 onChange={(event) => setRemarks(event.target.value)}
                 placeholder="Enter any additional details about this expense..."
                 className="ane-textarea"
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -382,7 +442,9 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
             <button
               type="submit"
               className="ane-btn-submit"
-              disabled={isSubmitting}
+              disabled={
+                isSubmitting || isCategoriesLoading || categories.length === 0
+              }
             >
               <Plus size={16} />
 
