@@ -28,20 +28,6 @@
     margin-bottom: 0;
 }
 
-.ledger-add-btn {
-    background-color: #047857;
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 18px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
 
 .ledger-add-btn:hover {
     background-color: #065f46;

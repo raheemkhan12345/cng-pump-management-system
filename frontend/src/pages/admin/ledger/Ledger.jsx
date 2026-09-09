@@ -140,10 +140,6 @@ const Ledger = () => {
                         Complete transaction record of your CNG station
                     </p>
                 </div>
-                <button className="ledger-add-btn">
-                    <Plus size={18} />
-                    <span>Add New Transaction</span>
-                </button>
             </div>
 
             {/* Filter Section */}
