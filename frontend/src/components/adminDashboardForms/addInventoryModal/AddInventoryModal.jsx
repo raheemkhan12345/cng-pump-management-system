@@ -26,9 +26,13 @@ const AddInventoryModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
     if (!formData.itemName.trim() || !formData.price || !formData.quantity) {
       return;
     }
-
     if (onSave) {
-      onSave(formData);
+      onSave({
+        itemName: formData.itemName.trim(),
+        price: Number(formData.price),
+        quantity: Number(formData.quantity),
+        remarks: formData.remarks.trim(),
+      });
     }
   };
 

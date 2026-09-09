@@ -1,95 +1,79 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Plus, Edit2, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 
 import AddInventoryModal from "../../../components/adminDashboardForms/addInventoryModal/AddInventoryModal";
 import EditInventoryModal from "../../../components/adminDashboardForms/EditInventoryModal/EditInventoryModal";
+
+import {
+  createInventory,
+  getAllInventory,
+} from "../../../services/adminApis/inventoryApi";
 
 import "./Inventory.css";
 
 const ITEMS_PER_PAGE = 5;
 
 const Inventory = () => {
-  // =========================================================
-  // INVENTORY DATA
-  // =========================================================
+  const [inventoryItems, setInventoryItems] = useState([]);
 
-  const [inventoryItems, setInventoryItems] = useState([
-    {
-      id: 1,
-      itemName: "Dispenser Nozzle",
-      price: 15000,
-      quantity: 4,
-      remarks: "Spare for bay 2",
-    },
-    {
-      id: 2,
-      itemName: "Compressor Oil",
-      price: 8500,
-      quantity: 1,
-      remarks: "Low stock, order soon",
-    },
-    {
-      id: 3,
-      itemName: "O-Ring Kit",
-      price: 2200,
-      quantity: 12,
-      remarks: "Standard maintenance kit",
-    },
-    {
-      id: 4,
-      itemName: "High Pressure Gauge",
-      price: 12000,
-      quantity: 3,
-      remarks: "Calibrated",
-    },
-  ]);
-
-  // =========================================================
-  // ADD MODAL STATE
-  // =========================================================
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // =========================================================
-  // EDIT MODAL STATE
-  // =========================================================
-
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  // Currently selected item for editing
-  const [selectedItem, setSelectedItem] = useState(null);
-
-  // =========================================================
-  // SUBMITTING STATE
-  // =========================================================
-
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // =========================================================
-  // PAGINATION
-  // =========================================================
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  // =========================================================
-  // TOTAL PAGES
-  // =========================================================
+  // Get inventory items
+  const fetchInventory = async () => {
+    try {
+      setIsLoading(true);
 
+      const response = await getAllInventory();
+
+      console.log("Inventory API Response:", response);
+
+      const items =
+        response?.data || response?.inventory || response?.items || [];
+
+      if (!Array.isArray(items)) {
+        throw new Error("Invalid inventory data received from server.");
+      }
+
+      const formattedItems = items.map((item) => ({
+        id: item._id || item.id,
+        itemName: item.itemName || "",
+        price: Number(item.price || 0),
+        quantity: Number(item.quantity || 0),
+        remarks: item.remarks || "",
+      }));
+
+      setInventoryItems(formattedItems);
+    } catch (error) {
+      console.error("Fetch Inventory Error:", error?.response?.data || error);
+
+      alert(
+        error?.response?.data?.message ||
+          "Unable to load inventory. Please try again.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInventory();
+  }, []);
+
+  // Pagination
   const totalPages = Math.ceil(inventoryItems.length / ITEMS_PER_PAGE);
-
-  // =========================================================
-  // PAGINATED DATA
-  // =========================================================
 
   const paginatedItems = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
     return inventoryItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [inventoryItems, currentPage]);
-
-  // =========================================================
-  // ENTRY INFORMATION
-  // =========================================================
 
   const startEntry =
     inventoryItems.length === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
@@ -99,24 +83,12 @@ const Inventory = () => {
     inventoryItems.length,
   );
 
-  // =========================================================
-  // OPEN ADD MODAL
-  // =========================================================
-
+  // Add inventory item
   const handleAddNewItem = () => {
-    // Make sure edit modal is closed
-    setIsEditModalOpen(false);
-
-    // Clear selected item
     setSelectedItem(null);
-
-    // Open Add Modal
+    setIsEditModalOpen(false);
     setIsModalOpen(true);
   };
-
-  // =========================================================
-  // CLOSE ADD MODAL
-  // =========================================================
 
   const handleCloseModal = () => {
     if (isSubmitting) return;
@@ -124,64 +96,45 @@ const Inventory = () => {
     setIsModalOpen(false);
   };
 
-  // =========================================================
-  // ADD NEW ITEM
-  // =========================================================
-
   const handleFormSubmit = async (formData) => {
     try {
       setIsSubmitting(true);
 
-      // ---------------------------------------------
-      // API call yahan future mein ayegi
-      // ---------------------------------------------
-
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const newItem = {
-        id: Date.now(),
+      const payload = {
         itemName: formData.itemName.trim(),
         price: Number(formData.price),
         quantity: Number(formData.quantity),
-        remarks: formData.remarks?.trim() || "",
+        remarks: formData.remarks?.trim() || "N/A",
       };
 
-      setInventoryItems((prev) => [...prev, newItem]);
+      console.log("Create Inventory Payload:", payload);
 
-      // New item add hone ke baad last page par jao
-      const newTotalPages = Math.ceil(
-        (inventoryItems.length + 1) / ITEMS_PER_PAGE,
-      );
+      const response = await createInventory(payload);
 
-      setCurrentPage(newTotalPages);
+      console.log("Create Inventory Response:", response);
 
-      // Close Add Modal
+      await fetchInventory();
+
       setIsModalOpen(false);
+      setCurrentPage(1);
     } catch (error) {
-      console.error("Add inventory item error:", error);
+      console.error("Create Inventory Error:", error?.response?.data || error);
+
+      alert(
+        error?.response?.data?.message ||
+          "Unable to add inventory item. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // =========================================================
-  // OPEN EDIT MODAL
-  // =========================================================
-
+  // Edit inventory item
   const handleEditItem = (item) => {
-    // Selected item save karo
     setSelectedItem(item);
-
-    // Make sure Add modal closed ho
     setIsModalOpen(false);
-
-    // Edit modal open
     setIsEditModalOpen(true);
   };
-
-  // =========================================================
-  // CLOSE EDIT MODAL
-  // =========================================================
 
   const handleCloseEditModal = () => {
     if (isSubmitting) return;
@@ -190,32 +143,22 @@ const Inventory = () => {
     setSelectedItem(null);
   };
 
-  // =========================================================
-  // UPDATE EXISTING ITEM
-  // =========================================================
-
   const handleEditFormSubmit = async (formData) => {
     if (!selectedItem) return;
 
     try {
       setIsSubmitting(true);
 
-      // ---------------------------------------------
-      // API PUT/PATCH call future mein yahan ayegi
-      // ---------------------------------------------
-
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
       const updatedItem = {
         itemName: formData.itemName.trim(),
         price: Number(formData.price),
         quantity: Number(formData.quantity),
-        remarks: formData.remarks?.trim() || "",
+        remarks: formData.remarks?.trim() || "N/A",
       };
 
-      // Existing item update
-      setInventoryItems((prev) =>
-        prev.map((item) =>
+      // Temporary local update until update API is available
+      setInventoryItems((prevItems) =>
+        prevItems.map((item) =>
           item.id === selectedItem.id
             ? {
                 ...item,
@@ -225,22 +168,18 @@ const Inventory = () => {
         ),
       );
 
-      // Close Edit Modal
       setIsEditModalOpen(false);
-
-      // Clear selected item
       setSelectedItem(null);
     } catch (error) {
-      console.error("Update inventory item error:", error);
+      console.error("Update Inventory Error:", error);
+
+      alert("Unable to update inventory item. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // =========================================================
-  // DELETE ITEM
-  // =========================================================
-
+  // Delete inventory item
   const handleDelete = (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this inventory item?",
@@ -248,66 +187,48 @@ const Inventory = () => {
 
     if (!confirmDelete) return;
 
-    setInventoryItems((prev) => prev.filter((item) => item.id !== id));
+    try {
+      setInventoryItems((prevItems) =>
+        prevItems.filter((item) => item.id !== id),
+      );
 
-    // Remaining items calculate
-    const remainingItems = inventoryItems.length - 1;
+      const remainingItems = inventoryItems.length - 1;
 
-    // New total pages
-    const newTotalPages = Math.max(
-      1,
-      Math.ceil(remainingItems / ITEMS_PER_PAGE),
-    );
+      const newTotalPages = Math.max(
+        1,
+        Math.ceil(remainingItems / ITEMS_PER_PAGE),
+      );
 
-    // Agar current page available nahi rahi
-    if (currentPage > newTotalPages) {
-      setCurrentPage(newTotalPages);
+      if (currentPage > newTotalPages) {
+        setCurrentPage(newTotalPages);
+      }
+    } catch (error) {
+      console.error("Delete Inventory Error:", error);
+
+      alert("Unable to delete inventory item. Please try again.");
     }
   };
 
-  // =========================================================
-  // PREVIOUS PAGE
-  // =========================================================
-
+  // Pagination handlers
   const handlePreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
-
-  // =========================================================
-  // NEXT PAGE
-  // =========================================================
 
   const handleNextPage = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
-  // =========================================================
-  // PAGE CHANGE
-  // =========================================================
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
-
-  // =========================================================
-  // PAGE NUMBERS
-  // =========================================================
 
   const pageNumbers = Array.from(
     { length: totalPages },
     (_, index) => index + 1,
   );
 
-  // =========================================================
-  // RENDER
-  // =========================================================
-
   return (
     <div className="inv-container">
-      {/* =====================================================
-          HEADER
-      ====================================================== */}
-
       <div className="inv-header-section">
         <div>
           <h2 className="inv-title">Inventory</h2>
@@ -327,10 +248,6 @@ const Inventory = () => {
         </button>
       </div>
 
-      {/* =====================================================
-          TABLE CARD
-      ====================================================== */}
-
       <div className="inv-card">
         <div className="inv-table-responsive">
           <table className="inv-table">
@@ -345,18 +262,18 @@ const Inventory = () => {
             </thead>
 
             <tbody>
-              {paginatedItems.length > 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td colSpan="5" className="inv-empty-state">
+                    Loading inventory...
+                  </td>
+                </tr>
+              ) : paginatedItems.length > 0 ? (
                 paginatedItems.map((item) => (
                   <tr key={item.id}>
-                    {/* ITEM NAME */}
-
                     <td className="inv-font-medium">{item.itemName}</td>
 
-                    {/* PRICE */}
-
-                    <td>Rs. {Number(item.price).toLocaleString("en-PK")}</td>
-
-                    {/* QUANTITY */}
+                    <td>Rs. {item.price.toLocaleString("en-PK")}</td>
 
                     <td>
                       <span
@@ -368,16 +285,10 @@ const Inventory = () => {
                       </span>
                     </td>
 
-                    {/* REMARKS */}
-
-                    <td className="inv-text-muted">{item.remarks || "-"}</td>
-
-                    {/* ACTIONS */}
+                    <td className="inv-text-muted">{item.remarks || "Null"}</td>
 
                     <td className="inv-text-right">
                       <div className="inv-actions">
-                        {/* EDIT */}
-
                         <button
                           type="button"
                           className="inv-action-btn edit"
@@ -386,8 +297,6 @@ const Inventory = () => {
                         >
                           <Edit2 size={16} />
                         </button>
-
-                        {/* DELETE */}
 
                         <button
                           type="button"
@@ -403,13 +312,7 @@ const Inventory = () => {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="5"
-                    style={{
-                      textAlign: "center",
-                      padding: "30px",
-                    }}
-                  >
+                  <td colSpan="5" className="inv-empty-state">
                     No inventory items found.
                   </td>
                 </tr>
@@ -417,10 +320,6 @@ const Inventory = () => {
             </tbody>
           </table>
         </div>
-
-        {/* ===================================================
-            PAGINATION
-        ==================================================== */}
 
         {inventoryItems.length > 0 && (
           <div className="inv-pagination-wrapper">
@@ -430,8 +329,6 @@ const Inventory = () => {
             </span>
 
             <div className="inv-pagination">
-              {/* PREVIOUS */}
-
               <button
                 type="button"
                 className="inv-page-btn nav-btn"
@@ -441,8 +338,6 @@ const Inventory = () => {
                 <ChevronLeft size={16} />
                 Prev
               </button>
-
-              {/* PAGE NUMBERS */}
 
               {pageNumbers.map((page) => (
                 <button
@@ -456,8 +351,6 @@ const Inventory = () => {
                   {page}
                 </button>
               ))}
-
-              {/* NEXT */}
 
               <button
                 type="button"
@@ -473,20 +366,12 @@ const Inventory = () => {
         )}
       </div>
 
-      {/* =====================================================
-          ADD INVENTORY MODAL
-      ====================================================== */}
-
       <AddInventoryModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSave={handleFormSubmit}
         isSubmitting={isSubmitting}
       />
-
-      {/* =====================================================
-          EDIT INVENTORY MODAL
-      ====================================================== */}
 
       <EditInventoryModal
         isOpen={isEditModalOpen}

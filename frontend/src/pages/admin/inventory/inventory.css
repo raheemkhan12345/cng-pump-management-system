@@ -7,6 +7,27 @@
 }
 
 
+/* Inventory Section Header */
+.inv-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.inv-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+}
+
+.inv-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+
 .inv-add-btn {
     background-color: #0f172a;
     color: #ffffff;
