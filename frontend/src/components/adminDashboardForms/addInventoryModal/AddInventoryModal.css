@@ -1,0 +1,219 @@
+.aim-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    /* Dark backdrop like image */
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.aim-container {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.aim-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 28px 16px 28px;
+    flex-shrink: 0;
+}
+
+.aim-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.aim-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+}
+
+.aim-close-btn:hover {
+    color: #0f172a;
+}
+
+.aim-body {
+    padding: 0 28px 24px 28px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.aim-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.aim-full-width {
+    grid-column: span 2;
+}
+
+.aim-form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.aim-form-group input[type="text"],
+.aim-form-group input[type="number"],
+.aim-form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.925rem;
+    color: #0f172a;
+    outline: none;
+    background-color: #ffffff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.aim-form-group input::placeholder,
+.aim-form-group textarea::placeholder {
+    color: #94a3b8;
+}
+
+.aim-form-group input:focus,
+.aim-form-group textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.aim-amount-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #ffffff;
+    transition: border-color 0.15s ease;
+}
+
+.aim-amount-box:focus-within {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.aim-currency-prefix {
+    background: #ffffff;
+    padding: 10px 0 10px 14px;
+    font-size: 0.925rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.aim-amount-box input {
+    border: none !important;
+    padding-left: 8px !important;
+    box-shadow: none !important;
+}
+
+.aim-form-group textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.aim-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.aim-btn-cancel {
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    color: #475569;
+    font-size: 0.925rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.aim-btn-cancel:hover {
+    color: #0f172a;
+}
+
+.aim-btn-submit {
+    padding: 10px 24px;
+    background: #0f172a;
+    /* Exact dark navy color from image */
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.925rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.aim-btn-submit:hover {
+    background-color: #1e293b;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+    .aim-overlay {
+        padding: 12px;
+    }
+
+    .aim-header {
+        padding: 20px 20px 12px 20px;
+    }
+
+    .aim-body {
+        padding: 0 20px 20px 20px;
+    }
+
+    .aim-form-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .aim-full-width {
+        grid-column: span 1;
+    }
+
+    .aim-footer {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    .aim-btn-cancel,
+    .aim-btn-submit {
+        width: 100%;
+        text-align: center;
+    }
+}
