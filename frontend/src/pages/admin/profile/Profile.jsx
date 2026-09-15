@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { User, Briefcase, ShieldAlert } from "lucide-react";
+import {
+  User,
+  Briefcase,
+  ShieldAlert,
+  Mail,
+  MapPin,
+  Calendar,
+  Building2,
+} from "lucide-react";
 import { getAdminProfile } from "../../../services/adminApis/profile";
 
 import "./Profile.css";
@@ -41,7 +49,11 @@ const Profile = () => {
   if (isLoading) {
     return (
       <div className="profile-container">
-        <p>Loading profile...</p>
+        <div className="skeleton hero-skeleton"></div>
+        <div className="details-grid">
+          <div className="skeleton card-skeleton"></div>
+          <div className="skeleton card-skeleton"></div>
+        </div>
       </div>
     );
   }
@@ -49,15 +61,31 @@ const Profile = () => {
   if (!profile) {
     return (
       <div className="profile-container">
-        <p>Profile not found.</p>
+        <div className="profile-empty-state">
+          <ShieldAlert size={48} className="empty-icon" />
+          <h3>Profile Not Found</h3>
+          <p>We couldn't retrieve profile information at this time.</p>
+        </div>
       </div>
     );
   }
+
+  // Generate dynamic initials for visual appeal
+  const displayName = profile.fullName || profile.name || "N/A";
+  const initials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
 
   return (
     <div className="profile-container">
       {/* Top Hero Banner Card */}
       <div className="profile-hero-card">
+        <div className="hero-avatar">
+          <span>{initials}</span>
+        </div>
         <div className="hero-details">
           <h2 className="hero-name">
             {profile.fullName || profile.name || "N/A"}
@@ -75,7 +103,7 @@ const Profile = () => {
         <div className="details-card">
           <div className="card-header">
             <div className="card-icon-box">
-              <User size={18} />
+              <User size={20} />
             </div>
 
             <h3>Personal Details</h3>
@@ -83,17 +111,23 @@ const Profile = () => {
 
           <div className="card-body">
             <div className="info-group">
-              <label>Full Name</label>
+              <label>
+                <User size={14} className="info-icon" /> Full Name
+              </label>
               <p>{profile.fullName || profile.name || "N/A"}</p>
             </div>
 
             <div className="info-group">
-              <label>Email Address</label>
-              <p>{profile.email || "N/A"}</p>
+              <label>
+                <Mail size={14} className="info-icon" /> Email Address
+              </label>
+              <p className="info-email">{profile.email || "N/A"}</p>
             </div>
 
             <div className="info-group">
-              <label>Address</label>
+              <label>
+                <MapPin size={14} className="info-icon" /> Address
+              </label>
               <p>{profile.address || "N/A"}</p>
             </div>
           </div>
@@ -103,7 +137,7 @@ const Profile = () => {
         <div className="details-card">
           <div className="card-header">
             <div className="card-icon-box">
-              <Briefcase size={18} />
+              <Briefcase size={20} />
             </div>
 
             <h3>Professional Details</h3>
@@ -111,7 +145,9 @@ const Profile = () => {
 
           <div className="card-body">
             <div className="info-group">
-              <label>Assigned Station</label>
+              <label>
+                <Building2 size={14} className="info-icon" /> Assigned Station
+              </label>
               <p>{profile.assignedStation || "N/A"}</p>
             </div>
 
@@ -126,7 +162,9 @@ const Profile = () => {
             </div>
 
             <div className="info-group">
-              <label>Joining Date</label>
+              <label>
+                <Calendar size={14} className="info-icon" /> Joining Date
+              </label>
               <p>{profile.joiningDate || "N/A"}</p>
             </div>
           </div>
