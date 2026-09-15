@@ -8,6 +8,7 @@ import {
   createInventory,
   getAllInventory,
   updateInventory,
+  deleteInventory,
 } from "../../../services/adminApis/inventoryApi";
 
 import "./Inventory.css";
@@ -181,7 +182,7 @@ const Inventory = () => {
   };
 
   // Delete inventory item
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this inventory item?",
     );
@@ -189,10 +190,18 @@ const Inventory = () => {
     if (!confirmDelete) return;
 
     try {
-      setInventoryItems((prevItems) =>
-        prevItems.filter((item) => item.id !== id),
-      );
+      setIsSubmitting(true);
 
+      console.log("Delete Inventory ID:", id);
+
+      const response = await deleteInventory(id);
+
+      console.log("Delete Inventory Response:", response);
+
+      // Backend se fresh inventory data lao
+      await fetchInventory();
+
+      // Agar current page empty ho jaye
       const remainingItems = inventoryItems.length - 1;
 
       const newTotalPages = Math.max(
@@ -204,9 +213,14 @@ const Inventory = () => {
         setCurrentPage(newTotalPages);
       }
     } catch (error) {
-      console.error("Delete Inventory Error:", error);
+      console.error("Delete Inventory Error:", error?.response?.data || error);
 
-      alert("Unable to delete inventory item. Please try again.");
+      alert(
+        error?.response?.data?.message ||
+          "Unable to delete inventory item. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

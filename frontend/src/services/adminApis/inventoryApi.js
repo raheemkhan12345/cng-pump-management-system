@@ -28,3 +28,11 @@ export const updateInventory = async (id, inventoryData) => {
 
   return response.data;
 };
+
+export const deleteInventory = async (id) => {
+  const response = await axiosInstance.delete(
+    `/inventory/deleteItem/${id}`
+  );
+
+  return response.data;
+};
