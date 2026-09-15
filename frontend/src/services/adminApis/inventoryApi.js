@@ -18,3 +18,13 @@ export const getAllInventory = async () => {
 
   return response.data;
 };
+
+// UPDATE INVENTORY ITEM
+export const updateInventory = async (id, inventoryData) => {
+  const response = await axiosInstance.put(
+    `/inventory/updateItem/${id}`,
+    inventoryData,
+  );
+
+  return response.data;
+};

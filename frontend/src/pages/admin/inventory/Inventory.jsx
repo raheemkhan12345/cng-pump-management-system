@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus, Edit2, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 
 import AddInventoryModal from "../../../components/adminDashboardForms/addInventoryModal/AddInventoryModal";
@@ -7,6 +7,7 @@ import EditInventoryModal from "../../../components/adminDashboardForms/EditInve
 import {
   createInventory,
   getAllInventory,
+  updateInventory,
 } from "../../../services/adminApis/inventoryApi";
 
 import "./Inventory.css";
@@ -63,7 +64,10 @@ const Inventory = () => {
   };
 
   useEffect(() => {
-    fetchInventory();
+    const loadInventory = async () => {
+      fetchInventory();
+    };
+    loadInventory();
   }, []);
 
   // Pagination
@@ -156,24 +160,21 @@ const Inventory = () => {
         remarks: formData.remarks?.trim() || "N/A",
       };
 
-      // Temporary local update until update API is available
-      setInventoryItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === selectedItem.id
-            ? {
-                ...item,
-                ...updatedItem,
-              }
-            : item,
-        ),
-      );
+      console.log("ID:", selectedItem.id);
+      console.log("Payload:", updatedItem);
+
+      await updateInventory(selectedItem.id, updatedItem);
+
+      await fetchInventory();
 
       setIsEditModalOpen(false);
       setSelectedItem(null);
     } catch (error) {
-      console.error("Update Inventory Error:", error);
+      console.error("Update Inventory Error:", error?.response?.data || error);
 
-      alert("Unable to update inventory item. Please try again.");
+      alert(
+        error?.response?.data?.message || "Unable to update inventory item.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -374,6 +375,7 @@ const Inventory = () => {
       />
 
       <EditInventoryModal
+        key={selectedItem?.id || "edit-inventory"}
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
         onSave={handleEditFormSubmit}
