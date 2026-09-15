@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   FaSearch,
@@ -87,7 +87,10 @@ const Admins = () => {
   // =====================================================
 
   useEffect(() => {
-    fetchAdmins();
+    const loadAdmins = async () => {
+      fetchAdmins();
+    };
+    loadAdmins();
   }, [fetchAdmins]);
 
   // =====================================================

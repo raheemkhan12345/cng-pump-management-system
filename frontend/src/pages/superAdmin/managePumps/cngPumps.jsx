@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import  { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   FaPlus,
@@ -395,7 +395,10 @@ const CngPumps = () => {
   // ===================================================
 
   useEffect(() => {
-    fetchPumps();
+    const loadPump = async () => {
+      fetchPumps();
+    }
+    loadPump();
   }, [fetchPumps]);
 
   // ===================================================
@@ -508,51 +511,54 @@ const CngPumps = () => {
   // ===================================================
 
   const handleDelete = async (id) => {
-    if (!id) {
-      console.error("Delete failed: MongoDB ID missing.");
-      setError("Unable to delete this pump because Admin ID is missing.");
-      return;
+  if (!id) {
+    console.error("Delete failed: MongoDB ID missing.");
+    setError("Unable to delete this pump because Admin ID is missing.");
+    return;
+  }
+
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this pump?",
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    setIsDeleting(true);
+    setError("");
+
+    console.log("========================================");
+    console.log("DELETE PUMP / ADMIN");
+    console.log("========================================");
+
+    console.log("Admin ID:", id);
+
+    const response = await deleteAdmin(id);
+
+    console.log("Delete Admin Response:", response);
+
+    if (response?.success === false) {
+      throw new Error(response?.message || "Failed to delete admin.");
     }
 
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this pump?",
-    );
+    // Backend se fresh data
+    await fetchPumps();
+  } catch (error) {
+    console.error("Delete Admin Error:", error);
 
-    if (!confirmed) {
-      return;
-    }
+    const message =
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||
+      error?.message ||
+      "Failed to delete pump.";
 
-    try {
-      setError("");
-
-      console.log("========================================");
-      console.log("DELETE PUMP / ADMIN");
-      console.log("========================================");
-
-      console.log("Admin ID:", id);
-
-      const response = await deleteAdmin(id);
-
-      console.log("Delete Admin Response:", response);
-
-      if (response?.success === false) {
-        throw new Error(response?.message || "Failed to delete admin.");
-      }
-
-      // Backend se fresh data
-      await fetchPumps();
-    } catch (error) {
-      console.error("Delete Admin Error:", error);
-
-      const message =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        error?.message ||
-        "Failed to delete pump.";
-
-      setError(message);
-    }
-  };
+    setError(message);
+  } finally {
+    setIsDeleting(false);
+  }
+};
 
   // ===================================================
   // SEARCH + SORT

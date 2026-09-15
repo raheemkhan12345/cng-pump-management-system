@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import  { useCallback, useEffect, useState } from "react";
 
 import { Plus, Search, Filter, Fuel } from "lucide-react";
 
@@ -100,7 +100,10 @@ const SuperAdminDashboard = () => {
   // =====================================================
 
   useEffect(() => {
-    fetchAdmins();
+    const loadAdmins = async () => {
+      await fetchAdmins();
+    };
+    loadAdmins();
   }, [fetchAdmins]);
 
   // =====================================================
@@ -616,7 +619,7 @@ const SuperAdminDashboard = () => {
 
                       <td>
                         <span
-                          className={`badge ${String(pump.status)
+                          className={`sup-badge ${String(pump.status)
                             .toLowerCase()
                             .replace(/\s+/g, "-")}`}
                         >
