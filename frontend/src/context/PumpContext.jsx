@@ -102,18 +102,6 @@ export const PumpProvider = ({ children }) => {
     }
   };
 
-  /* ==========================================
-     REMOVE PUMP
-     
-     NOTE:
-     Abhi remove API available nahi hai,
-     isliye is function ko sirf frontend
-     state removal ke liye rakha gaya hai.
-     
-     Jab backend DELETE API milegi,
-     isko API based kar denge.
-  ========================================== */
-
   const removePump = (id) => {
     setPumps((prevPumps) =>
       prevPumps.filter((pump) => pump.id !== id && pump._id !== id),
