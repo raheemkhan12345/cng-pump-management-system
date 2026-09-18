@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { ArrowLeft, Landmark, Banknote, CheckCircle2 } from "lucide-react";
 
 import "./EditSaleModal.css";
@@ -10,18 +10,6 @@ const EditSaleModal = ({
   initialData = null,
   isSaving = false,
 }) => {
-  // =========================================================
-  // FORM STATE
-  // =========================================================
-
-  const [formData, setFormData] = useState({
-    date: "",
-    remarks: "",
-    salesKg: "",
-    totalAmount: "",
-    paymentMode: "cash",
-  });
-
   // =========================================================
   // NORMALIZE PAYMENT METHOD
   // =========================================================
@@ -43,30 +31,24 @@ const EditSaleModal = ({
   };
 
   // =========================================================
-  // LOAD SELECTED SALE DATA
+  // FORM STATE
   // =========================================================
 
-  useEffect(() => {
-    if (!isOpen || !initialData) {
-      return;
-    }
+  const [formData, setFormData] = useState(() => ({
+    date: initialData?.date || "",
 
-    setFormData({
-      date: initialData.date || "",
+    remarks: initialData?.notes || initialData?.remarks || "Daily Summary",
 
-      remarks: initialData.notes || initialData.remarks || "Daily Summary",
+    salesKg:
+      initialData?.salesKg !== undefined ? String(initialData.salesKg) : "",
 
-      salesKg:
-        initialData.salesKg !== undefined ? String(initialData.salesKg) : "",
+    totalAmount:
+      initialData?.totalAmount !== undefined
+        ? String(initialData.totalAmount)
+        : "",
 
-      totalAmount:
-        initialData.totalAmount !== undefined
-          ? String(initialData.totalAmount)
-          : "",
-
-      paymentMode: normalizePaymentMethod(initialData.paymentMethod),
-    });
-  }, [isOpen, initialData]);
+    paymentMode: normalizePaymentMethod(initialData?.paymentMethod),
+  }));
 
   // =========================================================
   // HANDLE CHANGE

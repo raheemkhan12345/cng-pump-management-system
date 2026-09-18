@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 import { createAdmin } from "../services/superAdminDash";
 
@@ -97,8 +97,6 @@ export const PumpProvider = ({ children }) => {
         "Failed to create pump.";
 
       setError(message);
-
-      throw new Error(message);
     } finally {
       setIsLoading(false);
     }

@@ -3,7 +3,6 @@ import {
   FaThLarge,
   FaUsers,
   FaGasPump,
-  FaCog,
   FaSignOutAlt,
   FaTimes,
 } from "react-icons/fa";

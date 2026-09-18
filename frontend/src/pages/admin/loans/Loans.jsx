@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Plus,
@@ -23,21 +23,20 @@ import {
 } from "../../../services/adminApis/loanApi";
 
 import "./Loans.css";
+// =========================================================
+// CONSTANTS
+// =========================================================
+
+const ITEMS_PER_PAGE = 5;
+
+const EMPTY_LOAN_STATS = {
+  thisMonthLoan: 0,
+  totalLoansGiven: 0,
+  thisMonthRecovery: 0,
+  activeLoanStaff: 0,
+};
 
 const Loans = () => {
-  // =========================================================
-  // CONSTANTS
-  // =========================================================
-
-  const ITEMS_PER_PAGE = 5;
-
-  const EMPTY_LOAN_STATS = {
-    thisMonthLoan: 0,
-    totalLoansGiven: 0,
-    thisMonthRecovery: 0,
-    activeLoanStaff: 0,
-  };
-
   // =========================================================
   // STATE
   // =========================================================
@@ -55,7 +54,7 @@ const Loans = () => {
 
   // API states
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // =========================================================
   // LOAN TRANSACTIONS
@@ -87,10 +86,8 @@ const Loans = () => {
   // GET ALL LOANS
   // =========================================================
 
-  const fetchLoans = async () => {
+  const fetchLoans = useCallback(async () => {
     try {
-      setIsLoading(true);
-
       const response = await getAllLoans();
 
       console.log("Get All Loans API Response:", response);
@@ -231,15 +228,19 @@ const Loans = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   // =========================================================
   // FETCH LOANS ON PAGE LOAD
   // =========================================================
 
   useEffect(() => {
-    fetchLoans();
-  }, []);
+    const loadLoans = async () => {
+      await fetchLoans();
+    };
+
+    loadLoans();
+  }, [fetchLoans]);
 
   // =========================================================
   // LOAN STATUS
@@ -352,6 +353,7 @@ const Loans = () => {
 
     // =====================================================
     // CONVERT TABLE DATE
+    // =====================================================
 
     let editDate = new Date().toISOString().split("T")[0];
 
@@ -577,6 +579,7 @@ const Loans = () => {
       // =====================================================
       // DELETE API LOGS
       // =====================================================
+
       console.log("DELETE LOAN");
 
       console.log("Delete Loan ID:", loan.id);
@@ -1116,6 +1119,7 @@ const Loans = () => {
       ===================================================== */}
 
       <EditLoanModal
+        key={selectedLoan?.id || "new"}
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
         onSave={handleUpdateLoan}

@@ -1,11 +1,11 @@
-import expenseAxiosInstance from "../expenseAxiosInstance";
+import xiosInstance from "../axiosInstance";
 
 // =========================================================
 // CREATE EXPENSE
 // =========================================================
 
 export const createExpense = async (expenseData) => {
-  const response = await expenseAxiosInstance.post(
+  const response = await xiosInstance.post(
     "/expense/createexpense",
     expenseData,
   );
@@ -18,7 +18,7 @@ export const createExpense = async (expenseData) => {
 // =========================================================
 
 export const getExpenseCategories = async () => {
-  const response = await expenseAxiosInstance.get(
+  const response = await xiosInstance.get(
     "/expenseCategory/get",
   );
 

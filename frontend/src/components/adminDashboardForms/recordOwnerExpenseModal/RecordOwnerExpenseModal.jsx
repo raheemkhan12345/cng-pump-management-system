@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   X,
   Calendar,
@@ -21,8 +21,6 @@ const RecordOwnerExpenseModal = ({ isOpen, onClose, onSubmit }) => {
 
   if (!isOpen) return null;
 
- 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -35,13 +33,6 @@ const RecordOwnerExpenseModal = ({ isOpen, onClose, onSubmit }) => {
     setFormData((prev) => ({
       ...prev,
       paymentMode: mode,
-    }));
-  };
-
-  const handleOwnerSelect = (ownerName) => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedOwner: ownerName,
     }));
   };
 
@@ -167,8 +158,6 @@ const RecordOwnerExpenseModal = ({ isOpen, onClose, onSubmit }) => {
               <option value="Anwar Ali">Anwar Ali</option>
               <option value="Khan Ali">Khan Ali</option>
             </select>
-
-            
           </div>
 
           {/* Row 4: Status */}

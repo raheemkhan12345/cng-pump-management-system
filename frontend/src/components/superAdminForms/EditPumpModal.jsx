@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { X, Save, Eye, EyeOff } from "lucide-react";
 
@@ -6,30 +6,99 @@ import { updateAdmin } from "../../services/superAdminDash";
 
 import "./EditPumpModal.css";
 
+// =====================================================
+// NORMALIZE STATUS
+// =====================================================
+
+const normalizeStatus = (status) => {
+  const normalized = String(status || "")
+    .trim()
+    .toLowerCase();
+
+  return normalized === "inactive" || normalized === "in active"
+    ? "inactive"
+    : "active";
+};
+
+// =====================================================
+// GET PUMP FORM DATA
+// =====================================================
+
+const getPumpFormData = (pumpData) => {
+  const existingPumpName =
+    pumpData?.pumpName ||
+    pumpData?.pump?.pumpName ||
+    pumpData?.stationName ||
+    pumpData?.pump?.name ||
+    pumpData?.name ||
+    "";
+
+  const existingPumpAddress =
+    pumpData?.pumpAddress ||
+    pumpData?.pump?.pumpAddress ||
+    pumpData?.address ||
+    pumpData?.location ||
+    "";
+
+  const existingStatus =
+    pumpData?.status ||
+    pumpData?.pumpStatus ||
+    pumpData?.pump?.status ||
+    "active";
+
+  const existingAdminName =
+    pumpData?.admin?.name ||
+    pumpData?.adminName ||
+    pumpData?.fullName ||
+    pumpData?.username ||
+    pumpData?.name ||
+    "";
+
+  const existingEmail =
+    pumpData?.admin?.email ||
+    pumpData?.email ||
+    pumpData?.adminEmail ||
+    "";
+
+  return {
+    pumpName: String(existingPumpName).trim(),
+
+    pumpAddress: String(existingPumpAddress).trim(),
+
+    status: normalizeStatus(existingStatus),
+
+    adminName: String(existingAdminName).trim(),
+
+    email: String(existingEmail).trim(),
+
+    // Existing password is NEVER loaded
+    password: "",
+  };
+};
+
 const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
   // =====================================================
   // FORM STATE
   // =====================================================
 
-  const [formData, setFormData] = useState({
-    pumpName: "",
-    pumpAddress: "",
-    status: "active",
-    adminName: "",
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState(() =>
+    getPumpFormData(pumpData)
+  );
 
   // =====================================================
   // ORIGINAL DATA
   // =====================================================
 
-  const [originalData, setOriginalData] = useState({
-    pumpName: "",
-    pumpAddress: "",
-    status: "active",
-    adminName: "",
-    email: "",
+  const [originalData] = useState(() => {
+    const data = getPumpFormData(pumpData);
+
+    return {
+      pumpName: data.pumpName,
+      pumpAddress: data.pumpAddress,
+      status: data.status,
+      adminName: data.adminName,
+      email: data.email,
+    };
   });
 
   // =====================================================
@@ -43,135 +112,6 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
   const [error, setError] = useState("");
 
   // =====================================================
-  // POPULATE FORM
-  // =====================================================
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    console.log("========================================");
-    console.log("EDIT PUMP MODAL OPENED");
-    console.log("========================================");
-
-    console.log("Pump Data Received:", pumpData);
-
-    if (!pumpData) {
-      console.error("Edit Pump Error: pumpData is missing.");
-
-      setError("Pump data is missing.");
-
-      return;
-    }
-
-    // ===================================================
-    // PUMP NAME
-    // ===================================================
-
-    const existingPumpName =
-      pumpData?.pumpName ||
-      pumpData?.pump?.pumpName ||
-      pumpData?.stationName ||
-      pumpData?.pump?.name ||
-      pumpData?.name ||
-      "";
-
-    // ===================================================
-    // PUMP ADDRESS
-    // ===================================================
-
-    const existingPumpAddress =
-      pumpData?.pumpAddress ||
-      pumpData?.pump?.pumpAddress ||
-      pumpData?.address ||
-      pumpData?.location ||
-      "";
-
-    // ===================================================
-    // STATUS
-    // ===================================================
-
-    const existingStatus =
-      pumpData?.status ||
-      pumpData?.pumpStatus ||
-      pumpData?.pump?.status ||
-      "active";
-
-    // ===================================================
-    // ADMIN NAME
-    // ===================================================
-
-    const existingAdminName =
-      pumpData?.admin?.name ||
-      pumpData?.adminName ||
-      pumpData?.fullName ||
-      pumpData?.username ||
-      pumpData?.name ||
-      "";
-
-    // ===================================================
-    // EMAIL
-    // ===================================================
-
-    const existingEmail =
-      pumpData?.admin?.email || pumpData?.email || pumpData?.adminEmail || "";
-
-    // ===================================================
-    // NORMALIZE STATUS
-    // ===================================================
-
-    const normalizedExistingStatus = String(existingStatus)
-      .trim()
-      .toLowerCase();
-
-    const normalizedStatus =
-      normalizedExistingStatus === "inactive" ||
-      normalizedExistingStatus === "in active"
-        ? "inactive"
-        : "active";
-
-    // ===================================================
-    // ORIGINAL VALUES
-    // ===================================================
-
-    const existingValues = {
-      pumpName: String(existingPumpName).trim(),
-
-      pumpAddress: String(existingPumpAddress).trim(),
-
-      status: normalizedStatus,
-
-      adminName: String(existingAdminName).trim(),
-
-      email: String(existingEmail).trim(),
-    };
-
-    console.log("Existing Values:", existingValues);
-
-    // ===================================================
-    // SET FORM DATA
-    // ===================================================
-
-    setFormData({
-      ...existingValues,
-
-      // Existing password is NEVER loaded
-      password: "",
-    });
-
-    // ===================================================
-    // SAVE ORIGINAL DATA
-    // ===================================================
-
-    setOriginalData(existingValues);
-
-    setShowPassword(false);
-
-    setError("");
-  }, [pumpData, isOpen]);
-
-  // =====================================================
   // INPUT CHANGE
   // =====================================================
 
@@ -182,7 +122,6 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
 
     setFormData((previous) => ({
       ...previous,
-
       [name]: value,
     }));
 
@@ -204,7 +143,6 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
 
     setFormData((previous) => ({
       ...previous,
-
       status,
     }));
 
@@ -357,7 +295,7 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
 
     // ===================================================
     // STATUS
-    // ===================================================
+    // =====================================================
 
     if (currentStatus !== originalData.status) {
       updateData.status = currentStatus;
@@ -381,7 +319,7 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
 
     // ===================================================
     // PASSWORD
-    // =====================================================
+    // ===================================================
 
     /*
      * Password blank hai:
@@ -442,7 +380,10 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
 
       console.log("Admin ID:", adminId);
 
-      console.log("Endpoint:", `/admins/updateAdmin/${adminId}`);
+      console.log(
+        "Endpoint:",
+        `/admins/updateAdmin/${adminId}`
+      );
 
       console.log("Payload:", {
         ...updateData,
@@ -458,7 +399,10 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
       // API CALL
       // =================================================
 
-      const response = await updateAdmin(adminId, updateData);
+      const response = await updateAdmin(
+        adminId,
+        updateData
+      );
 
       console.log("========================================");
       console.log("UPDATE ADMIN SUCCESS");
@@ -471,20 +415,22 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
       // =================================================
 
       if (response?.success === false) {
-        throw new Error(response?.message || "Failed to update admin.");
+        throw new Error(
+          response?.message ||
+            "Failed to update admin."
+        );
       }
 
       // =================================================
       // GET UPDATED RESULT
       // =================================================
 
-      const updatedResult = response?.admin ||
+      const updatedResult =
+        response?.admin ||
         response?.data?.admin ||
         response?.data || {
           ...pumpData,
-
           ...updateData,
-
           _id: adminId,
         };
 
@@ -495,7 +441,10 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
       // =================================================
 
       if (onSave) {
-        await onSave(updatedResult, changedFields);
+        await onSave(
+          updatedResult,
+          changedFields
+        );
       }
 
       // =================================================
@@ -512,15 +461,30 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
 
       console.error("Response:", err?.response);
 
-      console.error("Response Data:", err?.response?.data);
+      console.error(
+        "Response Data:",
+        err?.response?.data
+      );
 
-      console.error("Status:", err?.response?.status);
+      console.error(
+        "Status:",
+        err?.response?.status
+      );
 
-      console.error("Status Text:", err?.response?.statusText);
+      console.error(
+        "Status Text:",
+        err?.response?.statusText
+      );
 
-      console.error("Request URL:", err?.config?.url);
+      console.error(
+        "Request URL:",
+        err?.config?.url
+      );
 
-      console.error("Request Method:", err?.config?.method);
+      console.error(
+        "Request Method:",
+        err?.config?.method
+      );
 
       const message =
         err?.response?.data?.message ||
@@ -528,7 +492,10 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
         err?.message ||
         "Failed to update admin.";
 
-      console.error("Final Error Message:", message);
+      console.error(
+        "Final Error Message:",
+        message
+      );
 
       setError(message);
     } finally {
@@ -551,7 +518,10 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
   // =====================================================
 
   return (
-    <div className="edit-modal-overlay" onClick={handleClose}>
+    <div
+      className="edit-modal-overlay"
+      onClick={handleClose}
+    >
       <div
         className="edit-modal-container"
         onClick={(e) => e.stopPropagation()}
@@ -578,20 +548,29 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
             ERROR
         ================================================ */}
 
-        {error && <div className="edit-modal-error">{error}</div>}
+        {error && (
+          <div className="edit-modal-error">
+            {error}
+          </div>
+        )}
 
         {/* ================================================
             FORM
         ================================================ */}
 
-        <form onSubmit={handleSubmit} className="edit-modal-form">
+        <form
+          onSubmit={handleSubmit}
+          className="edit-modal-form"
+        >
           <div className="edit-modal-body">
             {/* ==========================================
                 PUMP NAME
             ========================================== */}
 
             <div className="edit-form-group">
-              <label htmlFor="pumpName">Pump Name</label>
+              <label htmlFor="pumpName">
+                Pump Name
+              </label>
 
               <input
                 type="text"
@@ -610,7 +589,9 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
             ========================================== */}
 
             <div className="edit-form-group">
-              <label htmlFor="pumpAddress">Pump Address</label>
+              <label htmlFor="pumpAddress">
+                Pump Address
+              </label>
 
               <input
                 type="text"
@@ -636,9 +617,13 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
                 <button
                   type="button"
                   className={`status-btn ${
-                    formData.status === "active" ? "active" : ""
+                    formData.status === "active"
+                      ? "active"
+                      : ""
                   }`}
-                  onClick={() => handleStatusChange("active")}
+                  onClick={() =>
+                    handleStatusChange("active")
+                  }
                   disabled={isUpdating}
                 >
                   Active
@@ -649,9 +634,13 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
                 <button
                   type="button"
                   className={`status-btn ${
-                    formData.status === "inactive" ? "inactive" : ""
+                    formData.status === "inactive"
+                      ? "inactive"
+                      : ""
                   }`}
-                  onClick={() => handleStatusChange("inactive")}
+                  onClick={() =>
+                    handleStatusChange("inactive")
+                  }
                   disabled={isUpdating}
                 >
                   Inactive
@@ -664,7 +653,9 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
             ========================================== */}
 
             <div className="edit-form-group">
-              <label htmlFor="adminName">Admin Name</label>
+              <label htmlFor="adminName">
+                Admin Name
+              </label>
 
               <input
                 type="text"
@@ -683,7 +674,9 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
             ========================================== */}
 
             <div className="edit-form-group">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">
+                Email
+              </label>
 
               <input
                 type="email"
@@ -702,11 +695,17 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
             ========================================== */}
 
             <div className="edit-form-group">
-              <label htmlFor="password">New Password</label>
+              <label htmlFor="password">
+                New Password
+              </label>
 
               <div className="password-input-wrapper">
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={
+                    showPassword
+                      ? "text"
+                      : "password"
+                  }
                   id="password"
                   name="password"
                   value={formData.password}
@@ -718,11 +717,23 @@ const EditPumpModal = ({ isOpen, onClose, pumpData, onSave }) => {
                 <button
                   type="button"
                   className="password-toggle-btn"
-                  onClick={() => setShowPassword((previous) => !previous)}
+                  onClick={() =>
+                    setShowPassword(
+                      (previous) => !previous
+                    )
+                  }
                   disabled={isUpdating}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={
+                    showPassword
+                      ? "Hide password"
+                      : "Show password"
+                  }
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
                 </button>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { X, Calendar, User, Wallet, Landmark, Save } from "lucide-react";
 
 import "./EditLoanModal.css";
@@ -10,49 +10,21 @@ const EditLoanModal = ({
   isSubmitting,
   initialData,
 }) => {
-  // =========================================================
-  // DEFAULT FORM DATA
-  // =========================================================
+  const [formData, setFormData] = useState(() => ({
+    date: initialData?.date || new Date().toISOString().split("T")[0],
 
-  const getDefaultFormData = () => ({
-    date: new Date().toISOString().split("T")[0],
-    loanType: "loan_given",
-    personName: "",
-    amount: "",
-    paymentMode: "cash",
-  });
+    loanType: initialData?.loanType || "loan_given",
 
-  // =========================================================
-  // FORM STATE
-  // =========================================================
+    personName: initialData?.personName || "",
 
-  const [formData, setFormData] = useState(getDefaultFormData());
+    amount: initialData?.amount ?? "",
+
+    paymentMode: initialData?.paymentMode === "bank transfer" ? "bank" : "cash",
+  }));
 
   // =========================================================
   // LOAD SELECTED LOAN DATA
   // =========================================================
-
-  useEffect(() => {
-    if (initialData && isOpen) {
-      setFormData({
-        date: initialData.date || new Date().toISOString().split("T")[0],
-
-        loanType: initialData.loanType || "loan_given",
-
-        personName: initialData.personName || "",
-
-        amount: initialData.amount ?? "",
-
-        // Frontend always uses:
-        // cash / bank
-        paymentMode: initialData.paymentMode === "bank transfer" ? "bank" : "cash",
-      });
-    }
-
-    if (!isOpen) {
-      setFormData(getDefaultFormData());
-    }
-  }, [initialData, isOpen]);
 
   // =========================================================
   // HANDLE INPUT CHANGE

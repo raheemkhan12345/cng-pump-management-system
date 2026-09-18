@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   FaArrowRightArrowLeft,
   FaXmark,
@@ -164,13 +164,9 @@ const CashTransferModal = ({
                 <button
                   type="button"
                   className={`ct-type-btn ${
-                    formData.transferType === "cash_to_bank"
-                      ? "active"
-                      : ""
+                    formData.transferType === "cash_to_bank" ? "active" : ""
                   }`}
-                  onClick={() =>
-                    handleTypeSelect("cash_to_bank")
-                  }
+                  onClick={() => handleTypeSelect("cash_to_bank")}
                   disabled={isSubmitting}
                 >
                   Cash to Bank
@@ -181,13 +177,9 @@ const CashTransferModal = ({
                 <button
                   type="button"
                   className={`ct-type-btn ${
-                    formData.transferType === "bank_to_cash"
-                      ? "active"
-                      : ""
+                    formData.transferType === "bank_to_cash" ? "active" : ""
                   }`}
-                  onClick={() =>
-                    handleTypeSelect("bank_to_cash")
-                  }
+                  onClick={() => handleTypeSelect("bank_to_cash")}
                   disabled={isSubmitting}
                 >
                   Bank to Cash
@@ -231,9 +223,9 @@ const CashTransferModal = ({
               <FaCircleInfo className="ct-info-icon" />
 
               <p className="ct-info-text">
-                Transfers are recorded immediately. Ensure physical
-                cash deposits align with this digital transfer before
-                end-of-day reconciliation.
+                Transfers are recorded immediately. Ensure physical cash
+                deposits align with this digital transfer before end-of-day
+                reconciliation.
               </p>
             </div>
           </div>
@@ -259,9 +251,7 @@ const CashTransferModal = ({
             >
               <FaCheck className="ct-submit-icon" />
 
-              <span>
-                {isSubmitting ? "Transferring..." : "Transfer"}
-              </span>
+              <span>{isSubmitting ? "Transferring..." : "Transfer"}</span>
             </button>
           </div>
         </form>
@@ -271,4 +261,3 @@ const CashTransferModal = ({
 };
 
 export default CashTransferModal;
-

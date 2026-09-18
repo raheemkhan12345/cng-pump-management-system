@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { X, Calendar, User, Wallet, Landmark, Save } from "lucide-react";
 
 import "./RecordLoanModel.css";
