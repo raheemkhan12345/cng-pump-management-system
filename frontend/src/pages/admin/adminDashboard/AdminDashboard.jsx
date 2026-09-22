@@ -1,30 +1,29 @@
 import React from 'react';
-import { Calendar, Plus } from 'lucide-react';
+import { Calendar, Undo2 } from 'lucide-react';
 import DashboardStats from './DashboardStats';
-
 import RecentTransactions from './RecentTransactions';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   return (
     <div className="admin-dashboard-wrapper">
-      {/* Top Header Filter & Add Expense Bar */}
+      {/* Top Header Filter & Action Bar */}
       <div className="dashboard-action-bar">
         <div className="date-filter-pill">
           <Calendar size={15} />
           <span>Viewing reports for August 2026</span>
-          <span className="dropdown-arrow">▾</span>
+          <span className="dropdown-arrow-badge">▾</span>
         </div>
-        <button className="btn-add-superAdmin">
-          
-          <span>Back Super Admin Dashboard</span>
+        
+        <button className="btn-super-admin">
+          <div className="icon-circle">
+            <Undo2 size={14} />
+          </div>
+          <span>Super Dashboard</span>
         </button>
       </div>
 
-    
       <DashboardStats />
-
-      {/* 3. Transactions Table */}
       <RecentTransactions /> 
     </div>
   );

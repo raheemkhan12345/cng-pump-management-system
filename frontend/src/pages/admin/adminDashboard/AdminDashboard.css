@@ -12,39 +12,69 @@
     align-items: center;
 }
 
+/* Date Filter Box */
 .date-filter-pill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background-color: #e2e8f0;
-    padding: 8px 16px;
-    border-radius: 20px;
+    background-color: #d1d5db;
+    /* Light grey background */
+    padding: 8px 12px;
+    border-radius: 6px;
+    /* Slightly rounded rectangle */
     font-size: 13px;
     font-weight: 500;
-    color: #475569;
+    color: #374151;
     cursor: pointer;
 }
 
-.dropdown-arrow {
-    font-size: 12px;
+.dropdown-arrow-badge {
+    background-color: #000000;
+    color: #ffffff;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
     margin-left: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.btn-add-superAdmin {
+/* Super Dashboard Button */
+.btn-super-admin {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background-color: #1F2A3C;
+    gap: 10px;
+    background-color: #1f2937;
+    /* Dark navy/grey */
     color: #ffffff;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 13px;
+    border: 1.5px solid #06b6d4;
+    /* Cyan border */
+    padding: 6px 16px 6px 6px;
+    /* Reduced left padding for circular icon */
+    border-radius: 50px;
+    /* Fully rounded pill shape */
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
 }
 
-.btn-add-expense:hover {
-    background-color: #047857;
+.btn-super-admin:hover {
+    background-color: #111827;
+    border-color: #22d3ee;
+}
+
+/* Circular Icon Container */
+.icon-circle {
+    background-color: #06b6d4;
+    /* Bright cyan circle background */
+    color: #0f172a;
+    /* Dark arrow color */
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
