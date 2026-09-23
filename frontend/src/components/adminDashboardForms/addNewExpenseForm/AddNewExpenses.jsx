@@ -6,11 +6,13 @@ import {
   Building2,
   Plus,
   Banknote,
+  Tag,
 } from "lucide-react";
 
 import {
   createExpense,
   getExpenseCategories,
+  createExpenseCategory,
 } from "../../../services/adminApis/expenseApi";
 
 import "./AddNewExpenses.css";
@@ -36,6 +38,14 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
 
   const [categories, setCategories] = useState([]);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
+
+  // =========================================================
+  // NEW CATEGORY STATES
+  // =========================================================
+
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
 
   // =========================================================
   // SUBMIT STATE
@@ -101,6 +111,11 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
     setPaymentMode("cash");
     setStatus("Paid");
     setRemarks("");
+
+    // Reset new category section
+    setIsAddingCategory(false);
+    setNewCategoryName("");
+    setIsCreatingCategory(false);
   };
 
   // =========================================================
@@ -108,10 +123,153 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
   // =========================================================
 
   const handleClose = () => {
-    if (isSubmitting) return;
+    if (isSubmitting || isCreatingCategory) return;
 
     resetForm();
     onClose();
+  };
+
+  // =========================================================
+  // OPEN ADD CATEGORY
+  // =========================================================
+
+  const handleOpenAddCategory = () => {
+    if (isSubmitting || isCreatingCategory) return;
+
+    setIsAddingCategory(true);
+    setNewCategoryName("");
+  };
+
+  // =========================================================
+  // CANCEL ADD CATEGORY
+  // =========================================================
+
+  const handleCancelAddCategory = () => {
+    if (isCreatingCategory) return;
+
+    setIsAddingCategory(false);
+    setNewCategoryName("");
+  };
+
+  // =========================================================
+  // CREATE NEW EXPENSE CATEGORY
+  // =========================================================
+
+  const handleAddCategory = async () => {
+    const trimmedCategoryName = newCategoryName.trim();
+
+    // =======================================================
+    // VALIDATION
+    // =======================================================
+
+    if (!trimmedCategoryName) {
+      console.error("Category Error: Category name is required.");
+      return;
+    }
+
+    // Prevent duplicate category on frontend
+    const categoryAlreadyExists = categories.some(
+      (item) =>
+        item?.name?.trim().toLowerCase() ===
+        trimmedCategoryName.toLowerCase(),
+    );
+
+    if (categoryAlreadyExists) {
+      console.error("Category Error: This category already exists.");
+      return;
+    }
+
+    try {
+      setIsCreatingCategory(true);
+
+      // =====================================================
+      // API PAYLOAD
+      // =====================================================
+
+      const categoryData = {
+        name: trimmedCategoryName,
+      };
+
+      console.log("========================================");
+      console.log("Create Expense Category Request:", categoryData);
+      console.log("========================================");
+
+      // =====================================================
+      // CREATE CATEGORY API
+      // =====================================================
+
+      const response = await createExpenseCategory(categoryData);
+
+      console.log("========================================");
+      console.log("Expense Category Created Successfully!");
+      console.log("Create Category Response:", response);
+      console.log("========================================");
+
+      // =====================================================
+      // GET CREATED CATEGORY FROM RESPONSE
+      // =====================================================
+
+      const createdCategory =
+        response?.expenseCategory ||
+        response?.category ||
+        response?.data?.expenseCategory ||
+        response?.data?.category;
+
+      // =====================================================
+      // IF BACKEND RETURNS CREATED CATEGORY
+      // =====================================================
+
+      if (createdCategory?._id) {
+        setCategories((previousCategories) => [
+          ...previousCategories,
+          createdCategory,
+        ]);
+
+        // Automatically select newly created category
+        setCategory(createdCategory._id);
+      } else {
+        // ===================================================
+        // FALLBACK:
+        // Fetch categories again from backend
+        // ===================================================
+
+        const categoriesResponse = await getExpenseCategories();
+
+        const updatedCategories =
+          categoriesResponse?.expenseCategories || [];
+
+        setCategories(updatedCategories);
+
+        // Find newly created category
+        const newlyCreatedCategory = updatedCategories.find(
+          (item) =>
+            item?.name?.trim().toLowerCase() ===
+            trimmedCategoryName.toLowerCase(),
+        );
+
+        if (newlyCreatedCategory?._id) {
+          setCategory(newlyCreatedCategory._id);
+        }
+      }
+
+      // =====================================================
+      // CLOSE NEW CATEGORY INPUT
+      // =====================================================
+
+      setNewCategoryName("");
+      setIsAddingCategory(false);
+    } catch (error) {
+      console.log("========================================");
+      console.log("Failed to create expense category.");
+      console.log("Category Error:", error);
+      console.log("Status:", error.response?.status);
+      console.log("Server Response:", error.response?.data);
+      console.log("Response Message:", error.response?.data?.message);
+      console.log("Response Error:", error.response?.data?.error);
+      console.log("========================================");
+    } finally {
+      setIsCreatingCategory(false);
+    }
   };
 
   // =========================================================
@@ -242,7 +400,7 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
             type="button"
             className="ane-close-btn"
             onClick={handleClose}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isCreatingCategory}
           >
             <X size={20} />
           </button>
@@ -270,6 +428,7 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                     value={date}
                     onChange={(event) => setDate(event.target.value)}
                     className="ane-input"
+                    disabled={isSubmitting}
                   />
 
                   <Calendar size={18} className="ane-input-icon" />
@@ -292,6 +451,7 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                     onChange={(event) => setAmount(event.target.value)}
                     placeholder="0.00"
                     className="ane-input ane-input-amount"
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -322,6 +482,85 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                   </option>
                 ))}
               </select>
+
+              {/* =================================================
+                  ADD NEW CATEGORY BUTTON
+              ================================================= */}
+
+              {!isAddingCategory && (
+                <button
+                  type="button"
+                  className="ane-add-category-btn"
+                  onClick={handleOpenAddCategory}
+                  disabled={isSubmitting || isCategoriesLoading}
+                >
+                  <Plus size={15} />
+
+                  <span>Add New Category</span>
+                </button>
+              )}
+
+              {/* =================================================
+                  NEW CATEGORY INPUT
+              ================================================= */}
+
+              {isAddingCategory && (
+                <div className="ane-new-category-box">
+                  <div className="ane-new-category-input-wrapper">
+                    <Tag size={15} className="ane-new-category-icon" />
+
+                    <input
+                      type="text"
+                      value={newCategoryName}
+                      onChange={(event) =>
+                        setNewCategoryName(event.target.value)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+
+                          if (!isCreatingCategory) {
+                            handleAddCategory();
+                          }
+                        }
+                      }}
+                      placeholder="Enter new category name"
+                      className="ane-new-category-input"
+                      disabled={isCreatingCategory}
+                      autoFocus
+                    />
+                  </div>
+
+                  <div className="ane-new-category-actions">
+                    <button
+                      type="button"
+                      className="ane-category-cancel-btn"
+                      onClick={handleCancelAddCategory}
+                      disabled={isCreatingCategory}
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="button"
+                      className="ane-category-add-btn"
+                      onClick={handleAddCategory}
+                      disabled={
+                        isCreatingCategory ||
+                        !newCategoryName.trim()
+                      }
+                    >
+                      <Plus size={14} />
+
+                      <span>
+                        {isCreatingCategory
+                          ? "Adding..."
+                          : "Add Category"}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* =================================================
@@ -335,9 +574,8 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                 {/* CASH */}
 
                 <div
-                  className={`ane-payment-card ${
-                    paymentMode === "cash" ? "ane-active" : ""
-                  }`}
+                  className={`ane-payment-card ${paymentMode === "cash" ? "ane-active" : ""
+                    }`}
                   onClick={() => {
                     if (!isSubmitting) {
                       setPaymentMode("cash");
@@ -362,9 +600,8 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                 {/* BANK */}
 
                 <div
-                  className={`ane-payment-card ${
-                    paymentMode === "bank" ? "ane-active" : ""
-                  }`}
+                  className={`ane-payment-card ${paymentMode === "bank" ? "ane-active" : ""
+                    }`}
                   onClick={() => {
                     if (!isSubmitting) {
                       setPaymentMode("bank");
@@ -434,7 +671,7 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
               type="button"
               className="ane-btn-cancel"
               onClick={handleClose}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isCreatingCategory}
             >
               Cancel
             </button>
@@ -443,12 +680,16 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
               type="submit"
               className="ane-btn-submit"
               disabled={
-                isSubmitting || isCategoriesLoading || categories.length === 0
+                isSubmitting ||
+                isCategoriesLoading ||
+                isCreatingCategory
               }
             >
               <Plus size={16} />
 
-              <span>{isSubmitting ? "Recording..." : "Record Expense"}</span>
+              <span>
+                {isSubmitting ? "Recording..." : "Record Expense"}
+              </span>
             </button>
           </div>
         </form>

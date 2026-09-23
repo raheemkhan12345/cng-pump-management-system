@@ -36,6 +36,7 @@
 }
 
 /* Header */
+
 .ane-modal-header {
     padding: 14px 18px;
     display: flex;
@@ -89,6 +90,7 @@
 }
 
 /* Body */
+
 .ane-modal-body {
     padding: 16px 18px;
     display: flex;
@@ -171,6 +173,149 @@
     padding-left: 6px;
 }
 
+/* =========================================================
+   ADD NEW CATEGORY
+========================================================= */
+
+.ane-add-category-btn {
+    width: fit-content;
+    margin-top: 2px;
+    padding: 5px 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: none;
+    background: transparent;
+    color: #055a36;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+}
+
+.ane-add-category-btn:hover:not(:disabled) {
+    background-color: #f0fdf4;
+}
+
+.ane-add-category-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* New Category Box */
+
+.ane-new-category-box {
+    margin-top: 3px;
+    padding: 9px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    animation: aneCategoryAppear 0.15s ease-out;
+}
+
+@keyframes aneCategoryAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-3px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ane-new-category-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ane-new-category-icon {
+    position: absolute;
+    left: 9px;
+    color: #64748b;
+    pointer-events: none;
+}
+
+.ane-new-category-input {
+    width: 100%;
+    padding: 7px 10px 7px 30px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #0f172a;
+    font-size: 12px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ane-new-category-input:focus {
+    border-color: #055a36;
+    box-shadow: 0 0 0 2px rgba(5, 90, 54, 0.08);
+}
+
+.ane-new-category-input::placeholder {
+    color: #94a3b8;
+}
+
+/* New Category Buttons */
+
+.ane-new-category-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.ane-category-cancel-btn,
+.ane-category-add-btn {
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.ane-category-cancel-btn {
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+    color: #475569;
+}
+
+.ane-category-cancel-btn:hover:not(:disabled) {
+    background-color: #f1f5f9;
+}
+
+.ane-category-add-btn {
+    border: none;
+    background-color: #055a36;
+    color: #ffffff;
+}
+
+.ane-category-add-btn:hover:not(:disabled) {
+    background-color: #04472b;
+}
+
+.ane-category-cancel-btn:disabled,
+.ane-category-add-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   PAYMENT
+========================================================= */
+
 .ane-payment-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -239,6 +384,7 @@
 }
 
 /* Footer */
+
 .ane-modal-footer {
     padding: 12px 18px;
     background-color: #f8fafc;
@@ -275,4 +421,44 @@
 
 .ane-btn-submit:hover {
     background-color: #1e293b;
+}
+
+/* =========================================================
+   DISABLED STATES
+========================================================= */
+
+.ane-btn-submit:disabled,
+.ane-btn-cancel:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 520px) {
+    .ane-modal-overlay {
+        padding: 8px;
+    }
+
+    .ane-modal-container {
+        max-width: 100%;
+    }
+
+    .ane-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .ane-payment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ane-modal-body {
+        padding: 14px;
+    }
+
+    .ane-modal-footer {
+        padding: 10px 14px;
+    }
 }
