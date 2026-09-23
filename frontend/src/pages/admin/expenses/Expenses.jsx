@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import AddNewExpenses from "../../../components/adminDashboardForms/addNewExpenseForm/AddNewExpenses";
+import RecentExpenses from "./RecentExpense";
 import "./Expenses.css";
 
 import ExpenseRecoveryModal from "../../../components/adminDashboardForms/expenseRecoveryModal/ExpenseRecoveryModal";
@@ -34,9 +35,11 @@ const Expenses = () => {
   const [isOwnerExpenseModalOpen, setIsOwnerExpenseModalOpen] = useState(false);
   const [isAddOwnerModalOpen, setIsAddOwnerModalOpen] = useState(false);
 
+  
   // ==========================================
   // Expense Stats
   // ==========================================
+  const [expenses, setExpenses] = useState([]);
 
   // Temporary hard-coded data.
   // GET Expense API will be integrated later.
@@ -51,50 +54,7 @@ const Expenses = () => {
   // Recent Expenses
   // ==========================================
 
-  // Temporary hard-coded data.
-  // GET Expense API will be integrated later.
-  const recentExpenses = [
-    {
-      id: 1,
-      date: "16-08-2026",
-      category: "Supplies",
-      categoryIcon: Package,
-      details: "Cleaning Materials",
-      amount: "2,200",
-      paymentMethod: "Cash",
-      status: "Paid",
-    },
-    {
-      id: 2,
-      date: "19-08-2026",
-      category: "Utility",
-      categoryIcon: Zap,
-      details: "Electricity Bill (Aug)",
-      amount: "12,000",
-      paymentMethod: "Bank",
-      status: "Paid",
-    },
-    {
-      id: 3,
-      date: "18-08-2026",
-      category: "Maintenance",
-      categoryIcon: Wrench,
-      details: "Compressor Service",
-      amount: "5,000",
-      paymentMethod: "Cash",
-      status: "Paid",
-    },
-    {
-      id: 4,
-      date: "17-08-2026",
-      category: "Staff",
-      categoryIcon: Users,
-      details: "Tea & Refreshments",
-      amount: "1,500",
-      paymentMethod: "Cash",
-      status: "Paid",
-    },
-  ];
+  
 
   // ==========================================
   // Expense Successfully Added
@@ -251,7 +211,7 @@ const Expenses = () => {
             <button
               type="button"
               className="exp-btn-action exp-btn-outline"
-              onClick={() => setIsOwnerExpenseModalOpen(true)}
+              
             >
               <Layers size={18} />
 
@@ -288,119 +248,11 @@ const Expenses = () => {
             Recent Expenses Table
         ========================================== */}
 
-        <div className="exp-table-card">
-          <div className="exp-table-header">
-            <h3 className="exp-table-title">Recent Expenses</h3>
-
-            <button type="button" className="exp-btn-view-all">
-              <span>View All</span>
-
-              <ArrowRight size={16} />
-            </button>
-          </div>
-
-          {/* ==========================================
-              Table
-          ========================================== */}
-
-          <div className="exp-table-wrapper">
-            <table className="exp-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Category</th>
-                  <th>Details</th>
-                  <th>Amount</th>
-                  <th>Payment Method</th>
-                  <th>Status</th>
-                  <th className="exp-text-center">Actions</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {recentExpenses.map((expense) => {
-                  const CategoryIcon = expense.categoryIcon;
-
-                  return (
-                    <tr key={expense.id}>
-                      {/* Date */}
-
-                      <td className="exp-text-muted">{expense.date}</td>
-
-                      {/* Category */}
-
-                      <td>
-                        <span className="exp-category-badge">
-                          <CategoryIcon size={14} />
-
-                          <span>{expense.category}</span>
-                        </span>
-                      </td>
-
-                      {/* Details */}
-
-                      <td className="exp-font-medium">{expense.details}</td>
-
-                      {/* Amount */}
-
-                      <td className="exp-font-bold">Rs. {expense.amount}</td>
-
-                      {/* Payment Method */}
-
-                      <td className="exp-text-muted">
-                        <div className="exp-payment-method">
-                          {expense.paymentMethod === "Cash" ? (
-                            <Banknote size={15} />
-                          ) : (
-                            <Building2 size={15} />
-                          )}
-
-                          <span>{expense.paymentMethod}</span>
-                        </div>
-                      </td>
-
-                      {/* Status */}
-
-                      <td>
-                        <span className="exp-status-paid">
-                          {expense.status}
-                        </span>
-                      </td>
-
-                      {/* Actions */}
-
-                      <td className="exp-actions-cell">
-                        {/* Edit */}
-
-                        <button
-                          type="button"
-                          className="exp-action-btn exp-edit-btn"
-                          title="Edit"
-                          aria-label={`Edit ${expense.details}`}
-                          onClick={() => handleEdit(expense)}
-                        >
-                          <Pencil size={11} />
-                        </button>
-
-                        {/* Delete */}
-
-                        <button
-                          type="button"
-                          className="exp-action-btn exp-delete-btn"
-                          title="Delete"
-                          aria-label={`Delete ${expense.details}`}
-                          onClick={() => handleDelete(expense)}
-                        >
-                          <Trash2 size={11} />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <RecentExpenses 
+        expenses={expenses}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        />
       </div>
 
       {/* ==========================================

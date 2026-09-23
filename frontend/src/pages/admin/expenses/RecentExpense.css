@@ -1,0 +1,177 @@
+/* ==========================================
+   RECENT EXPENSES TABLE
+========================================== */
+
+.exp-table-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.exp-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.exp-table-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.exp-btn-view-all {
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.exp-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.exp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.exp-table thead tr {
+    background-color: #1e293b;
+    color: #ffffff;
+}
+
+.exp-table th {
+    padding: 14px 24px;
+    font-weight: 600;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+}
+
+.exp-table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: middle;
+}
+
+.exp-text-muted {
+    color: #64748b;
+}
+
+.exp-font-medium {
+    font-weight: 500;
+    color: #0f172a;
+}
+
+.exp-font-bold {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.exp-text-center {
+    text-align: center;
+}
+
+/* Category Badge */
+
+.exp-category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #e2e8f0;
+    color: #334155;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Payment Method */
+
+.exp-payment-method {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Status Pill */
+
+.exp-status-paid {
+    display: inline-block;
+    background-color: #86efac;
+    color: #14532d;
+    padding: 4px 16px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* ==========================================
+   EXPENSE TABLE ACTIONS
+========================================== */
+
+.exp-actions-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    white-space: nowrap;
+}
+
+.exp-action-btn {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.exp-action-btn svg {
+    width: 11px;
+    height: 11px;
+}
+
+.exp-edit-btn {
+    color: #374151;
+}
+
+.exp-delete-btn {
+    color: #374151;
+}
+
+.exp-edit-btn:hover {
+    color: #2563eb;
+    transform: scale(1.15);
+}
+
+.exp-delete-btn:hover {
+    color: #dc2626;
+    transform: scale(1.15);
+}
+
+.exp-action-btn:focus-visible {
+    outline: 2px solid #94a3b8;
+    outline-offset: 3px;
+}
