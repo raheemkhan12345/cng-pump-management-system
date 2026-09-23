@@ -116,7 +116,7 @@ export const AuthProvider = ({ children }) => {
 
           pumpAddress: apiUser?.pumpAddress || "",
 
-          
+
         };
 
         // ===================================================
@@ -155,29 +155,20 @@ export const AuthProvider = ({ children }) => {
       // =====================================================
 
       const userData = {
-        id: apiUser?._id || apiUser?.id || "admin_1",
+        id: response?.id,
 
-        email: apiUser?.email || email.trim(),
+        email: response?.email || email.trim(),
 
-        name: apiUser?.name || apiUser?.fullName || "Admin",
+        name: response?.name || "Admin",
 
-        role: apiUser?.role || "ADMIN",
+        role: response?.role?.toUpperCase() || "ADMIN",
 
-        pumpName:
-          apiUser?.pumpName ||
-          apiUser?.stationName ||
-          apiUser?.pump?.name ||
-          "",
-
-        pumpAddress:
-          apiUser?.pumpAddress ||
-          apiUser?.stationAddress ||
-          apiUser?.pump?.address ||
-          "",
-
-
+        pump: {
+          id: response?.pump?.id || "",
+          name: response?.pump?.name || "",
+          address: response?.pump?.address || "",
+        },
       };
-
       // =====================================================
       // VALIDATE ADMIN ROLE
       // =====================================================

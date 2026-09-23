@@ -18,10 +18,13 @@ const AdminTopNavbar = ({ onToggleSidebar }) => {
         </button>
 
         <div className="pump-title-container">
-          <h1 className="pump-name">{user?.pumpName || "CNG Pump 01"}</h1>
+          <h1 className="pump-name">
+            {user?.pump?.name || "Loading..."}
+          </h1>
+
           <span className="pump-location">
             <MapPin size={12} className="location-icon" />
-            {user?.pumpAddress || "Mingora, Swat"}
+            {user?.pump?.address || "Loading..."}
           </span>
         </div>
       </div>
