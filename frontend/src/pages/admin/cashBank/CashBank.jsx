@@ -5,7 +5,6 @@ import {
   FaBuildingColumns,
   FaFilter,
   FaMoneyBillWave,
-  FaPen,
   FaTrashCan,
 } from "react-icons/fa6";
 
@@ -16,6 +15,7 @@ import {
 } from "../../../services/adminApis/cashBankApi";
 
 import CashTransferModal from "../../../components/adminDashboardForms/cashTransferModal/CashTransferModal";
+import OpeningBalanceModal from "../../../components/adminDashboardForms/addMonthllyOpeningModal/OpeningBalanceModal";
 
 import "./CashBank.css";
 
@@ -34,10 +34,14 @@ const CashBank = () => {
   // =========================================================
 
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [showOpeningBalanceModal, setShowOpeningBalanceModal] = useState(false);
+
   const [transactions, setTransactions] = useState([]);
   const [balances, setBalances] = useState(EMPTY_BALANCES);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [error, setError] = useState("");
 
   // =========================================================
@@ -267,6 +271,47 @@ const CashBank = () => {
   };
 
   // =========================================================
+  // CREATE OPENING BALANCE
+  // =========================================================
+
+  const handleOpeningBalanceSubmit = async (formData) => {
+    try {
+      setIsSubmitting(true);
+      setError("");
+
+      console.log("Opening Balance Payload:", formData);
+
+      /*
+       * Opening Balance API will be connected here.
+       *
+       * Example:
+       *
+       * const response = await createOpeningBalance(formData);
+       *
+       * console.log("Opening Balance Response:", response);
+       */
+
+      // Refresh Cash & Bank data
+      await fetchCashBankData();
+
+      // Close modal
+      setShowOpeningBalanceModal(false);
+    } catch (error) {
+      console.error("Failed to create Opening Balance:", error);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to create Opening Balance.";
+
+      alert(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // =========================================================
   // INITIAL LOAD
   // =========================================================
 
@@ -334,59 +379,48 @@ const CashBank = () => {
   // DELETE TRANSACTION
   // =========================================================
 
+  const handleDelete = async (transaction) => {
+    const transactionId = transaction?.id;
 
-const handleDelete = async (transaction) => {
-  const transactionId = transaction?.id;
+    if (!transactionId) {
+      alert("Transaction ID is missing.");
+      return;
+    }
 
-  if (!transactionId) {
-    alert("Transaction ID is missing.");
-    return;
-  }
-
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this transaction?",
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  try {
-    setError("");
-
-    console.log(
-      "Deleting Cash & Bank transaction:",
-      transactionId,
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this transaction?",
     );
 
-    const response = await deleteCashBankTransaction(transactionId);
+    if (!confirmed) {
+      return;
+    }
 
-    console.log("Delete Cash & Bank Response:", response);
+    try {
+      setError("");
 
-    setTransactions((currentTransactions) =>
-      currentTransactions.filter(
-        (tx) => tx.id !== transactionId,
-      ),
-    );
+      console.log("Deleting Cash & Bank transaction:", transactionId);
 
-    alert("Transaction deleted successfully.");
-  } catch (error) {
-    console.error(
-      "Failed to delete Cash & Bank transaction:",
-      error,
-    );
+      const response = await deleteCashBankTransaction(transactionId);
 
-    const message =
-      error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      error?.message ||
-      "Failed to delete Cash & Bank transaction.";
+      console.log("Delete Cash & Bank Response:", response);
 
-    alert(message);
-  }
-};
+      setTransactions((currentTransactions) =>
+        currentTransactions.filter((tx) => tx.id !== transactionId),
+      );
 
+      alert("Transaction deleted successfully.");
+    } catch (error) {
+      console.error("Failed to delete Cash & Bank transaction:", error);
 
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to delete Cash & Bank transaction.";
+
+      alert(message);
+    }
+  };
 
   // =========================================================
   // VISIBLE TRANSACTIONS
@@ -483,15 +517,26 @@ const handleDelete = async (transaction) => {
           </div>
         </div>
 
-        {/* TRANSFER CASH */}
+        {/* CASH & OPENING BALANCE ACTIONS */}
 
-        <div className="cb-transfer-action-wrap">
+        {/* CASH & OPENING BALANCE ACTIONS */}
+        <div className="cb-action-buttons-grid">
+          {/* TRANSFER CASH */}
           <button
             type="button"
-            className="cb-btn-transfer-dark"
+            className="cb-btn-action-dark"
             onClick={() => setShowTransferModal(true)}
           >
             <span>Transfer Cash</span>
+          </button>
+
+          {/* OPENING BALANCE FORM */}
+          <button
+            type="button"
+            className="cb-btn-action-dark"
+            onClick={() => setShowOpeningBalanceModal(true)}
+          >
+            <span>Opening Balance Form</span>
           </button>
         </div>
 
@@ -569,6 +614,15 @@ const handleDelete = async (transaction) => {
         isOpen={showTransferModal}
         onClose={() => setShowTransferModal(false)}
         onSubmit={handleTransferSubmit}
+        isSubmitting={isSubmitting}
+      />
+
+      {/* OPENING BALANCE MODAL */}
+
+      <OpeningBalanceModal
+        isOpen={showOpeningBalanceModal}
+        onClose={() => setShowOpeningBalanceModal(false)}
+        onSubmit={handleOpeningBalanceSubmit}
         isSubmitting={isSubmitting}
       />
     </div>
