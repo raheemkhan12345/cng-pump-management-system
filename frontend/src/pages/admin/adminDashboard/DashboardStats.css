@@ -2,127 +2,135 @@
    Responsive Stats Grid (4 columns default)
 ========================================== */
 .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    width: 100%;
-    box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ==========================================
    Card Container
 ========================================== */
 .stat-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 16px 18px;
-    min-height: 120px;
-    border-radius: 12px;
-    box-sizing: border-box;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 18px;
+  min-height: 120px;
+  border-radius: 12px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.stat-card:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }
 
 /* ==========================================
    Card Background Variants
 ========================================== */
 .card-green {
-    background-color: #bbf7d0;
-    /* Soft lime-green */
+  background-color: #bbf7d0;
+  /* Soft lime-green */
 }
 
 .card-teal {
-    background-color: #6ee7b7;
-    /* Mint / Teal */
+  background-color: #6ee7b7;
+  /* Mint / Teal */
 }
 
 .card-pink {
-    background-color: #fca5a5;
-    /* Light reddish pink */
+  background-color: #fca5a5;
+  /* Light reddish pink */
 }
 
 .card-grey {
-    background-color: #e5e7eb;
-    /* Soft neutral grey */
+  background-color: #e5e7eb;
+  /* Soft neutral grey */
 }
 
 /* ==========================================
    Red Left Accent Border
 ========================================== */
 .accent-border-red {
-    border-left: 5px solid #ef4444;
-    /* Thick left red border bar */
+  border-left: 5px solid #ef4444;
+  /* Thick left red border bar */
 }
 
 /* ==========================================
    Card Header (Label & Icon)
 ========================================== */
 .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .card-label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: #4b5563;
-    text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #4b5563;
+  text-transform: uppercase;
 }
 
 .card-icon {
-    font-size: 16px;
-    color: #374151;
+  font-size: 16px;
+  color: #374151;
 }
 
 /* ==========================================
    Card Main Content Area
 ========================================== */
 .card-body {
-    margin-top: 8px;
+  margin-top: 8px;
 }
 
 .card-amount {
-    font-size: 22px;
-    font-weight: 800;
-    color: #111827;
-    margin: 0;
-    line-height: 1.2;
+  font-size: 22px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+  line-height: 1.2;
 }
 
 .card-subtext {
-    font-size: 12px;
-    color: #4b5563;
-    margin: 4px 0 0 0;
-    font-weight: 500;
+  font-size: 12px;
+  color: #4b5563;
+  margin: 4px 0 0 0;
+  font-weight: 500;
 }
 
 /* Special Variations for Subtexts */
 .bold-subtext {
-    font-size: 16px;
-    font-weight: 700;
-    color: #111827;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
 }
 
 .large-subtext {
-    font-size: 18px;
-    font-weight: 700;
-    color: #111827;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
 }
 
 /* ==========================================
    Color Variants
 ========================================== */
 .text-red {
-    color: #dc2626 !important;
+  color: #dc2626 !important;
 }
 
 /* ==========================================
@@ -131,30 +139,30 @@
 
 /* Large Tablets / Laptops */
 @media (max-width: 1200px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 14px;
-    }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
 }
 
 /* Tablets & Mobile Devices */
 @media (max-width: 640px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 
-    .stat-card {
-        padding: 14px 16px;
-        min-height: 105px;
-    }
+  .stat-card {
+    padding: 14px 16px;
+    min-height: 105px;
+  }
 
-    .card-amount {
-        font-size: 20px;
-    }
+  .card-amount {
+    font-size: 20px;
+  }
 
-    .bold-subtext,
-    .large-subtext {
-        font-size: 15px;
-    }
+  .bold-subtext,
+  .large-subtext {
+    font-size: 15px;
+  }
 }
