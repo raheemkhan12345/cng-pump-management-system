@@ -80,7 +80,7 @@ const statsData = [
     value: "Rs. 10",
     variant: "card-grey accent-border-red",
     textVariant: "text-red",
-    path: "/admin/expenses",
+    path: "/admin/owner-expenses",
   },
 ];
 

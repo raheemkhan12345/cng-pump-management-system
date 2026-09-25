@@ -23,6 +23,7 @@ import Ledger from '../pages/admin/ledger/Ledger';
 import Inventory from '../pages/admin/inventory/Inventory';
 import Profile from '../pages/admin/profile/Profile';
 import DieselExpenseHistory from '../pages/admin/dieselExpenseHistory/DieselExpenseHistory';
+import OwnerExpenses from '../pages/admin/ownerExpenses/OwnerExpenses';
 
 // Admin Pages (Agar abhi files nahi bani toh yeh fallback render karega)
 
@@ -58,6 +59,7 @@ const AppRoutes = () => {
             <Route path="/admin/inventory" element={<Inventory />} />
             <Route path="/admin/profile" element={<Profile />} />
             <Route path="/admin/diesel-expense-history" element={<DieselExpenseHistory />} />
+            <Route path="/admin/owner-expenses" element={<OwnerExpenses />} />
           </Route>
         </Route>
 
