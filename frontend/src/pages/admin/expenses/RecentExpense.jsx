@@ -1,249 +1,281 @@
 import React from "react";
 import {
-    ArrowRight,
-    Banknote,
-    Building2,
-    Wrench,
-    Package,
-    Zap,
-    Users,
-    Pencil,
-    Trash2,
+  ArrowRight,
+  Banknote,
+  Building2,
+  Wrench,
+  Package,
+  Zap,
+  Users,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 
 import "./RecentExpense.css";
 
-const RecentExpenses = ({
-    expenses = [],
-    onEdit,
-    onDelete,
-}) => {
+const RecentExpenses = ({ expenses = [], onEdit, onDelete }) => {
+  // ==========================================
+  // Format Date
+  // ==========================================
 
-    // ==========================================
-    // Category Icons
-    // ==========================================
+  const formatDate = (date) => {
+    if (!date) {
+      return "-";
+    }
 
-    const getCategoryIcon = (category) => {
-        const categoryName = category?.toLowerCase();
+    const parsedDate = new Date(date);
 
-        if (!categoryName) {
-            return Package;
-        }
+    if (Number.isNaN(parsedDate.getTime())) {
+      return date;
+    }
 
-        if (
-            categoryName.includes("maintenance") ||
-            categoryName.includes("repair") ||
-            categoryName.includes("service")
-        ) {
-            return Wrench;
-        }
+    return parsedDate.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
-        if (
-            categoryName.includes("utility") ||
-            categoryName.includes("electric") ||
-            categoryName.includes("electricity")
-        ) {
-            return Zap;
-        }
+  // ==========================================
+  // Get Category Name Safely
+  // ==========================================
 
-        if (
-            categoryName.includes("staff") ||
-            categoryName.includes("salary") ||
-            categoryName.includes("employee")
-        ) {
-            return Users;
-        }
+  const getCategoryName = (category) => {
+    if (typeof category === "string") {
+      return category;
+    }
 
-        if (
-            categoryName.includes("supplies") ||
-            categoryName.includes("supply") ||
-            categoryName.includes("material")
-        ) {
-            return Package;
-        }
+    if (category && typeof category === "object") {
+      return (
+        category.name ||
+        category.title ||
+        category.categoryName ||
+        category.label ||
+        ""
+      );
+    }
 
-        return Package;
-    };
+    return "";
+  };
 
-    return (
-        <div className="exp-table-card">
+  // ==========================================
+  // Get Payment Method Safely
+  // ==========================================
 
-            {/* ==========================================
-                Header
-            ========================================== */}
+  const getPaymentMethod = (paymentMethod, paymentMode) => {
+    const value = paymentMethod ?? paymentMode;
 
-            <div className="exp-table-header">
-                <h3 className="exp-table-title">
-                    Recent Expenses
-                </h3>
+    if (typeof value === "string") {
+      return value;
+    }
 
-                <button
-                    type="button"
-                    className="exp-btn-view-all"
-                >
-                    <span>View All</span>
+    if (value && typeof value === "object") {
+      return (
+        value.name ||
+        value.title ||
+        value.paymentMethod ||
+        value.paymentMode ||
+        value.label ||
+        ""
+      );
+    }
 
-                    <ArrowRight size={16} />
-                </button>
-            </div>
+    return "";
+  };
 
-            {/* ==========================================
-                Table
-            ========================================== */}
+  // ==========================================
+  // Category Icons
+  // ==========================================
 
-            <div className="exp-table-wrapper">
-                <table className="exp-table">
+  const getCategoryIcon = (category) => {
+    const categoryName = getCategoryName(category).toLowerCase();
 
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Category</th>
-                            <th>Details</th>
-                            <th>Amount</th>
-                            <th>Payment Method</th>
-                            <th>Status</th>
-                            <th className="exp-text-center">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
+    if (!categoryName) {
+      return Package;
+    }
 
-                    <tbody>
-                        {expenses.length > 0 ? (
-                            expenses.map((expense) => {
+    if (
+      categoryName.includes("maintenance") ||
+      categoryName.includes("repair") ||
+      categoryName.includes("service")
+    ) {
+      return Wrench;
+    }
 
-                                const CategoryIcon =
-                                    getCategoryIcon(
-                                        expense.category
-                                    );
+    if (
+      categoryName.includes("utility") ||
+      categoryName.includes("electric") ||
+      categoryName.includes("electricity")
+    ) {
+      return Zap;
+    }
 
-                                return (
-                                    <tr key={expense._id || expense.id}>
+    if (
+      categoryName.includes("staff") ||
+      categoryName.includes("salary") ||
+      categoryName.includes("employee")
+    ) {
+      return Users;
+    }
 
-                                        {/* Date */}
+    if (
+      categoryName.includes("supplies") ||
+      categoryName.includes("supply") ||
+      categoryName.includes("material")
+    ) {
+      return Package;
+    }
 
-                                        <td className="exp-text-muted">
-                                            {expense.date}
-                                        </td>
+    return Package;
+  };
 
-                                        {/* Category */}
+  return (
+    <div className="exp-table-card">
+      {/* ==========================================
+          Header
+      ========================================== */}
 
-                                        <td>
-                                            <span className="exp-category-badge">
-                                                <CategoryIcon size={14} />
+      <div className="exp-table-header">
+        <h3 className="exp-table-title">Recent Expenses</h3>
 
-                                                <span>
-                                                    {expense.category || "-"}
-                                                </span>
-                                            </span>
-                                        </td>
+        <button type="button" className="exp-btn-view-all">
+          <span>View All</span>
 
-                                        {/* Details */}
+          <ArrowRight size={16} />
+        </button>
+      </div>
 
-                                        <td className="exp-font-medium">
-                                            {expense.details ||
-                                                expense.remarks ||
-                                                expense.description ||
-                                                "-"}
-                                        </td>
+      {/* ==========================================
+          Table
+      ========================================== */}
 
-                                        {/* Amount */}
+      <div className="exp-table-wrapper">
+        <table className="exp-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Category</th>
+              <th>Details</th>
+              <th>Amount</th>
+              <th>Payment Method</th>
+              <th>Status</th>
+              <th className="exp-text-center">Actions</th>
+            </tr>
+          </thead>
 
-                                        <td className="exp-font-bold">
-                                            Rs.{" "}
-                                            {expense.amount ?? "0"}
-                                        </td>
+          <tbody>
+            {expenses.length > 0 ? (
+              expenses.map((expense) => {
+                const CategoryIcon = getCategoryIcon(expense.category);
 
-                                        {/* Payment Method */}
+                const categoryName = getCategoryName(expense.category);
 
-                                        <td className="exp-text-muted">
-                                            <div className="exp-payment-method">
+                const paymentMethod = getPaymentMethod(
+                  expense.paymentMethod,
+                  expense.paymentMode,
+                );
 
-                                                {(
-                                                    expense.paymentMethod ||
-                                                    expense.paymentMode
-                                                )?.toLowerCase() === "cash" ? (
-                                                    <Banknote size={15} />
-                                                ) : (
-                                                    <Building2 size={15} />
-                                                )}
+                return (
+                  <tr key={expense._id || expense.id}>
+                    {/* Date */}
 
-                                                <span>
-                                                    {expense.paymentMethod ||
-                                                        expense.paymentMode ||
-                                                        "-"}
-                                                </span>
+                    <td className="exp-text-muted">
+                      {formatDate(expense.date)}
+                    </td>
 
-                                            </div>
-                                        </td>
+                    {/* Category */}
 
-                                        {/* Status */}
+                    <td>
+                      <span className="exp-category-badge">
+                        <CategoryIcon size={14} />
 
-                                        <td>
-                                            <span className="exp-status-paid">
-                                                {expense.status || "-"}
-                                            </span>
-                                        </td>
+                        <span>{categoryName || "-"}</span>
+                      </span>
+                    </td>
 
-                                        {/* Actions */}
+                    {/* Details */}
 
-                                        <td className="exp-actions-cell">
+                    <td className="exp-font-medium">
+                      {expense.details ||
+                        expense.remarks ||
+                        expense.description ||
+                        "-"}
+                    </td>
 
-                                            {/* Edit */}
+                    {/* Amount */}
 
-                                            <button
-                                                type="button"
-                                                className="exp-action-btn exp-edit-btn"
-                                                title="Edit"
-                                                aria-label={`Edit ${expense.details ||
-                                                    expense.description ||
-                                                    "expense"
-                                                    }`}
-                                                onClick={() =>
-                                                    onEdit?.(expense)
-                                                }
-                                            >
-                                                <Pencil size={11} />
-                                            </button>
+                    <td className="exp-font-bold">
+                      Rs. {expense.amount ?? "0"}
+                    </td>
 
-                                            {/* Delete */}
+                    {/* Payment Method */}
 
-                                            <button
-                                                type="button"
-                                                className="exp-action-btn exp-delete-btn"
-                                                title="Delete"
-                                                aria-label={`Delete ${expense.details ||
-                                                    expense.description ||
-                                                    "expense"
-                                                    }`}
-                                                onClick={() =>
-                                                    onDelete?.(expense)
-                                                }
-                                            >
-                                                <Trash2 size={11} />
-                                            </button>
-
-                                        </td>
-
-                                    </tr>
-                                );
-                            })
+                    <td className="exp-text-muted">
+                      <div className="exp-payment-method">
+                        {paymentMethod.toLowerCase() === "cash" ? (
+                          <Banknote size={15} />
                         ) : (
-                            <tr>
-                                <td
-                                    colSpan="7"
-                                    className="exp-empty-state"
-                                >
-                                    No expenses found.
-                                </td>
-                            </tr>
+                          <Building2 size={15} />
                         )}
-                    </tbody>
 
-                </table>
-            </div>
-        </div>
-    );
+                        <span>{paymentMethod || "-"}</span>
+                      </div>
+                    </td>
+
+                    {/* Status */}
+
+                    <td>
+                      <span className="exp-status-paid">
+                        {expense.status || "-"}
+                      </span>
+                    </td>
+
+                    {/* Actions */}
+
+                    <td className="exp-actions-cell">
+                      {/* Edit */}
+
+                      <button
+                        type="button"
+                        className="exp-action-btn exp-edit-btn"
+                        title="Edit"
+                        aria-label={`Edit ${
+                          expense.details || expense.description || "expense"
+                        }`}
+                        onClick={() => onEdit?.(expense)}
+                      >
+                        <Pencil size={11} />
+                      </button>
+
+                      {/* Delete */}
+
+                      <button
+                        type="button"
+                        className="exp-action-btn exp-delete-btn"
+                        title="Delete"
+                        aria-label={`Delete ${
+                          expense.details || expense.description || "expense"
+                        }`}
+                        onClick={() => onDelete?.(expense)}
+                      >
+                        <Trash2 size={11} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="7" className="exp-empty-state">
+                  No expenses found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 };
 
 export default RecentExpenses;

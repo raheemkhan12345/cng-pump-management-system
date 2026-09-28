@@ -14,6 +14,16 @@ export const createExpense = async (expenseData) => {
 };
 
 // =========================================================
+// GET ALL EXPENSES
+// =========================================================
+
+// GET ALL EXPENSES
+export const getExpenses = async () => {
+  const response = await axiosInstance.get("/expense/getexpense");
+  return response.data;
+};
+
+// =========================================================
 // GET EXPENSE CATEGORIES
 // =========================================================
 

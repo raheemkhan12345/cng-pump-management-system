@@ -1,28 +1,17 @@
-import React, { useState } from "react";
-import {
-  PlusCircle,
-  Layers,
-  TrendingDown,
-  Calendar,
-  ArrowRight,
-  Banknote,
-  Building2,
-  Wrench,
-  Package,
-  Zap,
-  Users,
-  Pencil,
-  Trash2,
-} from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { PlusCircle, Layers, TrendingDown, Calendar } from "lucide-react";
 
 import AddNewExpenses from "../../../components/adminDashboardForms/addNewExpenseForm/AddNewExpenses";
 import RecentExpenses from "./RecentExpense";
-import "./Expenses.css";
 
 import ExpenseRecoveryModal from "../../../components/adminDashboardForms/expenseRecoveryModal/ExpenseRecoveryModal";
 import AddDieselExpenseModal from "../../../components/adminDashboardForms/addDieselExpenseModal/AddDieselExpenseModal";
 import RecordOwnerExpenseModal from "../../../components/adminDashboardForms/recordOwnerExpenseModal/RecordOwnerExpenseModal";
 import AddNewOwnerModal from "../../../components/adminDashboardForms/addNewOwnerModal/AddNewOwnerModal";
+
+import { getExpenses } from "../../../services/adminApis/expenseApi";
+
+import "./Expenses.css";
 
 const Expenses = () => {
   // ==========================================
@@ -35,36 +24,174 @@ const Expenses = () => {
   const [isOwnerExpenseModalOpen, setIsOwnerExpenseModalOpen] = useState(false);
   const [isAddOwnerModalOpen, setIsAddOwnerModalOpen] = useState(false);
 
-  
   // ==========================================
-  // Expense Stats
+  // Expense Data
   // ==========================================
-  const [expenses, setExpenses] = useState([]);
 
-  // Temporary hard-coded data.
-  // GET Expense API will be integrated later.
-  const expenseStats = {
-    todayExpenses: "38,500",
-    monthExpenses: "412,000",
-    recoveryExpenses: "30,000",
-    currentMonth: "August 2026",
+  const [expenses, setExpenses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // ==========================================
+  // GET EXPENSES
+  // ==========================================
+
+  const fetchExpenses = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError("");
+
+      const response = await getExpenses();
+
+      console.log("========================================");
+      console.log("GET EXPENSE API RESPONSE:", response);
+      console.log("========================================");
+
+      let expenseData = [];
+
+      if (Array.isArray(response?.data)) {
+        expenseData = response.data;
+      } else if (Array.isArray(response?.expenses)) {
+        expenseData = response.expenses;
+      } else if (Array.isArray(response?.expense)) {
+        expenseData = response.expense;
+      } else if (Array.isArray(response)) {
+        expenseData = response;
+      }
+
+      console.log("Final Expense Data:", expenseData);
+
+      setExpenses(expenseData);
+    } catch (error) {
+      console.error("Failed to fetch expenses:", error);
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to load expenses.";
+
+      setError(errorMessage);
+      setExpenses([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // ==========================================
+  // GET EXPENSES ON PAGE LOAD
+  // ==========================================
+
+  useEffect(() => {
+    fetchExpenses();
+  }, [fetchExpenses]);
+
+  // ==========================================
+  // REAL EXPENSE STATS
+  // ==========================================
+
+  const getAmount = (expense) => {
+    return (
+      Number(
+        expense?.amount ?? expense?.totalAmount ?? expense?.expenseAmount ?? 0,
+      ) || 0
+    );
   };
 
-  // ==========================================
-  // Recent Expenses
-  // ==========================================
+  const getDate = (expense) => {
+    return expense?.date || expense?.expenseDate || expense?.createdAt || "";
+  };
 
-  
+  const getDateOnly = (dateValue) => {
+    if (!dateValue) return "";
+
+    const dateString = String(dateValue);
+
+    if (dateString.includes("T")) {
+      return dateString.split("T")[0];
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      return dateString;
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+
+    return date.toISOString().split("T")[0];
+  };
+
+  const today = new Date();
+
+  const todayDate = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0"),
+  ].join("-");
+
+  const currentYear = today.getFullYear();
+  const currentMonthNumber = today.getMonth() + 1;
+
+  const todayExpenses = expenses
+    .filter((expense) => {
+      return getDateOnly(getDate(expense)) === todayDate;
+    })
+    .reduce((total, expense) => {
+      return total + getAmount(expense);
+    }, 0);
+
+  const monthExpenses = expenses
+    .filter((expense) => {
+      const expenseDate = getDateOnly(getDate(expense));
+
+      if (!expenseDate) return false;
+
+      const [year, month] = expenseDate.split("-").map(Number);
+
+      return year === currentYear && month === currentMonthNumber;
+    })
+    .reduce((total, expense) => {
+      return total + getAmount(expense);
+    }, 0);
+
+  const recoveryExpenses = expenses
+    .filter((expense) => {
+      const type = String(
+        expense?.type || expense?.expenseType || expense?.category || "",
+      ).toLowerCase();
+
+      return type.includes("recovery");
+    })
+    .reduce((total, expense) => {
+      return total + getAmount(expense);
+    }, 0);
+
+  const currentMonth = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+  }).format(today);
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-PK").format(Number(amount) || 0);
+  };
 
   // ==========================================
   // Expense Successfully Added
   // ==========================================
 
-  const handleExpenseSuccess = (expenseResponse) => {
+  const handleExpenseSuccess = async (expenseResponse) => {
     console.log("========================================");
     console.log("Expense added successfully!");
     console.log("Expense Response:", expenseResponse);
     console.log("========================================");
+
+    setIsModalOpen(false);
+
+    // Refresh real data from backend
+    await fetchExpenses();
   };
 
   // ==========================================
@@ -83,7 +210,43 @@ const Expenses = () => {
     console.log("Delete Expense:", expense);
   };
 
-  
+  // ==========================================
+  // Loading State
+  // ==========================================
+
+  if (isLoading) {
+    return (
+      <div className="exp-page-container">
+        <div className="exp-content-wrapper">
+          <div className="exp-loading">Loading expenses...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // Error State
+  // ==========================================
+
+  if (error) {
+    return (
+      <div className="exp-page-container">
+        <div className="exp-content-wrapper">
+          <div className="exp-error">
+            <p>{error}</p>
+
+            <button type="button" onClick={fetchExpenses}>
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // MAIN UI
+  // ==========================================
 
   return (
     <div className="exp-page-container">
@@ -107,13 +270,12 @@ const Expenses = () => {
             onClick={() => setIsAddOwnerModalOpen(true)}
           >
             <PlusCircle size={18} />
-
             <span>Add Owners</span>
           </button>
         </div>
 
         {/* ==========================================
-            Top 3 Metric Cards
+            Expense Metric Cards
         ========================================== */}
 
         <div className="exp-stats-grid">
@@ -128,7 +290,7 @@ const Expenses = () => {
               </span>
 
               <h2 className="exp-stat-value">
-                Rs. {expenseStats.todayExpenses}
+                Rs. {formatCurrency(todayExpenses)}
               </h2>
 
               <span className="exp-stat-sub">Total outgoings today</span>
@@ -150,12 +312,10 @@ const Expenses = () => {
               </span>
 
               <h2 className="exp-stat-value">
-                Rs. {expenseStats.monthExpenses}
+                Rs. {formatCurrency(monthExpenses)}
               </h2>
 
-              <span className="exp-stat-sub">
-                Total for {expenseStats.currentMonth}
-              </span>
+              <span className="exp-stat-sub">Total for {currentMonth}</span>
             </div>
 
             <div className="exp-icon-box exp-icon-blue">
@@ -170,7 +330,7 @@ const Expenses = () => {
               <span className="exp-stat-label">RECOVERY EXPENSES</span>
 
               <h2 className="exp-stat-value">
-                Rs. {expenseStats.recoveryExpenses}
+                Rs. {formatCurrency(recoveryExpenses)}
               </h2>
             </div>
 
@@ -181,7 +341,7 @@ const Expenses = () => {
         </div>
 
         {/* ==========================================
-            Action Buttons Grid Section
+            Action Buttons
         ========================================== */}
 
         <div className="exp-actions-container">
@@ -194,7 +354,6 @@ const Expenses = () => {
               onClick={() => setIsModalOpen(true)}
             >
               <PlusCircle size={18} />
-
               <span>Add New Expense</span>
             </button>
 
@@ -204,17 +363,11 @@ const Expenses = () => {
               onClick={() => setIsRecoveryModalOpen(true)}
             >
               <PlusCircle size={18} />
-
               <span>Add Recovery Expense</span>
             </button>
 
-            <button
-              type="button"
-              className="exp-btn-action exp-btn-outline"
-              
-            >
+            <button type="button" className="exp-btn-action exp-btn-outline">
               <Layers size={18} />
-
               <span>View Expense Categories</span>
             </button>
           </div>
@@ -228,7 +381,6 @@ const Expenses = () => {
               onClick={() => setIsDieselModalOpen(true)}
             >
               <PlusCircle size={18} />
-
               <span>Diesel Expense</span>
             </button>
 
@@ -238,20 +390,19 @@ const Expenses = () => {
               onClick={() => setIsOwnerExpenseModalOpen(true)}
             >
               <PlusCircle size={18} />
-
               <span>Add Owner Expense</span>
             </button>
           </div>
         </div>
 
         {/* ==========================================
-            Recent Expenses Table
+            Recent Expenses
         ========================================== */}
 
-        <RecentExpenses 
-        expenses={expenses}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
+        <RecentExpenses
+          expenses={expenses}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
         />
       </div>
 
