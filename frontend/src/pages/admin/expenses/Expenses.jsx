@@ -9,7 +9,10 @@ import AddDieselExpenseModal from "../../../components/adminDashboardForms/addDi
 import RecordOwnerExpenseModal from "../../../components/adminDashboardForms/recordOwnerExpenseModal/RecordOwnerExpenseModal";
 import AddNewOwnerModal from "../../../components/adminDashboardForms/addNewOwnerModal/AddNewOwnerModal";
 
-import { getExpenses } from "../../../services/adminApis/expenseApi";
+import {
+  getExpenses,
+  deleteExpense,
+} from "../../../services/adminApis/expenseApi";
 
 import "./Expenses.css";
 
@@ -37,6 +40,12 @@ const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // ==========================================
+  // Delete State
+  // ==========================================
+
+  const [deletingExpenseId, setDeletingExpenseId] = useState(null);
 
   // ==========================================
   // GET EXPENSES
@@ -206,7 +215,6 @@ const Expenses = () => {
     setIsModalOpen(false);
     setEditingExpense(null);
 
-    // Refresh real data from backend
     await fetchExpenses();
   };
 
@@ -227,8 +235,76 @@ const Expenses = () => {
   // DELETE EXPENSE
   // ==========================================
 
-  const handleDelete = (expense) => {
-    console.log("Delete Expense:", expense);
+  const handleDelete = async (expense) => {
+    // ========================================
+    // GET EXPENSE ID
+    // ========================================
+
+    const expenseId = expense?._id || expense?.id || expense?.expenseId;
+
+    if (!expenseId) {
+      console.error("Delete Expense Error: Expense ID is missing.", expense);
+
+      return;
+    }
+
+    // ========================================
+    // CONFIRM DELETE
+    // ========================================
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this expense?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDeletingExpenseId(expenseId);
+
+      console.log("========================================");
+      console.log("DELETE EXPENSE");
+      console.log("Expense ID:", expenseId);
+      console.log("Delete URL:", `/expense/${expenseId}`);
+      console.log("========================================");
+
+      // ======================================
+      // DELETE API
+      // DELETE /expense/:id
+      // ======================================
+
+      const response = await deleteExpense(expenseId);
+
+      console.log("========================================");
+      console.log("EXPENSE DELETED SUCCESSFULLY");
+      console.log("Delete Response:", response);
+      console.log("========================================");
+
+      // ======================================
+      // REFRESH EXPENSE LIST
+      // ======================================
+
+      await fetchExpenses();
+    } catch (error) {
+      console.error("========================================");
+      console.error("FAILED TO DELETE EXPENSE");
+      console.error("Delete Error:", error);
+      console.error("Status:", error?.response?.status);
+      console.error("Server Response:", error?.response?.data);
+      console.error("Response Message:", error?.response?.data?.message);
+      console.error("========================================");
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to delete expense.";
+
+      window.alert(errorMessage);
+    } finally {
+      setDeletingExpenseId(null);
+    }
   };
 
   // ==========================================
@@ -433,6 +509,7 @@ const Expenses = () => {
           expenses={expenses}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          deletingExpenseId={deletingExpenseId}
         />
       </div>
 

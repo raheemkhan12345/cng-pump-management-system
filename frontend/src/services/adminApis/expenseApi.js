@@ -50,6 +50,19 @@ export const updateExpense = async (expenseId, expenseData) => {
 };
 
 // =========================================================
+// DELETE EXPENSE
+// DELETE /expense/:id
+// =========================================================
+
+export const deleteExpense = async (expenseId) => {
+  const response = await axiosInstance.delete(
+    `/expense/${expenseId}`,
+  );
+
+  return response.data;
+};
+
+// =========================================================
 // CREATE EXPENSE CATEGORY
 // =========================================================
 
