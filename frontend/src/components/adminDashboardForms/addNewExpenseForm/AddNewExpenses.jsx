@@ -11,13 +11,25 @@ import {
 
 import {
   createExpense,
+  updateExpense,
   getExpenseCategories,
   createExpenseCategory,
 } from "../../../services/adminApis/expenseApi";
 
 import "./AddNewExpenses.css";
 
-const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
+const AddNewExpenses = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  editingExpense = null,
+}) => {
+  // =========================================================
+  // EDIT MODE
+  // =========================================================
+
+  const isEditMode = Boolean(editingExpense);
+
   // =========================================================
   // FORM STATES
   // =========================================================
@@ -54,6 +66,84 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // =========================================================
+  // CATEGORY HELPERS
+  // =========================================================
+
+  const getCategoryId = (item) => {
+    if (!item) return "";
+
+    if (typeof item === "string") {
+      return item;
+    }
+
+    return item?._id || item?.id || item?.categoryId || "";
+  };
+
+  const getCategoryName = (item) => {
+    if (!item) return "";
+
+    if (typeof item === "string") {
+      return item;
+    }
+
+    return item?.name || item?.title || item?.categoryName || item?.label || "";
+  };
+
+  const getPaymentModeValue = (value) => {
+    if (!value) {
+      return "cash";
+    }
+
+    let paymentValue = value;
+
+    if (typeof value === "object") {
+      paymentValue =
+        value?.name ||
+        value?.title ||
+        value?.paymentMethod ||
+        value?.paymentMode ||
+        value?.label ||
+        "";
+    }
+
+    const normalizedValue = String(paymentValue).toLowerCase();
+
+    if (normalizedValue.includes("bank")) {
+      return "bank";
+    }
+
+    return "cash";
+  };
+
+  const getExpenseDate = (expenseDate) => {
+    if (!expenseDate) {
+      return new Date().toISOString().split("T")[0];
+    }
+
+    const dateString = String(expenseDate);
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      return dateString;
+    }
+
+    if (dateString.includes("T")) {
+      return dateString.split("T")[0];
+    }
+
+    const parsedDate = new Date(expenseDate);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return new Date().toISOString().split("T")[0];
+    }
+
+    return parsedDate.toISOString().split("T")[0];
+  };
+
+  const getExpenseRemarks = (expense) => {
+    return expense?.remarks || expense?.details || expense?.description || "";
+  };
+
+  // =========================================================
   // GET EXPENSE CATEGORIES
   // =========================================================
 
@@ -70,14 +160,15 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
         console.log("Expense Categories API Response:", response);
         console.log("========================================");
 
-        // Backend response:
-        // {
-        //   success: true,
-        //   count: 5,
-        //   expenseCategories: [...]
-        // }
-
-        const categoryData = response?.expenseCategories || [];
+        const categoryData = Array.isArray(response?.expenseCategories)
+          ? response.expenseCategories
+          : Array.isArray(response?.categories)
+            ? response.categories
+            : Array.isArray(response?.data)
+              ? response.data
+              : Array.isArray(response)
+                ? response
+                : [];
 
         setCategories(categoryData);
 
@@ -86,9 +177,8 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
         console.log("========================================");
         console.log("Failed to fetch expense categories.");
         console.log("Category Error:", error);
-        console.log("Status:", error.response?.status);
-        console.log("Server Response:", error.response?.data);
-        console.log("Response Message:", error.response?.data?.message);
+        console.log("Status:", error?.response?.status);
+        console.log("Server Response:", error?.response?.data);
         console.log("========================================");
 
         setCategories([]);
@@ -99,6 +189,60 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
 
     fetchCategories();
   }, [isOpen]);
+
+  // =========================================================
+  // PREFILL FORM WHEN EDITING
+  // =========================================================
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (!editingExpense) {
+      resetForm();
+      return;
+    }
+
+    console.log("========================================");
+    console.log("Prefilling Expense For Edit:", editingExpense);
+    console.log("========================================");
+
+    // Date
+    setDate(
+      getExpenseDate(
+        editingExpense?.date ||
+          editingExpense?.expenseDate ||
+          editingExpense?.createdAt,
+      ),
+    );
+
+    // Amount
+    setAmount(
+      editingExpense?.amount ??
+        editingExpense?.totalAmount ??
+        editingExpense?.expenseAmount ??
+        "",
+    );
+
+    // Category
+    setCategory(getCategoryId(editingExpense?.category));
+
+    // Payment Mode
+    setPaymentMode(
+      getPaymentModeValue(
+        editingExpense?.paymentMethod || editingExpense?.paymentMode,
+      ),
+    );
+
+    // Status
+    setStatus(editingExpense?.status || "Paid");
+
+    // Remarks
+    setRemarks(getExpenseRemarks(editingExpense));
+
+    // Close Add Category section
+    setIsAddingCategory(false);
+    setNewCategoryName("");
+  }, [isOpen, editingExpense]);
 
   // =========================================================
   // RESET FORM
@@ -112,7 +256,6 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
     setStatus("Paid");
     setRemarks("");
 
-    // Reset new category section
     setIsAddingCategory(false);
     setNewCategoryName("");
     setIsCreatingCategory(false);
@@ -167,12 +310,17 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
       return;
     }
 
-    // Prevent duplicate category on frontend
-    const categoryAlreadyExists = categories.some(
-      (item) =>
-        item?.name?.trim().toLowerCase() ===
-        trimmedCategoryName.toLowerCase(),
-    );
+    // =======================================================
+    // DUPLICATE CHECK
+    // =======================================================
+
+    const categoryAlreadyExists = categories.some((item) => {
+      const existingName = getCategoryName(item);
+
+      return (
+        existingName.trim().toLowerCase() === trimmedCategoryName.toLowerCase()
+      );
+    });
 
     if (categoryAlreadyExists) {
       console.error("Category Error: This category already exists.");
@@ -182,10 +330,6 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
     try {
       setIsCreatingCategory(true);
 
-      // =====================================================
-      // API PAYLOAD
-      // =====================================================
-
       const categoryData = {
         name: trimmedCategoryName,
       };
@@ -193,10 +337,6 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
       console.log("========================================");
       console.log("Create Expense Category Request:", categoryData);
       console.log("========================================");
-
-      // =====================================================
-      // CREATE CATEGORY API
-      // =====================================================
 
       const response = await createExpenseCategory(categoryData);
 
@@ -206,7 +346,7 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
       console.log("========================================");
 
       // =====================================================
-      // GET CREATED CATEGORY FROM RESPONSE
+      // GET CREATED CATEGORY
       // =====================================================
 
       const createdCategory =
@@ -215,40 +355,53 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
         response?.data?.expenseCategory ||
         response?.data?.category;
 
+      const createdCategoryId = getCategoryId(createdCategory);
+
       // =====================================================
-      // IF BACKEND RETURNS CREATED CATEGORY
+      // BACKEND RETURNS CREATED CATEGORY
       // =====================================================
 
-      if (createdCategory?._id) {
+      if (createdCategoryId) {
         setCategories((previousCategories) => [
           ...previousCategories,
           createdCategory,
         ]);
 
-        // Automatically select newly created category
-        setCategory(createdCategory._id);
+        setCategory(createdCategoryId);
       } else {
         // ===================================================
-        // FALLBACK:
-        // Fetch categories again from backend
+        // FALLBACK: FETCH CATEGORIES AGAIN
         // ===================================================
 
         const categoriesResponse = await getExpenseCategories();
 
-        const updatedCategories =
-          categoriesResponse?.expenseCategories || [];
+        const updatedCategories = Array.isArray(
+          categoriesResponse?.expenseCategories,
+        )
+          ? categoriesResponse.expenseCategories
+          : Array.isArray(categoriesResponse?.categories)
+            ? categoriesResponse.categories
+            : Array.isArray(categoriesResponse?.data)
+              ? categoriesResponse.data
+              : Array.isArray(categoriesResponse)
+                ? categoriesResponse
+                : [];
 
         setCategories(updatedCategories);
 
-        // Find newly created category
-        const newlyCreatedCategory = updatedCategories.find(
-          (item) =>
-            item?.name?.trim().toLowerCase() ===
-            trimmedCategoryName.toLowerCase(),
-        );
+        const newlyCreatedCategory = updatedCategories.find((item) => {
+          const existingName = getCategoryName(item);
 
-        if (newlyCreatedCategory?._id) {
-          setCategory(newlyCreatedCategory._id);
+          return (
+            existingName.trim().toLowerCase() ===
+            trimmedCategoryName.toLowerCase()
+          );
+        });
+
+        const newlyCreatedCategoryId = getCategoryId(newlyCreatedCategory);
+
+        if (newlyCreatedCategoryId) {
+          setCategory(newlyCreatedCategoryId);
         }
       }
 
@@ -262,10 +415,10 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
       console.log("========================================");
       console.log("Failed to create expense category.");
       console.log("Category Error:", error);
-      console.log("Status:", error.response?.status);
-      console.log("Server Response:", error.response?.data);
-      console.log("Response Message:", error.response?.data?.message);
-      console.log("Response Error:", error.response?.data?.error);
+      console.log("Status:", error?.response?.status);
+      console.log("Server Response:", error?.response?.data);
+      console.log("Response Message:", error?.response?.data?.message);
+      console.log("Response Error:", error?.response?.data?.error);
       console.log("========================================");
     } finally {
       setIsCreatingCategory(false);
@@ -273,7 +426,7 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
   };
 
   // =========================================================
-  // CREATE EXPENSE
+  // CREATE / UPDATE EXPENSE
   // =========================================================
 
   const handleSubmit = async (event) => {
@@ -319,49 +472,76 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
     };
 
     console.log("========================================");
-    console.log("Expense API Request:", expenseData);
+    console.log(
+      isEditMode
+        ? "UPDATE EXPENSE API REQUEST:"
+        : "CREATE EXPENSE API REQUEST:",
+    );
+    console.log(expenseData);
     console.log("========================================");
 
     try {
       setIsSubmitting(true);
 
+      let response;
+
       // =====================================================
-      // CREATE EXPENSE API
+      // UPDATE EXISTING EXPENSE
       // =====================================================
 
-      const response = await createExpense(expenseData);
+      if (isEditMode) {
+        const expenseId =
+          editingExpense?._id ||
+          editingExpense?.id ||
+          editingExpense?.expenseId;
+
+        if (!expenseId) {
+          console.error("Expense Error: Expense ID is missing. Cannot update.");
+
+          return;
+        }
+
+        console.log("Updating Expense ID:", expenseId);
+
+        response = await updateExpense(expenseId, expenseData);
+      } else {
+        // ===================================================
+        // CREATE NEW EXPENSE
+        // ===================================================
+
+        response = await createExpense(expenseData);
+      }
 
       // =====================================================
       // SUCCESS
       // =====================================================
 
       console.log("========================================");
-      console.log("Expense added successfully!");
+      console.log(
+        isEditMode
+          ? "Expense updated successfully!"
+          : "Expense added successfully!",
+      );
       console.log("Expense Response:", response);
       console.log("========================================");
 
-      // Parent ko response send
       if (onSuccess) {
-        onSuccess(response);
+        await onSuccess(response);
       }
 
-      // Form reset
       resetForm();
 
-      // Modal close
       onClose();
     } catch (error) {
-      // =====================================================
-      // ERROR
-      // =====================================================
-
       console.log("========================================");
-      console.log("Failed to add expense.");
+      console.log(
+        isEditMode ? "Failed to update expense." : "Failed to add expense.",
+      );
       console.log("Expense Error:", error);
-      console.log("Status:", error.response?.status);
-      console.log("Server Response:", error.response?.data);
-      console.log("Response Message:", error.response?.data?.message);
-      console.log("Response Error:", error.response?.data?.error);
+      console.log("Status:", error?.response?.status);
+      console.log("Server Response:", error?.response?.data);
+      console.log("Response Message:", error?.response?.data?.message);
+      console.log("Response Error:", error?.response?.data?.error);
       console.log("========================================");
     } finally {
       setIsSubmitting(false);
@@ -388,10 +568,14 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
             </div>
 
             <div>
-              <h2 className="ane-modal-title">Record New Expense</h2>
+              <h2 className="ane-modal-title">
+                {isEditMode ? "Edit Expense" : "Record New Expense"}
+              </h2>
 
               <p className="ane-modal-subtitle">
-                Log an outgoing payment or operational cost.
+                {isEditMode
+                  ? "Update expense information."
+                  : "Log an outgoing payment or operational cost."}
               </p>
             </div>
           </div>
@@ -476,11 +660,20 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                     : "Select a category..."}
                 </option>
 
-                {categories.map((item) => (
-                  <option key={item._id} value={item._id}>
-                    {item.name}
-                  </option>
-                ))}
+                {categories.map((item) => {
+                  const categoryId = getCategoryId(item);
+                  const categoryName = getCategoryName(item);
+
+                  if (!categoryId) {
+                    return null;
+                  }
+
+                  return (
+                    <option key={categoryId} value={categoryId}>
+                      {categoryName}
+                    </option>
+                  );
+                })}
               </select>
 
               {/* =================================================
@@ -545,17 +738,12 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                       type="button"
                       className="ane-category-add-btn"
                       onClick={handleAddCategory}
-                      disabled={
-                        isCreatingCategory ||
-                        !newCategoryName.trim()
-                      }
+                      disabled={isCreatingCategory || !newCategoryName.trim()}
                     >
                       <Plus size={14} />
 
                       <span>
-                        {isCreatingCategory
-                          ? "Adding..."
-                          : "Add Category"}
+                        {isCreatingCategory ? "Adding..." : "Add Category"}
                       </span>
                     </button>
                   </div>
@@ -574,8 +762,9 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                 {/* CASH */}
 
                 <div
-                  className={`ane-payment-card ${paymentMode === "cash" ? "ane-active" : ""
-                    }`}
+                  className={`ane-payment-card ${
+                    paymentMode === "cash" ? "ane-active" : ""
+                  }`}
                   onClick={() => {
                     if (!isSubmitting) {
                       setPaymentMode("cash");
@@ -600,8 +789,9 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
                 {/* BANK */}
 
                 <div
-                  className={`ane-payment-card ${paymentMode === "bank" ? "ane-active" : ""
-                    }`}
+                  className={`ane-payment-card ${
+                    paymentMode === "bank" ? "ane-active" : ""
+                  }`}
                   onClick={() => {
                     if (!isSubmitting) {
                       setPaymentMode("bank");
@@ -680,15 +870,19 @@ const AddNewExpenses = ({ isOpen, onClose, onSuccess }) => {
               type="submit"
               className="ane-btn-submit"
               disabled={
-                isSubmitting ||
-                isCategoriesLoading ||
-                isCreatingCategory
+                isSubmitting || isCategoriesLoading || isCreatingCategory
               }
             >
               <Plus size={16} />
 
               <span>
-                {isSubmitting ? "Recording..." : "Record Expense"}
+                {isSubmitting
+                  ? isEditMode
+                    ? "Updating..."
+                    : "Recording..."
+                  : isEditMode
+                    ? "Update Expense"
+                    : "Record Expense"}
               </span>
             </button>
           </div>

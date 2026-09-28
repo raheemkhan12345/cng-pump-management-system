@@ -17,9 +17,9 @@ export const createExpense = async (expenseData) => {
 // GET ALL EXPENSES
 // =========================================================
 
-// GET ALL EXPENSES
 export const getExpenses = async () => {
   const response = await axiosInstance.get("/expense/getexpense");
+
   return response.data;
 };
 
@@ -30,6 +30,20 @@ export const getExpenses = async () => {
 export const getExpenseCategories = async () => {
   const response = await axiosInstance.get(
     "/expenseCategory/get",
+  );
+
+  return response.data;
+};
+
+// =========================================================
+// UPDATE EXPENSE
+// PUT /expense/:id
+// =========================================================
+
+export const updateExpense = async (expenseId, expenseData) => {
+  const response = await axiosInstance.put(
+    `/expense/${expenseId}`,
+    expenseData,
   );
 
   return response.data;

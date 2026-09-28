@@ -25,6 +25,12 @@ const Expenses = () => {
   const [isAddOwnerModalOpen, setIsAddOwnerModalOpen] = useState(false);
 
   // ==========================================
+  // Edit Expense State
+  // ==========================================
+
+  const [editingExpense, setEditingExpense] = useState(null);
+
+  // ==========================================
   // Expense Data
   // ==========================================
 
@@ -179,35 +185,59 @@ const Expenses = () => {
   };
 
   // ==========================================
-  // Expense Successfully Added
+  // ADD EXPENSE
+  // ==========================================
+
+  const handleAddExpense = () => {
+    setEditingExpense(null);
+    setIsModalOpen(true);
+  };
+
+  // ==========================================
+  // EXPENSE SUCCESS
   // ==========================================
 
   const handleExpenseSuccess = async (expenseResponse) => {
     console.log("========================================");
-    console.log("Expense added successfully!");
+    console.log("Expense operation successful!");
     console.log("Expense Response:", expenseResponse);
     console.log("========================================");
 
     setIsModalOpen(false);
+    setEditingExpense(null);
 
     // Refresh real data from backend
     await fetchExpenses();
   };
 
   // ==========================================
-  // Edit Expense
+  // EDIT EXPENSE
   // ==========================================
 
   const handleEdit = (expense) => {
+    console.log("========================================");
     console.log("Edit Expense:", expense);
+    console.log("========================================");
+
+    setEditingExpense(expense);
+    setIsModalOpen(true);
   };
 
   // ==========================================
-  // Delete Expense
+  // DELETE EXPENSE
   // ==========================================
 
   const handleDelete = (expense) => {
     console.log("Delete Expense:", expense);
+  };
+
+  // ==========================================
+  // CLOSE EXPENSE MODAL
+  // ==========================================
+
+  const handleCloseExpenseModal = () => {
+    setIsModalOpen(false);
+    setEditingExpense(null);
   };
 
   // ==========================================
@@ -351,7 +381,7 @@ const Expenses = () => {
             <button
               type="button"
               className="exp-btn-action exp-btn-green"
-              onClick={() => setIsModalOpen(true)}
+              onClick={handleAddExpense}
             >
               <PlusCircle size={18} />
               <span>Add New Expense</span>
@@ -407,13 +437,14 @@ const Expenses = () => {
       </div>
 
       {/* ==========================================
-          Add New Expense Modal
+          Add / Edit Expense Modal
       ========================================== */}
 
       <AddNewExpenses
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseExpenseModal}
         onSuccess={handleExpenseSuccess}
+        editingExpense={editingExpense}
       />
 
       {/* ==========================================
