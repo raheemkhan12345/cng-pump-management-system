@@ -16,11 +16,12 @@ const RecordOwnerExpenseModal = ({
   owners = [],
   ownersLoading = false,
   ownersError = "",
+  isSubmitting = false,
 }) => {
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],
     amount: "",
-    paymentMode: "Cash",
+    paymentMode: "Cash Account",
     selectedOwner: "",
     status: "Paid",
     detailRemarks: "",
@@ -28,9 +29,10 @@ const RecordOwnerExpenseModal = ({
 
   if (!isOpen) return null;
 
-  // ==========================================
-  // Get Owner Name Safely
-  // ==========================================
+  // =========================================================
+  // GET OWNER NAME
+  // =========================================================
+
   const getOwnerName = (owner) => {
     if (typeof owner === "string") {
       return owner;
@@ -46,20 +48,23 @@ const RecordOwnerExpenseModal = ({
     );
   };
 
-  // ==========================================
-  // Get Owner Value Safely
-  // ==========================================
+  // =========================================================
+  // GET OWNER ID
+  // Backend expects owner ID
+  // =========================================================
+
   const getOwnerValue = (owner) => {
     if (typeof owner === "string") {
       return owner;
     }
 
-    return owner?._id || owner?.id || owner?.ownerId || getOwnerName(owner);
+    return owner?._id || owner?.id || owner?.ownerId || "";
   };
 
-  // ==========================================
-  // Handle Input Changes
-  // ==========================================
+  // =========================================================
+  // HANDLE INPUT CHANGE
+  // =========================================================
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -69,9 +74,10 @@ const RecordOwnerExpenseModal = ({
     }));
   };
 
-  // ==========================================
-  // Handle Payment Mode
-  // ==========================================
+  // =========================================================
+  // HANDLE PAYMENT MODE
+  // =========================================================
+
   const handlePaymentModeSelect = (mode) => {
     setFormData((prev) => ({
       ...prev,
@@ -79,14 +85,15 @@ const RecordOwnerExpenseModal = ({
     }));
   };
 
-  // ==========================================
-  // Handle Form Submit
-  // ==========================================
+  // =========================================================
+  // HANDLE FORM SUBMIT
+  // =========================================================
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!formData.selectedOwner) {
-      window.alert("Please select an owner.");
+    if (!formData.date) {
+      window.alert("Please select a date.");
       return;
     }
 
@@ -95,22 +102,44 @@ const RecordOwnerExpenseModal = ({
       return;
     }
 
-    if (onSubmit) {
-      onSubmit({
-        ...formData,
-        amount: Number(formData.amount),
-      });
+    if (!formData.selectedOwner) {
+      window.alert("Please select an owner.");
+      return;
     }
 
-    onClose();
+    // =======================================================
+    // EXACT BACKEND PAYLOAD
+    // =======================================================
+
+    const ownerExpenseData = {
+      date: formData.date,
+      amount: Number(formData.amount),
+      paymentMode: formData.paymentMode,
+      owner: formData.selectedOwner,
+      status: formData.status,
+      remarks: formData.detailRemarks.trim(),
+    };
+
+    console.log("========================================");
+    console.log("OWNER EXPENSE FORM SUBMIT");
+    console.log(
+      "OWNER EXPENSE PAYLOAD:",
+      JSON.stringify(ownerExpenseData, null, 2),
+    );
+    console.log("========================================");
+
+    if (onSubmit) {
+      onSubmit(ownerExpenseData);
+    }
   };
 
   return (
     <div className="roem-overlay">
       <div className="roem-modal-container">
-        {/* ==========================================
-            Header
-        ========================================== */}
+        {/* =====================================================
+            HEADER
+        ====================================================== */}
+
         <div className="roem-header">
           <div className="roem-title-group">
             <div className="roem-header-icon-box">
@@ -125,20 +154,24 @@ const RecordOwnerExpenseModal = ({
             onClick={onClose}
             type="button"
             aria-label="Close modal"
+            disabled={isSubmitting}
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* ==========================================
-            Form Body
-        ========================================== */}
+        {/* =====================================================
+            FORM
+        ====================================================== */}
+
         <form onSubmit={handleSubmit} className="roem-form">
-          {/* ==========================================
-              Row 1: Date & Amount
-          ========================================== */}
+          {/* ===================================================
+              DATE & AMOUNT
+          ==================================================== */}
+
           <div className="roem-grid-2">
-            {/* Date */}
+            {/* DATE */}
+
             <div className="roem-field">
               <label className="roem-label">Date</label>
 
@@ -150,13 +183,15 @@ const RecordOwnerExpenseModal = ({
                   onChange={handleChange}
                   className="roem-input"
                   required
+                  disabled={isSubmitting}
                 />
 
                 <Calendar size={18} className="roem-input-icon" />
               </div>
             </div>
 
-            {/* Amount */}
+            {/* AMOUNT */}
+
             <div className="roem-field">
               <label className="roem-label">Amount (PKR)</label>
 
@@ -173,24 +208,29 @@ const RecordOwnerExpenseModal = ({
                   min="0"
                   step="0.01"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
             </div>
           </div>
 
-          {/* ==========================================
-              Row 2: Payment Mode / Pool
-          ========================================== */}
+          {/* ===================================================
+              PAYMENT MODE
+          ==================================================== */}
+
           <div className="roem-field">
             <label className="roem-label">Payment Mode / Pool</label>
 
             <div className="roem-payment-grid">
-              {/* Cash Option */}
+              {/* CASH */}
+
               <div
                 className={`roem-payment-card ${
-                  formData.paymentMode === "Cash" ? "active" : ""
+                  formData.paymentMode === "Cash Account" ? "active" : ""
                 }`}
-                onClick={() => handlePaymentModeSelect("Cash")}
+                onClick={() =>
+                  !isSubmitting && handlePaymentModeSelect("Cash Account")
+                }
                 role="button"
                 tabIndex={0}
               >
@@ -206,17 +246,20 @@ const RecordOwnerExpenseModal = ({
                   </div>
                 </div>
 
-                {formData.paymentMode === "Cash" && (
+                {formData.paymentMode === "Cash Account" && (
                   <CheckCircle2 size={20} className="roem-check-icon" />
                 )}
               </div>
 
-              {/* Bank Option */}
+              {/* BANK */}
+
               <div
                 className={`roem-payment-card ${
-                  formData.paymentMode === "Bank" ? "active" : ""
+                  formData.paymentMode === "Bank Account" ? "active" : ""
                 }`}
-                onClick={() => handlePaymentModeSelect("Bank")}
+                onClick={() =>
+                  !isSubmitting && handlePaymentModeSelect("Bank Account")
+                }
                 role="button"
                 tabIndex={0}
               >
@@ -232,16 +275,17 @@ const RecordOwnerExpenseModal = ({
                   </div>
                 </div>
 
-                {formData.paymentMode === "Bank" && (
+                {formData.paymentMode === "Bank Account" && (
                   <CheckCircle2 size={20} className="roem-check-icon" />
                 )}
               </div>
             </div>
           </div>
 
-          {/* ==========================================
-              Row 3: Dynamic Owner Dropdown
-          ========================================== */}
+          {/* ===================================================
+              OWNER
+          ==================================================== */}
+
           <div className="roem-field">
             <label className="roem-label">Owner</label>
 
@@ -251,7 +295,7 @@ const RecordOwnerExpenseModal = ({
               onChange={handleChange}
               className="roem-select"
               required
-              disabled={ownersLoading}
+              disabled={ownersLoading || isSubmitting}
             >
               <option value="">
                 {ownersLoading ? "Loading owners..." : "Select Owner"}
@@ -261,6 +305,7 @@ const RecordOwnerExpenseModal = ({
                 owners.length > 0 &&
                 owners.map((owner, index) => {
                   const ownerName = getOwnerName(owner);
+
                   const ownerValue = getOwnerValue(owner);
 
                   return (
@@ -277,7 +322,8 @@ const RecordOwnerExpenseModal = ({
               )}
             </select>
 
-            {/* API Error */}
+            {/* API ERROR */}
+
             {ownersError && (
               <small
                 style={{
@@ -290,7 +336,8 @@ const RecordOwnerExpenseModal = ({
               </small>
             )}
 
-            {/* No Owners Message */}
+            {/* NO OWNERS */}
+
             {!ownersLoading && !ownersError && owners.length === 0 && (
               <small
                 style={{
@@ -304,9 +351,10 @@ const RecordOwnerExpenseModal = ({
             )}
           </div>
 
-          {/* ==========================================
-              Row 4: Status
-          ========================================== */}
+          {/* ===================================================
+              STATUS
+          ==================================================== */}
+
           <div className="roem-field">
             <label className="roem-label">Status</label>
 
@@ -316,15 +364,18 @@ const RecordOwnerExpenseModal = ({
               onChange={handleChange}
               className="roem-select"
               required
+              disabled={isSubmitting}
             >
               <option value="Paid">Paid</option>
+
               <option value="Pending">Pending</option>
             </select>
           </div>
 
-          {/* ==========================================
-              Row 5: Detail / Remarks
-          ========================================== */}
+          {/* ===================================================
+              REMARKS
+          ==================================================== */}
+
           <div className="roem-field">
             <label className="roem-label">Detail / Remarks</label>
 
@@ -335,25 +386,32 @@ const RecordOwnerExpenseModal = ({
               onChange={handleChange}
               rows={3}
               className="roem-textarea"
+              disabled={isSubmitting}
             />
           </div>
 
-          {/* ==========================================
-              Footer Actions
-          ========================================== */}
+          {/* ===================================================
+              FOOTER
+          ==================================================== */}
+
           <div className="roem-footer">
-            <button type="button" className="roem-btn-cancel" onClick={onClose}>
+            <button
+              type="button"
+              className="roem-btn-cancel"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               Cancel
             </button>
 
             <button
               type="submit"
               className="roem-btn-submit"
-              disabled={ownersLoading || owners.length === 0}
+              disabled={ownersLoading || owners.length === 0 || isSubmitting}
             >
               <Plus size={18} />
 
-              <span>Record Expense</span>
+              <span>{isSubmitting ? "Recording..." : "Record Expense"}</span>
             </button>
           </div>
         </form>

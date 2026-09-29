@@ -138,3 +138,16 @@ export const getOwners = async () => {
 
   return response.data;
 };
+
+//=========================================================
+//  OWNER EXPENSES
+//=========================================================
+
+export const createOwnerExpense = async (ownerExpenseData) => {
+  const response = await axiosInstance.post(
+    "/ownerexpense/create",
+    ownerExpenseData,
+  );
+
+  return response.data;
+};

@@ -17,6 +17,7 @@ import {
   createDieselExpense,
   createOwner,
   getOwners,
+  createOwnerExpense,
 } from "../../../services/adminApis/expenseApi";
 
 import "./Expenses.css";
@@ -54,7 +55,6 @@ const Expenses = () => {
 
   // =========================================================
   // OWNER DATA
-  // Owners are loaded from backend.
   // =========================================================
 
   const [owners, setOwners] = useState([]);
@@ -73,17 +73,22 @@ const Expenses = () => {
   const [deletingExpenseId, setDeletingExpenseId] = useState(null);
 
   // =========================================================
+  // OWNER EXPENSE LOADING STATE
+  // =========================================================
+
+  const [isOwnerExpenseSubmitting, setIsOwnerExpenseSubmitting] =
+    useState(false);
+
+  // =========================================================
   // FRONTEND PAGINATION
   // =========================================================
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Number of records displayed per page
   const pageSize = 5;
 
   // =========================================================
   // GET ALL NORMAL EXPENSES
-  // FRONTEND PAGINATION
   // =========================================================
 
   const fetchExpenses = useCallback(async () => {
@@ -198,10 +203,6 @@ const Expenses = () => {
 
       let ownerData = [];
 
-      // -------------------------------------------------------
-      // HANDLE DIFFERENT POSSIBLE RESPONSE STRUCTURES
-      // -------------------------------------------------------
-
       if (Array.isArray(response?.data)) {
         ownerData = response.data;
       } else if (Array.isArray(response?.owners)) {
@@ -210,12 +211,15 @@ const Expenses = () => {
         ownerData = response.owner;
       } else if (Array.isArray(response?.data?.owners)) {
         ownerData = response.data.owners;
+      } else if (Array.isArray(response?.data?.owner)) {
+        ownerData = response.data.owner;
+      } else if (Array.isArray(response?.data?.data)) {
+        ownerData = response.data.data;
       } else if (Array.isArray(response)) {
         ownerData = response;
       }
 
       console.log("FINAL OWNER DATA:", ownerData);
-
       console.log("TOTAL OWNERS:", ownerData.length);
 
       setOwners(ownerData);
@@ -259,12 +263,11 @@ const Expenses = () => {
   const totalPages = Math.max(Math.ceil(totalExpenses / pageSize), 1);
 
   // =========================================================
-  // GET ONLY CURRENT PAGE EXPENSES
+  // GET CURRENT PAGE EXPENSES
   // =========================================================
 
   const expenses = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
-
     const endIndex = startIndex + pageSize;
 
     return allExpenses.slice(startIndex, endIndex);
@@ -331,7 +334,6 @@ const Expenses = () => {
   ].join("-");
 
   const currentYear = today.getFullYear();
-
   const currentMonthNumber = today.getMonth() + 1;
 
   // =========================================================
@@ -654,6 +656,11 @@ const Expenses = () => {
         ownerName: data?.ownerName?.trim(),
       };
 
+      if (!ownerData.ownerName) {
+        window.alert("Please enter an owner name.");
+        return;
+      }
+
       console.log("OWNER API REQUEST:", JSON.stringify(ownerData, null, 2));
 
       const response = await createOwner(ownerData);
@@ -665,10 +672,7 @@ const Expenses = () => {
 
       setIsAddOwnerModalOpen(false);
 
-      // -----------------------------------------------------
       // Refresh owner dropdown
-      // -----------------------------------------------------
-
       await fetchOwners();
     } catch (error) {
       console.error("========================================");
@@ -688,6 +692,68 @@ const Expenses = () => {
         "Failed to create owner.";
 
       window.alert(errorMessage);
+    }
+  };
+
+  // =========================================================
+  // CREATE OWNER EXPENSE
+  // POST /ownerexpense/create
+  // =========================================================
+
+  const handleOwnerExpense = async (data) => {
+    try {
+      setIsOwnerExpenseSubmitting(true);
+
+      console.log("========================================");
+      console.log("CREATE OWNER EXPENSE");
+      console.log("OWNER EXPENSE DATA:", data);
+      console.log("========================================");
+
+      const ownerExpenseData = {
+        date: data?.date,
+        amount: Number(data?.amount),
+        paymentMode: data?.paymentMode,
+        owner: data?.owner,
+        status: data?.status,
+        remarks: data?.remarks || "",
+      };
+
+      console.log(
+        "OWNER EXPENSE API REQUEST:",
+        JSON.stringify(ownerExpenseData, null, 2),
+      );
+
+      const response = await createOwnerExpense(ownerExpenseData);
+
+      console.log("========================================");
+      console.log("OWNER EXPENSE CREATED SUCCESSFULLY");
+      console.log("OWNER EXPENSE RESPONSE:", response);
+      console.log("========================================");
+
+      setIsOwnerExpenseModalOpen(false);
+
+      // Refresh expense list
+      await fetchExpenses();
+    } catch (error) {
+      console.error("========================================");
+      console.error("FAILED TO CREATE OWNER EXPENSE");
+      console.error("ERROR:", error);
+      console.error("STATUS:", error?.response?.status);
+      console.error(
+        "SERVER RESPONSE:",
+        JSON.stringify(error?.response?.data, null, 2),
+      );
+      console.error("========================================");
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to create owner expense.";
+
+      window.alert(errorMessage);
+    } finally {
+      setIsOwnerExpenseSubmitting(false);
     }
   };
 
@@ -991,10 +1057,11 @@ const Expenses = () => {
       <RecordOwnerExpenseModal
         isOpen={isOwnerExpenseModalOpen}
         onClose={() => setIsOwnerExpenseModalOpen(false)}
-        onSubmit={(data) => {
-          console.log("Owner Expense Data:", data);
-        }}
+        onSubmit={handleOwnerExpense}
         owners={owners}
+        ownersLoading={false}
+        ownersError=""
+        isSubmitting={isOwnerExpenseSubmitting}
       />
 
       {/* =====================================================
