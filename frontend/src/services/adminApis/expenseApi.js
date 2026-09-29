@@ -96,3 +96,17 @@ export const getRecoveryExpenses = async () => {
   const response = await axiosInstance.get("/recoveryExpense/get");
   return response.data;
 };
+
+// =========================================================
+// DIESEL EXPENSE
+// POST /dieselExpense
+// =========================================================
+
+export const createDieselExpense = async (dieselExpenseData) => {
+  const response = await axiosInstance.post(
+    "/dieselExpense/create",
+    dieselExpenseData
+  );
+
+  return response.data;
+};

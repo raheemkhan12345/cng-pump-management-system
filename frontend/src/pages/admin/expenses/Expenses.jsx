@@ -14,6 +14,7 @@ import {
   deleteExpense,
   createRecoveryExpense,
   getRecoveryExpenses,
+  createDieselExpense,
 } from "../../../services/adminApis/expenseApi";
 
 import "./Expenses.css";
@@ -451,6 +452,62 @@ const Expenses = () => {
   };
 
   // =========================================================
+  // CREATE DIESEL EXPENSE
+  // =========================================================
+
+  const handleDieselExpense = async (data) => {
+    try {
+      console.log("========================================");
+      console.log("CREATE DIESEL EXPENSE");
+      console.log("Diesel Form Data:", data);
+      console.log("========================================");
+
+      const dieselExpenseData = {
+        date: data.date,
+        dieselQuantity: Number(data.dieselQuantity),
+        amount: Number(data.amount),
+        remarks: data.remarks,
+      };
+
+      console.log(
+        "DIESEL API REQUEST:",
+        JSON.stringify(dieselExpenseData, null, 2),
+      );
+
+      const response = await createDieselExpense(dieselExpenseData);
+
+      console.log("========================================");
+      console.log("DIESEL EXPENSE CREATED SUCCESSFULLY");
+      console.log("Diesel Response:", response);
+      console.log("========================================");
+
+      // Close Diesel modal
+      setIsDieselModalOpen(false);
+
+      // Refresh normal expenses
+      await fetchExpenses();
+    } catch (error) {
+      console.error("========================================");
+      console.error("FAILED TO CREATE DIESEL EXPENSE");
+      console.error("Error:", error);
+      console.error("Status:", error?.response?.status);
+      console.error(
+        "Server Response:",
+        JSON.stringify(error?.response?.data, null, 2),
+      );
+      console.error("========================================");
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to create diesel expense.";
+
+      window.alert(errorMessage);
+    }
+  };
+
+  // =========================================================
   // LOADING STATE
   // =========================================================
 
@@ -681,7 +738,7 @@ const Expenses = () => {
       <AddDieselExpenseModal
         isOpen={isDieselModalOpen}
         onClose={() => setIsDieselModalOpen(false)}
-        onSubmit={(data) => console.log("Diesel Expense Data:", data)}
+        onSubmit={handleDieselExpense}
       />
 
       {/* =====================================================
