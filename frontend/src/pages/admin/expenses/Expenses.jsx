@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PlusCircle, Layers, TrendingDown, Calendar } from "lucide-react";
 
 import AddNewExpenses from "../../../components/adminDashboardForms/addNewExpenseForm/AddNewExpenses";
@@ -13,6 +13,7 @@ import {
   getExpenses,
   deleteExpense,
   createRecoveryExpense,
+  getRecoveryExpenses,
 } from "../../../services/adminApis/expenseApi";
 
 import "./Expenses.css";
@@ -35,10 +36,21 @@ const Expenses = () => {
   const [editingExpense, setEditingExpense] = useState(null);
 
   // =========================================================
-  // EXPENSE DATA
+  // NORMAL EXPENSE DATA
   // =========================================================
 
   const [expenses, setExpenses] = useState([]);
+
+  // =========================================================
+  // RECOVERY EXPENSE DATA
+  // =========================================================
+
+  const [recoveryExpensesData, setRecoveryExpensesData] = useState([]);
+
+  // =========================================================
+  // LOADING / ERROR
+  // =========================================================
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -49,7 +61,7 @@ const Expenses = () => {
   const [deletingExpenseId, setDeletingExpenseId] = useState(null);
 
   // =========================================================
-  // GET ALL EXPENSES
+  // GET ALL NORMAL EXPENSES
   // =========================================================
 
   const fetchExpenses = useCallback(async () => {
@@ -95,15 +107,55 @@ const Expenses = () => {
   }, []);
 
   // =========================================================
+  // GET ALL RECOVERY EXPENSES
+  // =========================================================
+
+  const fetchRecoveryExpenses = useCallback(async () => {
+    try {
+      const response = await getRecoveryExpenses();
+
+      console.log("========================================");
+      console.log("GET RECOVERY EXPENSE API RESPONSE:", response);
+      console.log("========================================");
+
+      let recoveryData = [];
+
+      if (Array.isArray(response?.data)) {
+        recoveryData = response.data;
+      } else if (Array.isArray(response?.recoveryExpenses)) {
+        recoveryData = response.recoveryExpenses;
+      } else if (Array.isArray(response?.recoveryExpense)) {
+        recoveryData = response.recoveryExpense;
+      } else if (Array.isArray(response)) {
+        recoveryData = response;
+      }
+
+      console.log("Final Recovery Expense Data:", recoveryData);
+
+      setRecoveryExpensesData(recoveryData);
+    } catch (error) {
+      console.error("Failed to fetch recovery expenses:", error);
+
+      console.error(
+        "Recovery API Response:",
+        JSON.stringify(error?.response?.data, null, 2),
+      );
+
+      setRecoveryExpensesData([]);
+    }
+  }, []);
+
+  // =========================================================
   // LOAD EXPENSES ON PAGE LOAD
   // =========================================================
 
   useEffect(() => {
     fetchExpenses();
-  }, [fetchExpenses]);
+    fetchRecoveryExpenses();
+  }, [fetchExpenses, fetchRecoveryExpenses]);
 
   // =========================================================
-  // GET EXPENSE AMOUNT
+  // GET NORMAL EXPENSE AMOUNT
   // =========================================================
 
   const getAmount = (expense) => {
@@ -166,7 +218,7 @@ const Expenses = () => {
   const currentMonthNumber = today.getMonth() + 1;
 
   // =========================================================
-  // TODAY'S EXPENSES
+  // TODAY'S NORMAL EXPENSES
   // =========================================================
 
   const todayExpenses = expenses
@@ -178,7 +230,7 @@ const Expenses = () => {
     }, 0);
 
   // =========================================================
-  // MONTH EXPENSES
+  // CURRENT MONTH NORMAL EXPENSES
   // =========================================================
 
   const monthExpenses = expenses
@@ -198,20 +250,23 @@ const Expenses = () => {
     }, 0);
 
   // =========================================================
-  // RECOVERY EXPENSES
+  // RECOVERY EXPENSE TOTAL
+  // =========================================================
+  // This amount now comes from:
+  // GET /recoveryExpense/get
   // =========================================================
 
-  const recoveryExpenses = expenses
-    .filter((expense) => {
-      const type = String(
-        expense?.type || expense?.expenseType || expense?.category || "",
-      ).toLowerCase();
+  const recoveryExpenses = recoveryExpensesData.reduce((total, recovery) => {
+    const amount =
+      Number(
+        recovery?.recoveryAmount ??
+          recovery?.amount ??
+          recovery?.totalAmount ??
+          0,
+      ) || 0;
 
-      return type.includes("recovery");
-    })
-    .reduce((total, expense) => {
-      return total + getAmount(expense);
-    }, 0);
+    return total + amount;
+  }, 0);
 
   // =========================================================
   // CURRENT MONTH LABEL
@@ -363,7 +418,8 @@ const Expenses = () => {
 
       setIsRecoveryModalOpen(false);
 
-      await fetchExpenses();
+      // Refresh both normal expenses and recovery expenses
+      await Promise.all([fetchExpenses(), fetchRecoveryExpenses()]);
     } catch (error) {
       console.error("========================================");
       console.error("FAILED TO CREATE RECOVERY EXPENSE");

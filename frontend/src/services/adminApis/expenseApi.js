@@ -89,3 +89,10 @@ export const createRecoveryExpense = async (recoveryExpenseData) => {
 
   return response.data;
 };
+
+
+// GET ALL RECOVERY EXPENSES
+export const getRecoveryExpenses = async () => {
+  const response = await axiosInstance.get("/recoveryExpense/get");
+  return response.data;
+};
