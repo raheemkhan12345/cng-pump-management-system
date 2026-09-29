@@ -151,3 +151,15 @@ export const createOwnerExpense = async (ownerExpenseData) => {
 
   return response.data;
 };
+
+//=========================================================
+//  GET ALL OWNER EXPENSES
+//=========================================================
+
+export const getOwnerExpenses = async () => {
+  const response = await axiosInstance.get(
+    "/ownerexpense/get",
+  );
+
+  return response.data;
+};

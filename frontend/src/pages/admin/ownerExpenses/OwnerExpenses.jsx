@@ -1,186 +1,576 @@
-import React from "react";
-import { FaPlus } from "react-icons/fa6";
+import React, { useEffect, useState } from "react";
+import { getOwnerExpenses } from "../../../services/adminApis/expenseApi";
 import "./OwnerExpenses.css";
 
-const ownersData = [
-  {
-    id: "owner-a",
-    initial: "A",
-    name: "Owner A",
-    role: "Managing Partner",
-    totalExpenses: "Rs. 1,250,000",
-    currentMonthExpenses: "Rs. 85,000",
-    transactions: [
-      {
-        id: 1,
-        date: "24 Oct, 2023",
-        category: "Drawing",
-        categoryClass: "tag-drawing",
-        description: "Monthly withdrawal",
-        account: "Cash Account",
-        amount: "50,000",
-      },
-      {
-        id: 2,
-        date: "18 Oct, 2023",
-        category: "Business",
-        categoryClass: "tag-business",
-        description: "Site visit fuel",
-        account: "Bank Account",
-        amount: "15,000",
-      },
-      {
-        id: 3,
-        date: "05 Oct, 2023",
-        category: "Personal",
-        categoryClass: "tag-personal",
-        description: "Vehicle maintenance",
-        account: "Cash Account",
-        amount: "20,000",
-      },
-    ],
-  },
-  {
-    id: "owner-b",
-    initial: "B",
-    name: "Owner B",
-    role: "Silent Partner",
-    totalExpenses: "Rs. 980,000",
-    currentMonthExpenses: "Rs. 45,000",
-    transactions: [
-      {
-        id: 1,
-        date: "22 Oct, 2023",
-        category: "Drawing",
-        categoryClass: "tag-drawing",
-        description: "Monthly withdrawal",
-        account: null,
-        amount: "45,000",
-      },
-      {
-        id: 2,
-        date: "12 Sep, 2023",
-        category: "Drawing",
-        categoryClass: "tag-drawing",
-        description: "Monthly withdrawal",
-        account: null,
-        amount: "45,000",
-      },
-      {
-        id: 3,
-        date: "15 Aug, 2023",
-        category: "Drawing",
-        categoryClass: "tag-drawing",
-        description: "Monthly withdrawal",
-        account: null,
-        amount: "45,000",
-      },
-    ],
-  },
-];
+// =========================================================
+// HELPERS
+// =========================================================
+
+const formatCurrency = (value) => {
+  if (value === undefined || value === null || value === "") {
+    return "0";
+  }
+
+  return new Intl.NumberFormat("en-PK").format(Number(value) || 0);
+};
+
+const formatDate = (date) => {
+  if (!date) return "-";
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return date;
+  }
+
+  return parsedDate.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const getOwnerId = (owner) => {
+  if (!owner) return "";
+
+  if (typeof owner === "string") {
+    return owner;
+  }
+
+  return owner._id || owner.id || owner.ownerId || "";
+};
+
+const getOwnerName = (owner) => {
+  if (!owner) return "Unknown Owner";
+
+  if (typeof owner === "string") {
+    return owner;
+  }
+
+  return (
+    owner.ownerName ||
+    owner.name ||
+    owner.fullName ||
+    owner.owner ||
+    "Unknown Owner"
+  );
+};
+
+const getOwnerInitial = (name) => {
+  if (!name) return "?";
+
+  return name.trim().charAt(0).toUpperCase();
+};
+
+const getCategoryClass = (category) => {
+  if (!category) return "tag-drawing";
+
+  const normalizedCategory = String(category).toLowerCase();
+
+  if (normalizedCategory.includes("business")) {
+    return "tag-business";
+  }
+
+  if (normalizedCategory.includes("personal")) {
+    return "tag-personal";
+  }
+
+  return "tag-drawing";
+};
+
+// =========================================================
+// GET PAYMENT MODE
+// =========================================================
+
+const getPaymentMode = (expense) => {
+  const paymentMode =
+    expense?.paymentMode || expense?.account || expense?.pool || "";
+
+  if (!paymentMode) {
+    return "";
+  }
+
+  const normalizedPaymentMode = String(paymentMode).toLowerCase();
+
+  if (normalizedPaymentMode.includes("cash")) {
+    return "Cash Account";
+  }
+
+  if (normalizedPaymentMode.includes("bank")) {
+    return "Bank Account";
+  }
+
+  return paymentMode;
+};
+
+// =========================================================
+// COMPONENT
+// =========================================================
 
 const OwnerExpenses = () => {
+  const [ownerExpenses, setOwnerExpenses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // =========================================================
+  // FETCH OWNER EXPENSES
+  // =========================================================
+
+  const fetchOwnerExpenses = async () => {
+    try {
+      setIsLoading(true);
+      setError("");
+
+      console.log("========================================");
+      console.log("GET OWNER EXPENSES");
+      console.log("GET OWNER EXPENSE API REQUEST");
+      console.log("========================================");
+
+      const response = await getOwnerExpenses();
+
+      console.log("========================================");
+      console.log("GET OWNER EXPENSE API RESPONSE:");
+      console.log(response);
+      console.log("========================================");
+
+      // -------------------------------------------------------
+      // Extract API array safely
+      // -------------------------------------------------------
+
+      let expenses = [];
+
+      if (Array.isArray(response)) {
+        expenses = response;
+      } else if (Array.isArray(response?.data)) {
+        expenses = response.data;
+      } else if (Array.isArray(response?.ownerExpenses)) {
+        expenses = response.ownerExpenses;
+      } else if (Array.isArray(response?.owners)) {
+        expenses = response.owners;
+      } else if (Array.isArray(response?.expenses)) {
+        expenses = response.expenses;
+      } else if (Array.isArray(response?.data?.ownerExpenses)) {
+        expenses = response.data.ownerExpenses;
+      } else if (Array.isArray(response?.data?.owners)) {
+        expenses = response.data.owners;
+      } else if (Array.isArray(response?.data?.expenses)) {
+        expenses = response.data.expenses;
+      }
+
+      console.log("FINAL OWNER EXPENSE DATA:", expenses);
+
+      setOwnerExpenses(expenses);
+    } catch (error) {
+      console.error("========================================");
+      console.error("FAILED TO GET OWNER EXPENSES");
+      console.error("ERROR:", error);
+      console.error("STATUS:", error?.response?.status);
+      console.error(
+        "SERVER RESPONSE:",
+        JSON.stringify(error?.response?.data, null, 2),
+      );
+      console.error("========================================");
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to load owner expenses.";
+
+      setError(errorMessage);
+      setOwnerExpenses([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOwnerExpenses();
+  }, []);
+
+  // =========================================================
+  // LOADING
+  // =========================================================
+
+  if (isLoading) {
+    return (
+      <div className="owner-expenses-container">
+        <div className="section-header">
+          <h1 className="section-title">Owner Expenses</h1>
+
+          <p className="section-subtitle">
+            Track and manage individual owner withdrawals and business expenses.
+          </p>
+        </div>
+
+        <div className="owner-expenses-loading">Loading owner expenses...</div>
+      </div>
+    );
+  }
+
+  // =========================================================
+  // ERROR
+  // =========================================================
+
+  if (error) {
+    return (
+      <div className="owner-expenses-container">
+        <div className="section-header">
+          <h1 className="section-title">Owner Expenses</h1>
+
+          <p className="section-subtitle">
+            Track and manage individual owner withdrawals and business expenses.
+          </p>
+        </div>
+
+        <div className="owner-expenses-error">
+          <p>{error}</p>
+
+          <button type="button" onClick={fetchOwnerExpenses}>
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================
+  // GROUP EXPENSES BY OWNER
+  // =========================================================
+
+  const ownersMap = {};
+
+  ownerExpenses.forEach((expense) => {
+    const owner =
+      expense?.owner ||
+      expense?.ownerId ||
+      expense?.ownerData ||
+      expense?.user ||
+      null;
+
+    const ownerId = getOwnerId(owner);
+
+    if (!ownerId) {
+      return;
+    }
+
+    // -------------------------------------------------------
+    // Create Owner
+    // -------------------------------------------------------
+
+    if (!ownersMap[ownerId]) {
+      const ownerName = getOwnerName(owner);
+
+      ownersMap[ownerId] = {
+        id: ownerId,
+        initial: getOwnerInitial(ownerName),
+        name: ownerName,
+        role: owner?.role || expense?.ownerRole || "",
+        transactions: [],
+      };
+    }
+
+    // -------------------------------------------------------
+    // Add Transaction
+    // -------------------------------------------------------
+
+    ownersMap[ownerId].transactions.push({
+      id:
+        expense?._id ||
+        expense?.id ||
+        `${ownerId}-${ownersMap[ownerId].transactions.length}`,
+
+      date: formatDate(expense?.date),
+
+      category:
+        expense?.category?.name ||
+        expense?.category?.categoryName ||
+        expense?.category ||
+        "Owner Expense",
+
+      categoryClass: getCategoryClass(
+        expense?.category?.name ||
+          expense?.category?.categoryName ||
+          expense?.category,
+      ),
+
+      description:
+        expense?.remarks ||
+        expense?.description ||
+        expense?.detailRemarks ||
+        "-",
+
+      // -----------------------------------------------------
+      // Payment Status
+      // Cash Account / Bank Account
+      // -----------------------------------------------------
+
+      account: getPaymentMode(expense),
+
+      amount: formatCurrency(expense?.amount),
+    });
+  });
+
+  const ownersData = Object.values(ownersMap);
+
+  // =========================================================
+  // CALCULATE OWNER METRICS
+  // =========================================================
+
+  const ownersWithMetrics = ownersData.map((owner) => {
+    const ownerRawExpenses = ownerExpenses.filter((expense) => {
+      const expenseOwner =
+        expense?.owner ||
+        expense?.ownerId ||
+        expense?.ownerData ||
+        expense?.user ||
+        null;
+
+      return getOwnerId(expenseOwner) === owner.id;
+    });
+
+    // -------------------------------------------------------
+    // Total Expenses
+    // -------------------------------------------------------
+
+    const totalExpenses = ownerRawExpenses.reduce((total, expense) => {
+      return total + (Number(expense?.amount) || 0);
+    }, 0);
+
+    // -------------------------------------------------------
+    // Current Month Expenses
+    // -------------------------------------------------------
+
+    const currentDate = new Date();
+
+    const currentMonthExpenses = ownerRawExpenses.reduce((total, expense) => {
+      if (!expense?.date) {
+        return total;
+      }
+
+      const expenseDate = new Date(expense.date);
+
+      if (
+        expenseDate.getMonth() === currentDate.getMonth() &&
+        expenseDate.getFullYear() === currentDate.getFullYear()
+      ) {
+        return total + (Number(expense?.amount) || 0);
+      }
+
+      return total;
+    }, 0);
+
+    return {
+      ...owner,
+      totalExpenses,
+      currentMonthExpenses,
+    };
+  });
+
+  // =========================================================
+  // EMPTY STATE
+  // =========================================================
+
+  if (ownersWithMetrics.length === 0) {
+    return (
+      <div className="owner-expenses-container">
+        <div className="section-header">
+          <h1 className="section-title">Owner Expenses</h1>
+
+          <p className="section-subtitle">
+            Track and manage individual owner withdrawals and business expenses.
+          </p>
+        </div>
+
+        <div className="owner-expenses-empty">No owner expenses found.</div>
+      </div>
+    );
+  }
+
+  // =========================================================
+  // UI
+  // =========================================================
 
   return (
     <div className="owner-expenses-container">
-      {/* Page Header */}
+      {/* =====================================================
+          PAGE HEADER
+      ====================================================== */}
+
       <div className="section-header">
         <h1 className="section-title">Owner Expenses</h1>
+
         <p className="section-subtitle">
           Track and manage individual owner withdrawals and business expenses.
         </p>
       </div>
 
-      {/* Owner Cards Grid */}
+      {/* =====================================================
+          OWNER CARDS GRID
+      ====================================================== */}
+
       <div className="owners-grid">
-        {ownersData.map((owner) => (
+        {ownersWithMetrics.map((owner) => (
           <div key={owner.id} className="owner-card">
-            {/* Header / Profile Info */}
+            {/* =================================================
+                OWNER HEADER / PROFILE
+            ================================================== */}
+
             <div className="owner-header">
               <div className="owner-profile-info">
                 <div className="owner-avatar">{owner.initial}</div>
+
                 <div className="owner-details">
                   <h3 className="owner-name">{owner.name}</h3>
-                  <span className="owner-role">{owner.role}</span>
+
+                  {owner.role && (
+                    <span className="owner-role">{owner.role}</span>
+                  )}
                 </div>
               </div>
-             
             </div>
 
-            {/* Metrics */}
+            {/* =================================================
+                METRICS
+            ================================================== */}
+
             <div className="metrics-row">
               <div className="metric-box">
                 <span className="metric-label">Total Expenses to Date</span>
-                <span className="metric-value">{owner.totalExpenses}</span>
+
+                <span className="metric-value">
+                  Rs. {formatCurrency(owner.totalExpenses)}
+                </span>
               </div>
+
               <div className="metric-box">
                 <span className="metric-label">Current Month Expenses</span>
+
                 <span className="metric-value">
-                  {owner.currentMonthExpenses}
+                  Rs. {formatCurrency(owner.currentMonthExpenses)}
                 </span>
               </div>
             </div>
 
-            {/* Transactions Section */}
+            {/* =================================================
+                TRANSACTIONS
+            ================================================== */}
+
             <div className="transactions-section">
               <h4 className="transactions-title">RECENT TRANSACTIONS</h4>
 
-              {/* Table View (Desktops / Tablets) */}
+              {/* =================================================
+                  DESKTOP / TABLET
+              ================================================== */}
+
               <div className="table-responsive desktop-table-view">
                 <table className="transactions-table">
                   <thead>
                     <tr>
                       <th>Date</th>
+
                       <th>Category</th>
+
                       <th>Description</th>
+
+                      <th>Status</th>
+
                       <th className="text-right">Amount (Rs.)</th>
                     </tr>
                   </thead>
+
                   <tbody>
-                    {owner.transactions.map((tx) => (
-                      <tr key={tx.id}>
-                        <td className="tx-date">{tx.date}</td>
-                        <td>
-                          <span className={`category-tag ${tx.categoryClass}`}>
-                            {tx.category}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="tx-description">
-                            <span>{tx.description}</span>
-                            {tx.account && (
+                    {owner.transactions.length > 0 ? (
+                      owner.transactions.map((tx) => (
+                        <tr key={tx.id}>
+                          {/* Date */}
+
+                          <td className="tx-date">{tx.date}</td>
+
+                          {/* Category */}
+
+                          <td>
+                            <span
+                              className={`category-tag ${tx.categoryClass}`}
+                            >
+                              {tx.category}
+                            </span>
+                          </td>
+
+                          {/* Description */}
+
+                          <td>
+                            <div className="tx-description">
+                              <span>{tx.description}</span>
+                            </div>
+                          </td>
+
+                          {/* Status */}
+
+                          <td>
+                            {tx.account ? (
                               <span className="account-tag">{tx.account}</span>
+                            ) : (
+                              <span className="account-tag account-empty">
+                                -
+                              </span>
                             )}
-                          </div>
-                        </td>
-                        <td className="tx-amount">{tx.amount}</td>
+                          </td>
+
+                          {/* Amount */}
+
+                          <td className="tx-amount">{tx.amount}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5">No transactions found.</td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
 
-              {/* Card List View (Mobile Devices <= 576px) */}
+              {/* =================================================
+                  MOBILE
+              ================================================== */}
+
               <div className="mobile-cards-view">
-                {owner.transactions.map((tx) => (
-                  <div key={tx.id} className="mobile-tx-card">
-                    <div className="mobile-tx-row top-row">
-                      <span className="tx-date">{tx.date}</span>
-                      <span className="tx-amount">Rs. {tx.amount}</span>
-                    </div>
-                    <div className="mobile-tx-row bottom-row">
-                      <div className="tx-description">
-                        <span className="tx-desc-text">{tx.description}</span>
-                        {tx.account && (
-                          <span className="account-tag">{tx.account}</span>
-                        )}
+                {owner.transactions.length > 0 ? (
+                  owner.transactions.map((tx) => (
+                    <div key={tx.id} className="mobile-tx-card">
+                      {/* Top Row */}
+
+                      <div className="mobile-tx-row top-row">
+                        <span className="tx-date">{tx.date}</span>
+
+                        <span className="tx-amount">Rs. {tx.amount}</span>
                       </div>
-                      <span className={`category-tag ${tx.categoryClass}`}>
-                        {tx.category}
-                      </span>
+
+                      {/* Bottom Row */}
+
+                      <div className="mobile-tx-row bottom-row">
+                        <div className="tx-description">
+                          <span className="tx-desc-text">{tx.description}</span>
+
+                          {/* Payment Status */}
+
+                          {tx.account && (
+                            <span className="account-tag">{tx.account}</span>
+                          )}
+                        </div>
+
+                        {/* Category */}
+
+                        <span className={`category-tag ${tx.categoryClass}`}>
+                          {tx.category}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className="mobile-tx-card">No transactions found.</div>
+                )}
               </div>
             </div>
           </div>
