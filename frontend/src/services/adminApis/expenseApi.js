@@ -74,3 +74,18 @@ export const createExpenseCategory = async (categoryData) => {
 
   return response.data;
 };
+
+
+// =========================================================
+// CREATE RECOVERY EXPENSE
+// POST /recoveryExpense/create
+// =========================================================
+
+export const createRecoveryExpense = async (recoveryExpenseData) => {
+  const response = await axiosInstance.post(
+    "/recoveryExpense/create",
+    recoveryExpenseData,
+  );
+
+  return response.data;
+};

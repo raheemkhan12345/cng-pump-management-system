@@ -12,14 +12,15 @@ import AddNewOwnerModal from "../../../components/adminDashboardForms/addNewOwne
 import {
   getExpenses,
   deleteExpense,
+  createRecoveryExpense,
 } from "../../../services/adminApis/expenseApi";
 
 import "./Expenses.css";
 
 const Expenses = () => {
-  // ==========================================
-  // Modal States
-  // ==========================================
+  // =========================================================
+  // MODAL STATES
+  // =========================================================
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
@@ -27,29 +28,29 @@ const Expenses = () => {
   const [isOwnerExpenseModalOpen, setIsOwnerExpenseModalOpen] = useState(false);
   const [isAddOwnerModalOpen, setIsAddOwnerModalOpen] = useState(false);
 
-  // ==========================================
-  // Edit Expense State
-  // ==========================================
+  // =========================================================
+  // EDIT EXPENSE
+  // =========================================================
 
   const [editingExpense, setEditingExpense] = useState(null);
 
-  // ==========================================
-  // Expense Data
-  // ==========================================
+  // =========================================================
+  // EXPENSE DATA
+  // =========================================================
 
   const [expenses, setExpenses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // ==========================================
-  // Delete State
-  // ==========================================
+  // =========================================================
+  // DELETE STATE
+  // =========================================================
 
   const [deletingExpenseId, setDeletingExpenseId] = useState(null);
 
-  // ==========================================
-  // GET EXPENSES
-  // ==========================================
+  // =========================================================
+  // GET ALL EXPENSES
+  // =========================================================
 
   const fetchExpenses = useCallback(async () => {
     try {
@@ -93,17 +94,17 @@ const Expenses = () => {
     }
   }, []);
 
-  // ==========================================
-  // GET EXPENSES ON PAGE LOAD
-  // ==========================================
+  // =========================================================
+  // LOAD EXPENSES ON PAGE LOAD
+  // =========================================================
 
   useEffect(() => {
     fetchExpenses();
   }, [fetchExpenses]);
 
-  // ==========================================
-  // REAL EXPENSE STATS
-  // ==========================================
+  // =========================================================
+  // GET EXPENSE AMOUNT
+  // =========================================================
 
   const getAmount = (expense) => {
     return (
@@ -113,12 +114,22 @@ const Expenses = () => {
     );
   };
 
+  // =========================================================
+  // GET EXPENSE DATE
+  // =========================================================
+
   const getDate = (expense) => {
     return expense?.date || expense?.expenseDate || expense?.createdAt || "";
   };
 
+  // =========================================================
+  // GET DATE ONLY
+  // =========================================================
+
   const getDateOnly = (dateValue) => {
-    if (!dateValue) return "";
+    if (!dateValue) {
+      return "";
+    }
 
     const dateString = String(dateValue);
 
@@ -139,6 +150,10 @@ const Expenses = () => {
     return date.toISOString().split("T")[0];
   };
 
+  // =========================================================
+  // CURRENT DATE
+  // =========================================================
+
   const today = new Date();
 
   const todayDate = [
@@ -150,6 +165,10 @@ const Expenses = () => {
   const currentYear = today.getFullYear();
   const currentMonthNumber = today.getMonth() + 1;
 
+  // =========================================================
+  // TODAY'S EXPENSES
+  // =========================================================
+
   const todayExpenses = expenses
     .filter((expense) => {
       return getDateOnly(getDate(expense)) === todayDate;
@@ -158,11 +177,17 @@ const Expenses = () => {
       return total + getAmount(expense);
     }, 0);
 
+  // =========================================================
+  // MONTH EXPENSES
+  // =========================================================
+
   const monthExpenses = expenses
     .filter((expense) => {
       const expenseDate = getDateOnly(getDate(expense));
 
-      if (!expenseDate) return false;
+      if (!expenseDate) {
+        return false;
+      }
 
       const [year, month] = expenseDate.split("-").map(Number);
 
@@ -171,6 +196,10 @@ const Expenses = () => {
     .reduce((total, expense) => {
       return total + getAmount(expense);
     }, 0);
+
+  // =========================================================
+  // RECOVERY EXPENSES
+  // =========================================================
 
   const recoveryExpenses = expenses
     .filter((expense) => {
@@ -184,31 +213,39 @@ const Expenses = () => {
       return total + getAmount(expense);
     }, 0);
 
+  // =========================================================
+  // CURRENT MONTH LABEL
+  // =========================================================
+
   const currentMonth = new Intl.DateTimeFormat("en-US", {
     month: "long",
     year: "numeric",
   }).format(today);
 
+  // =========================================================
+  // CURRENCY FORMAT
+  // =========================================================
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-PK").format(Number(amount) || 0);
   };
 
-  // ==========================================
+  // =========================================================
   // ADD EXPENSE
-  // ==========================================
+  // =========================================================
 
   const handleAddExpense = () => {
     setEditingExpense(null);
     setIsModalOpen(true);
   };
 
-  // ==========================================
+  // =========================================================
   // EXPENSE SUCCESS
-  // ==========================================
+  // =========================================================
 
   const handleExpenseSuccess = async (expenseResponse) => {
     console.log("========================================");
-    console.log("Expense operation successful!");
+    console.log("EXPENSE OPERATION SUCCESSFUL");
     console.log("Expense Response:", expenseResponse);
     console.log("========================================");
 
@@ -218,39 +255,34 @@ const Expenses = () => {
     await fetchExpenses();
   };
 
-  // ==========================================
+  // =========================================================
   // EDIT EXPENSE
-  // ==========================================
+  // =========================================================
 
   const handleEdit = (expense) => {
     console.log("========================================");
-    console.log("Edit Expense:", expense);
+    console.log("EDIT EXPENSE");
+    console.log("Expense:", expense);
     console.log("========================================");
 
     setEditingExpense(expense);
     setIsModalOpen(true);
   };
 
-  // ==========================================
+  // =========================================================
   // DELETE EXPENSE
-  // ==========================================
+  // =========================================================
 
   const handleDelete = async (expense) => {
-    // ========================================
-    // GET EXPENSE ID
-    // ========================================
-
     const expenseId = expense?._id || expense?.id || expense?.expenseId;
 
     if (!expenseId) {
       console.error("Delete Expense Error: Expense ID is missing.", expense);
 
+      window.alert("Expense ID is missing. Cannot delete this expense.");
+
       return;
     }
-
-    // ========================================
-    // CONFIRM DELETE
-    // ========================================
 
     const confirmed = window.confirm(
       "Are you sure you want to delete this expense?",
@@ -269,21 +301,12 @@ const Expenses = () => {
       console.log("Delete URL:", `/expense/${expenseId}`);
       console.log("========================================");
 
-      // ======================================
-      // DELETE API
-      // DELETE /expense/:id
-      // ======================================
-
       const response = await deleteExpense(expenseId);
 
       console.log("========================================");
       console.log("EXPENSE DELETED SUCCESSFULLY");
       console.log("Delete Response:", response);
       console.log("========================================");
-
-      // ======================================
-      // REFRESH EXPENSE LIST
-      // ======================================
 
       await fetchExpenses();
     } catch (error) {
@@ -307,18 +330,73 @@ const Expenses = () => {
     }
   };
 
-  // ==========================================
+  // =========================================================
+  // CREATE RECOVERY EXPENSE
+  // =========================================================
+
+  const handleRecoveryExpense = async (data) => {
+    try {
+      console.log("========================================");
+      console.log("CREATE RECOVERY EXPENSE");
+      console.log("Recovery Form Data:", data);
+      console.log("========================================");
+
+      const recoveryExpenseData = {
+        date: data.date,
+        category: data.category,
+        recoveryAmount: Number(data.recoveryAmount),
+        remarks: data.remarks,
+        paymentMode: data.paymentMode,
+      };
+
+      console.log(
+        "RECOVERY API REQUEST:",
+        JSON.stringify(recoveryExpenseData, null, 2),
+      );
+
+      const response = await createRecoveryExpense(recoveryExpenseData);
+
+      console.log("========================================");
+      console.log("RECOVERY EXPENSE CREATED SUCCESSFULLY");
+      console.log("Recovery Response:", response);
+      console.log("========================================");
+
+      setIsRecoveryModalOpen(false);
+
+      await fetchExpenses();
+    } catch (error) {
+      console.error("========================================");
+      console.error("FAILED TO CREATE RECOVERY EXPENSE");
+      console.error("Error:", error);
+      console.error("Status:", error?.response?.status);
+      console.error(
+        "Server Response:",
+        JSON.stringify(error?.response?.data, null, 2),
+      );
+      console.error("========================================");
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to create recovery expense.";
+
+      window.alert(errorMessage);
+    }
+  };
+
+  // =========================================================
   // CLOSE EXPENSE MODAL
-  // ==========================================
+  // =========================================================
 
   const handleCloseExpenseModal = () => {
     setIsModalOpen(false);
     setEditingExpense(null);
   };
 
-  // ==========================================
-  // Loading State
-  // ==========================================
+  // =========================================================
+  // LOADING STATE
+  // =========================================================
 
   if (isLoading) {
     return (
@@ -330,9 +408,9 @@ const Expenses = () => {
     );
   }
 
-  // ==========================================
-  // Error State
-  // ==========================================
+  // =========================================================
+  // ERROR STATE
+  // =========================================================
 
   if (error) {
     return (
@@ -350,16 +428,16 @@ const Expenses = () => {
     );
   }
 
-  // ==========================================
+  // =========================================================
   // MAIN UI
-  // ==========================================
+  // =========================================================
 
   return (
     <div className="exp-page-container">
       <div className="exp-content-wrapper">
-        {/* ==========================================
-            Title & Top Right Action Button
-        ========================================== */}
+        {/* ===================================================
+            TITLE
+        ==================================================== */}
 
         <div className="exp-title-row">
           <div className="exp-title-section">
@@ -376,13 +454,14 @@ const Expenses = () => {
             onClick={() => setIsAddOwnerModalOpen(true)}
           >
             <PlusCircle size={18} />
+
             <span>Add Owners</span>
           </button>
         </div>
 
-        {/* ==========================================
-            Expense Metric Cards
-        ========================================== */}
+        {/* ===================================================
+            EXPENSE STATS
+        ==================================================== */}
 
         <div className="exp-stats-grid">
           {/* Today's Expenses */}
@@ -446,9 +525,9 @@ const Expenses = () => {
           </div>
         </div>
 
-        {/* ==========================================
-            Action Buttons
-        ========================================== */}
+        {/* ===================================================
+            ACTION BUTTONS
+        ==================================================== */}
 
         <div className="exp-actions-container">
           {/* Row 1 */}
@@ -460,6 +539,7 @@ const Expenses = () => {
               onClick={handleAddExpense}
             >
               <PlusCircle size={18} />
+
               <span>Add New Expense</span>
             </button>
 
@@ -469,11 +549,13 @@ const Expenses = () => {
               onClick={() => setIsRecoveryModalOpen(true)}
             >
               <PlusCircle size={18} />
+
               <span>Add Recovery Expense</span>
             </button>
 
             <button type="button" className="exp-btn-action exp-btn-outline">
               <Layers size={18} />
+
               <span>View Expense Categories</span>
             </button>
           </div>
@@ -487,6 +569,7 @@ const Expenses = () => {
               onClick={() => setIsDieselModalOpen(true)}
             >
               <PlusCircle size={18} />
+
               <span>Diesel Expense</span>
             </button>
 
@@ -496,14 +579,15 @@ const Expenses = () => {
               onClick={() => setIsOwnerExpenseModalOpen(true)}
             >
               <PlusCircle size={18} />
+
               <span>Add Owner Expense</span>
             </button>
           </div>
         </div>
 
-        {/* ==========================================
-            Recent Expenses
-        ========================================== */}
+        {/* ===================================================
+            RECENT EXPENSES
+        ==================================================== */}
 
         <RecentExpenses
           expenses={expenses}
@@ -513,9 +597,9 @@ const Expenses = () => {
         />
       </div>
 
-      {/* ==========================================
-          Add / Edit Expense Modal
-      ========================================== */}
+      {/* =====================================================
+          ADD / EDIT EXPENSE MODAL
+      ====================================================== */}
 
       <AddNewExpenses
         isOpen={isModalOpen}
@@ -524,19 +608,19 @@ const Expenses = () => {
         editingExpense={editingExpense}
       />
 
-      {/* ==========================================
-          Add New Recovery Expense Modal
-      ========================================== */}
+      {/* =====================================================
+          RECOVERY EXPENSE MODAL
+      ====================================================== */}
 
       <ExpenseRecoveryModal
         isOpen={isRecoveryModalOpen}
         onClose={() => setIsRecoveryModalOpen(false)}
-        onSubmit={(data) => console.log("Recovery Data:", data)}
+        onSubmit={handleRecoveryExpense}
       />
 
-      {/* ==========================================
-          Add Diesel Expense Modal
-      ========================================== */}
+      {/* =====================================================
+          DIESEL EXPENSE MODAL
+      ====================================================== */}
 
       <AddDieselExpenseModal
         isOpen={isDieselModalOpen}
@@ -544,9 +628,9 @@ const Expenses = () => {
         onSubmit={(data) => console.log("Diesel Expense Data:", data)}
       />
 
-      {/* ==========================================
-          Record Owner Expense Modal
-      ========================================== */}
+      {/* =====================================================
+          OWNER EXPENSE MODAL
+      ====================================================== */}
 
       <RecordOwnerExpenseModal
         isOpen={isOwnerExpenseModalOpen}
@@ -554,9 +638,9 @@ const Expenses = () => {
         onSubmit={(data) => console.log("Owner Expense Data:", data)}
       />
 
-      {/* ==========================================
-          Add New Owner Modal
-      ========================================== */}
+      {/* =====================================================
+          ADD OWNER MODAL
+      ====================================================== */}
 
       <AddNewOwnerModal
         isOpen={isAddOwnerModalOpen}

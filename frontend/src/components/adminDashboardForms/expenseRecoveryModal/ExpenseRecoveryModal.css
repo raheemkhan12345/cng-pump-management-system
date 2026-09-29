@@ -1,292 +1,753 @@
-/* Modal Overlay */
+/* =========================================================
+   RECOVERY EXPENSE MODAL
+   RESPONSIVE STYLES
+========================================================= */
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
 .erm-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 16px;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Container Box */
+/* =========================================================
+   MODAL CONTAINER
+========================================================= */
+
 .erm-modal-container {
-    background: #ffffff;
-    width: 100%;
-    max-width: 540px;
-    border-radius: 16px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    animation: ermFadeIn 0.2s ease-out;
+  width: 100%;
+  max-width: 650px;
+
+  max-height: calc(100vh - 40px);
+
+  background: #ffffff;
+  border-radius: 14px;
+
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  animation: erm-modal-enter 0.2s ease-out;
 }
 
-@keyframes ermFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(8px) scale(0.98);
-    }
+@keyframes erm-modal-enter {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* Header */
+/* =========================================================
+   HEADER
+========================================================= */
+
 .erm-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px 24px;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  flex-shrink: 0;
 }
 
 .erm-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0;
+  margin: 0;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  line-height: 1.3;
+
+  color: #111827;
 }
 
 .erm-close-btn {
-    background: transparent;
-    border: none;
-    color: #64748b;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 8px;
+
+  background: transparent;
+  color: #6b7280;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .erm-close-btn:hover {
-    background-color: #f1f5f9;
-    color: #0f172a;
+  background: #f3f4f6;
+  color: #111827;
 }
 
-/* Form Styling */
+/* =========================================================
+   FORM
+========================================================= */
+
 .erm-form {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  padding: 24px;
+
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
+
+/* =========================================================
+   TWO COLUMN GRID
+========================================================= */
 
 .erm-grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 18px;
 }
 
+/* =========================================================
+   FIELD
+========================================================= */
+
 .erm-field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+  width: 100%;
+  margin-bottom: 18px;
 }
 
 .erm-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #334155;
+  display: block;
+
+  margin-bottom: 7px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #374151;
 }
 
-/* Input Fields */
+/* =========================================================
+   INPUT
+========================================================= */
+
+.erm-input-icon-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .erm-input {
-    width: 100%;
-    height: 44px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 0 14px;
-    font-size: 14px;
-    color: #0f172a;
-    background-color: #f8fafc;
-    outline: none;
-    transition: all 0.2s ease;
-    box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  outline: none;
+
+  background: #ffffff;
+  color: #111827;
+
+  font-size: 14px;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .erm-input:focus {
-    border-color: #10b981;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  border-color: #16a34a;
+
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
 
-.erm-input-icon-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
+.erm-input[readonly] {
+  background: #f9fafb;
+  color: #4b5563;
+  cursor: default;
 }
+
+/* =========================================================
+   DATE INPUT
+========================================================= */
 
 .erm-input-icon {
-    position: absolute;
-    right: 12px;
-    color: #64748b;
-    pointer-events: none;
+  position: absolute;
+
+  top: 50%;
+  right: 12px;
+
+  transform: translateY(-50%);
+
+  color: #6b7280;
+
+  pointer-events: none;
 }
 
-/* Amount Input Prefix */
+/* =========================================================
+   AMOUNT INPUT
+========================================================= */
+
 .erm-amount-input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+  width: 100%;
 }
 
 .erm-currency-prefix {
-    position: absolute;
-    left: 14px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #475569;
+  position: absolute;
+
+  top: 50%;
+  left: 12px;
+
+  transform: translateY(-50%);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #6b7280;
+
+  pointer-events: none;
 }
 
 .erm-amount-input {
-    padding-left: 45px;
-    font-weight: 600;
-    font-size: 16px;
+  padding-left: 42px;
 }
 
-/* Textarea */
+/* Remove number input arrows */
+
+.erm-amount-input::-webkit-outer-spin-button,
+.erm-amount-input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.erm-amount-input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+/* =========================================================
+   TEXTAREA
+========================================================= */
+
 .erm-textarea {
-    width: 100%;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 12px 14px;
-    font-size: 14px;
-    color: #0f172a;
-    background-color: #f8fafc;
-    outline: none;
-    resize: none;
-    font-family: inherit;
-    transition: all 0.2s ease;
-    box-sizing: border-box;
+  width: 100%;
+  min-height: 90px;
+
+  padding: 11px 12px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  outline: none;
+
+  resize: vertical;
+
+  background: #ffffff;
+  color: #111827;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .erm-textarea:focus {
-    border-color: #10b981;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  border-color: #16a34a;
+
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
 
-/* Payment Mode Grid */
+/* =========================================================
+   PAYMENT GRID
+========================================================= */
+
 .erm-payment-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 14px;
+
+  width: 100%;
 }
+
+/* =========================================================
+   PAYMENT CARD
+========================================================= */
 
 .erm-payment-card {
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    background-color: #ffffff;
-    transition: all 0.2s ease;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 13px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .erm-payment-card:hover {
-    border-color: #cbd5e1;
-    background-color: #f8fafc;
+  border-color: #9ca3af;
+  background: #f9fafb;
 }
 
 .erm-payment-card.active {
-    border-color: #10b981;
-    background-color: #f0fdf4;
+  border-color: #16a34a;
+  background: #f0fdf4;
+
+  box-shadow: 0 0 0 1px #16a34a;
 }
+
+/* =========================================================
+   PAYMENT CARD LEFT
+========================================================= */
 
 .erm-payment-card-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
 }
+
+/* =========================================================
+   PAYMENT ICON
+========================================================= */
 
 .erm-pm-icon-box {
-    color: #10b981;
-    display: flex;
-    align-items: center;
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: #f3f4f6;
+  color: #374151;
 }
 
+.erm-payment-card.active .erm-pm-icon-box {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* =========================================================
+   PAYMENT TEXT
+========================================================= */
+
 .erm-pm-text {
-    display: flex;
-    flex-direction: column;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
 }
 
 .erm-pm-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: #0f172a;
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #111827;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .erm-pm-sub {
-    font-size: 11px;
-    color: #64748b;
+  font-size: 11px;
+
+  color: #6b7280;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+/* =========================================================
+   CHECK ICON
+========================================================= */
 
 .erm-check-icon {
-    color: #10b981;
+  flex-shrink: 0;
+
+  color: #16a34a;
 }
 
-/* Footer Buttons */
+/* =========================================================
+   FOOTER
+========================================================= */
+
 .erm-footer {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 12px;
+
+  padding-top: 6px;
+
+  margin-top: 2px;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.erm-btn-cancel,
+.erm-btn-submit {
+  min-height: 42px;
+
+  padding: 10px 18px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .erm-btn-cancel {
-    height: 42px;
-    padding: 0 20px;
-    border: 1px solid #cbd5e1;
-    background-color: #ffffff;
-    color: #334155;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
+  border: 1px solid #d1d5db;
+
+  background: #ffffff;
+  color: #374151;
 }
 
 .erm-btn-cancel:hover {
-    background-color: #f8fafc;
+  background: #f9fafb;
 }
 
 .erm-btn-submit {
-    height: 42px;
-    padding: 0 20px;
-    background-color: #0f172a;
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  border: 1px solid #16a34a;
+
+  background: #16a34a;
+  color: #ffffff;
 }
 
 .erm-btn-submit:hover {
-    background-color: #1e293b;
+  background: #15803d;
+  border-color: #15803d;
 }
 
-/* Responsive */
-@media (max-width: 540px) {
+.erm-btn-submit:active,
+.erm-btn-cancel:active {
+  transform: translateY(1px);
+}
 
-    .erm-grid-2,
-    .erm-payment-grid {
-        grid-template-columns: 1fr;
-    }
+/* =========================================================
+   TABLET
+   768px - 1024px
+========================================================= */
+
+@media (max-width: 1024px) {
+  .erm-overlay {
+    padding: 18px;
+  }
+
+  .erm-modal-container {
+    max-width: 620px;
+    max-height: calc(100vh - 36px);
+  }
+
+  .erm-header {
+    padding: 18px 20px;
+  }
+
+  .erm-form {
+    padding: 20px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   <= 767px
+========================================================= */
+
+@media (max-width: 767px) {
+  .erm-overlay {
+    align-items: flex-start;
+
+    padding: 12px;
+
+    overflow-y: auto;
+  }
+
+  .erm-modal-container {
+    width: 100%;
+    max-width: none;
+
+    max-height: calc(100vh - 24px);
+
+    margin: auto 0;
+
+    border-radius: 12px;
+  }
+
+  .erm-header {
+    padding: 16px;
+
+    min-height: 60px;
+  }
+
+  .erm-title {
+    font-size: 18px;
+  }
+
+  .erm-close-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .erm-form {
+    padding: 16px;
+  }
+
+  /* Stack date and category */
+
+  .erm-grid-2 {
+    grid-template-columns: 1fr;
+
+    gap: 0;
+  }
+
+  .erm-field {
+    margin-bottom: 16px;
+  }
+
+  /* Payment cards */
+
+  .erm-payment-grid {
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+  }
+
+  .erm-payment-card {
+    min-height: 62px;
+  }
+
+  /* Footer */
+
+  .erm-footer {
+    flex-direction: column-reverse;
+
+    width: 100%;
+
+    gap: 10px;
+
+    padding-top: 4px;
+  }
+
+  .erm-btn-cancel,
+  .erm-btn-submit {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   <= 480px
+========================================================= */
+
+@media (max-width: 480px) {
+  .erm-overlay {
+    padding: 8px;
+  }
+
+  .erm-modal-container {
+    max-height: calc(100vh - 16px);
+
+    border-radius: 10px;
+  }
+
+  .erm-header {
+    padding: 14px;
+  }
+
+  .erm-title {
+    font-size: 17px;
+  }
+
+  .erm-form {
+    padding: 14px;
+  }
+
+  .erm-label {
+    font-size: 12px;
+  }
+
+  .erm-input,
+  .erm-textarea {
+    font-size: 13px;
+  }
+
+  .erm-input {
+    min-height: 42px;
+  }
+
+  .erm-textarea {
+    min-height: 80px;
+  }
+
+  .erm-payment-card {
+    padding: 11px;
+  }
+
+  .erm-pm-icon-box {
+    width: 34px;
+    height: 34px;
+  }
+
+  .erm-pm-title {
+    font-size: 12px;
+  }
+
+  .erm-pm-sub {
+    font-size: 10px;
+  }
+
+  .erm-btn-cancel,
+  .erm-btn-submit {
+    min-height: 42px;
+
+    font-size: 13px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+   <= 360px
+========================================================= */
+
+@media (max-width: 360px) {
+  .erm-overlay {
+    padding: 5px;
+  }
+
+  .erm-modal-container {
+    max-height: calc(100vh - 10px);
+  }
+
+  .erm-header {
+    padding: 12px;
+  }
+
+  .erm-form {
+    padding: 12px;
+  }
+
+  .erm-title {
+    font-size: 16px;
+  }
+
+  .erm-payment-card-left {
+    gap: 7px;
+  }
+
+  .erm-pm-icon-box {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.erm-close-btn:focus-visible,
+.erm-btn-cancel:focus-visible,
+.erm-btn-submit:focus-visible,
+.erm-payment-card:focus-visible,
+.erm-input:focus-visible,
+.erm-textarea:focus-visible {
+  outline: 2px solid #16a34a;
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .erm-modal-container {
+    animation: none;
+  }
+
+  .erm-close-btn,
+  .erm-input,
+  .erm-textarea,
+  .erm-payment-card,
+  .erm-btn-cancel,
+  .erm-btn-submit {
+    transition: none;
+  }
 }
