@@ -15,6 +15,8 @@ import {
   createRecoveryExpense,
   getRecoveryExpenses,
   createDieselExpense,
+  createOwner,
+  getOwners,
 } from "../../../services/adminApis/expenseApi";
 
 import "./Expenses.css";
@@ -51,6 +53,13 @@ const Expenses = () => {
   const [recoveryExpensesData, setRecoveryExpensesData] = useState([]);
 
   // =========================================================
+  // OWNER DATA
+  // Owners are loaded from backend.
+  // =========================================================
+
+  const [owners, setOwners] = useState([]);
+
+  // =========================================================
   // LOADING / ERROR
   // =========================================================
 
@@ -82,8 +91,6 @@ const Expenses = () => {
       setIsLoading(true);
       setError("");
 
-      // Backend does NOT support pagination.
-      // Therefore, get all expenses once.
       const response = await getExpenses();
 
       console.log("========================================");
@@ -91,10 +98,6 @@ const Expenses = () => {
       console.log("========================================");
 
       let expenseData = [];
-
-      // -------------------------------------------------------
-      // GET EXPENSE ARRAY SAFELY
-      // -------------------------------------------------------
 
       if (Array.isArray(response?.data)) {
         expenseData = response.data;
@@ -109,18 +112,7 @@ const Expenses = () => {
       console.log("ALL EXPENSE DATA:", expenseData);
       console.log("TOTAL EXPENSES:", expenseData.length);
 
-      // -------------------------------------------------------
-      // SAVE COMPLETE EXPENSE LIST
-      // -------------------------------------------------------
-
       setAllExpenses(expenseData);
-
-      // -------------------------------------------------------
-      // KEEP CURRENT PAGE VALID
-      // Example:
-      // Page 2 has only 1 record.
-      // If that record gets deleted, return to page 1.
-      // -------------------------------------------------------
 
       const calculatedTotalPages = Math.max(
         Math.ceil(expenseData.length / pageSize),
@@ -187,6 +179,62 @@ const Expenses = () => {
   }, []);
 
   // =========================================================
+  // GET ALL OWNERS
+  // GET /ownerexpense/getOwner
+  // =========================================================
+
+  const fetchOwners = useCallback(async () => {
+    try {
+      console.log("========================================");
+      console.log("GET OWNERS");
+      console.log("GET OWNER API REQUEST");
+      console.log("========================================");
+
+      const response = await getOwners();
+
+      console.log("========================================");
+      console.log("GET OWNER API RESPONSE:", response);
+      console.log("========================================");
+
+      let ownerData = [];
+
+      // -------------------------------------------------------
+      // HANDLE DIFFERENT POSSIBLE RESPONSE STRUCTURES
+      // -------------------------------------------------------
+
+      if (Array.isArray(response?.data)) {
+        ownerData = response.data;
+      } else if (Array.isArray(response?.owners)) {
+        ownerData = response.owners;
+      } else if (Array.isArray(response?.owner)) {
+        ownerData = response.owner;
+      } else if (Array.isArray(response?.data?.owners)) {
+        ownerData = response.data.owners;
+      } else if (Array.isArray(response)) {
+        ownerData = response;
+      }
+
+      console.log("FINAL OWNER DATA:", ownerData);
+
+      console.log("TOTAL OWNERS:", ownerData.length);
+
+      setOwners(ownerData);
+    } catch (error) {
+      console.error("========================================");
+      console.error("FAILED TO GET OWNERS");
+      console.error("ERROR:", error);
+      console.error("STATUS:", error?.response?.status);
+      console.error(
+        "SERVER RESPONSE:",
+        JSON.stringify(error?.response?.data, null, 2),
+      );
+      console.error("========================================");
+
+      setOwners([]);
+    }
+  }, []);
+
+  // =========================================================
   // LOAD DATA ON PAGE LOAD
   // =========================================================
 
@@ -198,6 +246,10 @@ const Expenses = () => {
     fetchRecoveryExpenses();
   }, [fetchRecoveryExpenses]);
 
+  useEffect(() => {
+    fetchOwners();
+  }, [fetchOwners]);
+
   // =========================================================
   // FRONTEND PAGINATION CALCULATIONS
   // =========================================================
@@ -206,20 +258,13 @@ const Expenses = () => {
 
   const totalPages = Math.max(Math.ceil(totalExpenses / pageSize), 1);
 
-  // ---------------------------------------------------------
+  // =========================================================
   // GET ONLY CURRENT PAGE EXPENSES
-  //
-  // Page 1:
-  // start = 0
-  // end = 5
-  //
-  // Page 2:
-  // start = 5
-  // end = 10
-  // ---------------------------------------------------------
+  // =========================================================
 
   const expenses = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
+
     const endIndex = startIndex + pageSize;
 
     return allExpenses.slice(startIndex, endIndex);
@@ -256,14 +301,10 @@ const Expenses = () => {
 
     const dateString = String(dateValue);
 
-    // Example:
-    // 2026-09-29T00:00:00.000Z
     if (dateString.includes("T")) {
       return dateString.split("T")[0];
     }
 
-    // Example:
-    // 2026-09-29
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
       return dateString;
     }
@@ -290,13 +331,11 @@ const Expenses = () => {
   ].join("-");
 
   const currentYear = today.getFullYear();
+
   const currentMonthNumber = today.getMonth() + 1;
 
   // =========================================================
   // TODAY'S EXPENSES
-  //
-  // IMPORTANT:
-  // Use allExpenses, NOT current-page expenses.
   // =========================================================
 
   const todayExpenses = allExpenses
@@ -309,9 +348,6 @@ const Expenses = () => {
 
   // =========================================================
   // CURRENT MONTH EXPENSES
-  //
-  // IMPORTANT:
-  // Use allExpenses, NOT current-page expenses.
   // =========================================================
 
   const monthExpenses = allExpenses
@@ -407,7 +443,6 @@ const Expenses = () => {
     setIsModalOpen(false);
     setEditingExpense(null);
 
-    // Refresh complete expense list
     await fetchExpenses();
   };
 
@@ -464,7 +499,6 @@ const Expenses = () => {
       console.log("DELETE RESPONSE:", response);
       console.log("========================================");
 
-      // Refresh all expenses
       await fetchExpenses();
     } catch (error) {
       console.error("========================================");
@@ -583,7 +617,6 @@ const Expenses = () => {
 
       setIsDieselModalOpen(false);
 
-      // Refresh complete expense list
       await fetchExpenses();
     } catch (error) {
       console.error("========================================");
@@ -601,6 +634,58 @@ const Expenses = () => {
         error?.response?.data?.error ||
         error?.message ||
         "Failed to create diesel expense.";
+
+      window.alert(errorMessage);
+    }
+  };
+
+  // =========================================================
+  // CREATE NEW OWNER
+  // =========================================================
+
+  const handleAddOwner = async (data) => {
+    try {
+      console.log("========================================");
+      console.log("CREATE NEW OWNER");
+      console.log("OWNER FORM DATA:", data);
+      console.log("========================================");
+
+      const ownerData = {
+        ownerName: data?.ownerName?.trim(),
+      };
+
+      console.log("OWNER API REQUEST:", JSON.stringify(ownerData, null, 2));
+
+      const response = await createOwner(ownerData);
+
+      console.log("========================================");
+      console.log("OWNER CREATED SUCCESSFULLY");
+      console.log("OWNER RESPONSE:", response);
+      console.log("========================================");
+
+      setIsAddOwnerModalOpen(false);
+
+      // -----------------------------------------------------
+      // Refresh owner dropdown
+      // -----------------------------------------------------
+
+      await fetchOwners();
+    } catch (error) {
+      console.error("========================================");
+      console.error("FAILED TO CREATE OWNER");
+      console.error("ERROR:", error);
+      console.error("STATUS:", error?.response?.status);
+      console.error(
+        "SERVER RESPONSE:",
+        JSON.stringify(error?.response?.data, null, 2),
+      );
+      console.error("========================================");
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to create owner.";
 
       window.alert(errorMessage);
     }
@@ -909,6 +994,7 @@ const Expenses = () => {
         onSubmit={(data) => {
           console.log("Owner Expense Data:", data);
         }}
+        owners={owners}
       />
 
       {/* =====================================================
@@ -918,9 +1004,7 @@ const Expenses = () => {
       <AddNewOwnerModal
         isOpen={isAddOwnerModalOpen}
         onClose={() => setIsAddOwnerModalOpen(false)}
-        onSubmit={(data) => {
-          console.log("New Owner Data:", data);
-        }}
+        onSubmit={handleAddOwner}
       />
     </div>
   );

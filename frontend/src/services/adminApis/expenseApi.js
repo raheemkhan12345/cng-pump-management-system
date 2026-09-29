@@ -110,3 +110,31 @@ export const createDieselExpense = async (dieselExpenseData) => {
 
   return response.data;
 };
+
+
+// =========================================================
+// CREATE NEW OWNER
+// POST /ownerexpense/createOwner
+// =========================================================
+
+export const createOwner = async (ownerData) => {
+  const response = await axiosInstance.post(
+    "/ownerexpense/createOwner",
+    ownerData,
+  );
+
+  return response.data;
+};
+
+// =========================================================
+// GET ALL OWNERS
+// GET /ownerexpense/getOwner
+// =========================================================
+
+export const getOwners = async () => {
+  const response = await axiosInstance.get(
+    "/ownerexpense/getOwner",
+  );
+
+  return response.data;
+};
