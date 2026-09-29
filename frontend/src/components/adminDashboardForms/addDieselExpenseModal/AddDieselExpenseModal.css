@@ -397,7 +397,7 @@
 
   padding: 0 20px;
 
-  background-color: #007a3d;
+  background-color: #0f172a;
   color: #ffffff;
 
   border: none;
@@ -421,11 +421,11 @@
 }
 
 .dem-btn-submit:hover {
-  background-color: #006331;
+  background-color: #1e293b;
 }
 
 .dem-btn-submit:focus-visible {
-  outline: 2px solid #007a3d;
+  outline: 2px solid #1e293b;
   outline-offset: 2px;
 }
 

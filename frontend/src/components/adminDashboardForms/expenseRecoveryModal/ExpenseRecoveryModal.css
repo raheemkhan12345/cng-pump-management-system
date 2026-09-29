@@ -487,15 +487,15 @@
 }
 
 .erm-btn-submit {
-  border: 1px solid #16a34a;
+  border: 1px solid #1e293b;
 
-  background: #16a34a;
+  background: #0f172a;
   color: #ffffff;
 }
 
 .erm-btn-submit:hover {
-  background: #15803d;
-  border-color: #15803d;
+  background: #1e293b;
+  border-color: #1e293b;
 }
 
 .erm-btn-submit:active,
