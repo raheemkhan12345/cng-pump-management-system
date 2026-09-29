@@ -80,9 +80,6 @@ const ownersData = [
 ];
 
 const OwnerExpenses = () => {
-  const handleRecordExpense = (ownerName) => {
-    console.log(`Record expense clicked for ${ownerName}`);
-  };
 
   return (
     <div className="owner-expenses-container">
@@ -107,13 +104,7 @@ const OwnerExpenses = () => {
                   <span className="owner-role">{owner.role}</span>
                 </div>
               </div>
-              <button
-                className="btn-record-expense"
-                onClick={() => handleRecordExpense(owner.name)}
-              >
-                <FaPlus size={12} />
-                <span>Record Expense</span>
-              </button>
+             
             </div>
 
             {/* Metrics */}
