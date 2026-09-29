@@ -1,506 +1,835 @@
-/* ==========================================
+/* =========================================================
    EXPENSES PAGE
-========================================== */
+========================================================= */
 
 .exp-page-container {
-    width: 100%;
-    min-height: 100vh;
-    background-color: #f8fafc;
-    color: #1e293b;
-    padding: 20px 30px;
-    box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px 30px;
+  box-sizing: border-box;
+
+  background: #f8fafc;
+  color: #1e293b;
 }
 
-/* ==========================================
-   HEADER SECTION
-========================================== */
+/* =========================================================
+   HEADER
+========================================================= */
 
 .exp-header-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  width: 100%;
+  margin-bottom: 20px;
 }
 
 .exp-header-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    color: #0f172a;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  min-width: 0;
+
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .exp-divider {
-    color: #cbd5e1;
+  color: #cbd5e1;
 }
 
 .exp-location-text {
-    color: #64748b;
-    font-weight: 500;
+  color: #64748b;
+  font-weight: 500;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ==========================================
+/* =========================================================
    TITLE SECTION
-========================================== */
+========================================================= */
 
 .exp-title-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 20px;
-    margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+
+  width: 100%;
+  margin-bottom: 24px;
 }
 
 .exp-title-section {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  flex: 1;
 }
 
 .exp-page-title {
-    margin: 0 0 4px;
-    font-size: 24px;
-    font-weight: 700;
-    color: #0f172a;
-    line-height: 1.25;
+  margin: 0 0 5px;
+
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.25;
 }
 
 .exp-page-subtitle {
-    margin: 0;
-    font-size: 14px;
-    color: #64748b;
-    line-height: 1.5;
+  margin: 0;
+
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
-/* Add Owners Button */
+/* =========================================================
+   ADD OWNERS BUTTON
+========================================================= */
 
 .exp-btn-add-owners {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 
-    padding: 10px 20px;
+  flex-shrink: 0;
 
-    background-color: #007a3d;
-    color: #ffffff;
+  min-height: 42px;
+  padding: 10px 20px;
 
-    border: none;
-    border-radius: 8px;
+  border: none;
+  border-radius: 8px;
 
-    font-size: 14px;
-    font-weight: 600;
+  background: #007a3d;
+  color: #ffffff;
 
-    cursor: pointer;
-    white-space: nowrap;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
 
-    transition:
-        background-color 0.2s ease,
-        transform 0.2s ease;
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .exp-btn-add-owners:hover {
-    background-color: #006331;
+  background: #006331;
+}
+
+.exp-btn-add-owners:focus-visible {
+  outline: 2px solid #007a3d;
+  outline-offset: 2px;
 }
 
 .exp-btn-add-owners:active {
-    transform: scale(0.98);
+  transform: scale(0.98);
 }
 
-/* ==========================================
-   EXPENSE STAT CARDS
-========================================== */
+/* =========================================================
+   EXPENSE STATISTICS
+========================================================= */
 
 .exp-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
-    margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+
+  width: 100%;
+  margin-bottom: 24px;
 }
 
 .exp-stat-card {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
 
-    min-width: 0;
+  min-width: 0;
+  min-height: 120px;
+  padding: 20px;
 
-    padding: 20px;
+  box-sizing: border-box;
 
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
 
-    box-sizing: border-box;
+  overflow: hidden;
 }
 
 .exp-stat-info {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  flex: 1;
 }
 
 .exp-stat-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: #64748b;
-    letter-spacing: 0.5px;
-    line-height: 1.3;
+  margin: 0;
+
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+
+  text-transform: uppercase;
 }
 
 .exp-stat-value {
-    margin: 10px 0 4px;
+  margin: 9px 0 4px;
 
-    font-size: 24px;
-    font-weight: 700;
-    color: #0f172a;
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
 
-    line-height: 1.2;
-    word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .exp-stat-sub {
-    font-size: 12px;
-    color: #94a3b8;
-    line-height: 1.4;
+  margin: 0;
+
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+
+  overflow-wrap: anywhere;
 }
 
+/* =========================================================
+   STAT ICONS
+========================================================= */
+
 .exp-icon-box {
-    flex: 0 0 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    width: 36px;
-    height: 36px;
+  flex: 0 0 36px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 36px;
+  height: 36px;
 
-    border-radius: 8px;
+  border-radius: 8px;
 }
 
 .exp-icon-red {
-    background-color: #fee2e2;
-    color: #ef4444;
+  background: #fee2e2;
+  color: #ef4444;
 }
 
 .exp-icon-blue {
-    background-color: #e0f2fe;
-    color: #0284c7;
+  background: #e0f2fe;
+  color: #0284c7;
 }
 
-/* ==========================================
-   ACTION BUTTONS
-========================================== */
+/* =========================================================
+   ACTION BUTTONS CONTAINER
+========================================================= */
 
 .exp-actions-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  width: 100%;
+  margin-bottom: 28px;
 }
+
+/* First row - 3 buttons */
 
 .exp-action-row-1 {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+
+  width: 100%;
 }
+
+/* Second row - 2 buttons */
 
 .exp-action-row-2 {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-    width: 66.66%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+
+  width: 66.6667%;
 }
 
+/* =========================================================
+   COMMON ACTION BUTTON
+========================================================= */
+
 .exp-btn-action {
-    width: 100%;
-    min-width: 0;
-    height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 16px;
 
-    padding: 0 16px;
+  box-sizing: border-box;
 
-    border-radius: 8px;
+  border-radius: 8px;
 
-    font-size: 14px;
-    font-weight: 600;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    white-space: nowrap;
+  white-space: nowrap;
 
-    transition:
-        background-color 0.2s ease,
-        border-color 0.2s ease,
-        color 0.2s ease,
-        transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.exp-btn-action:focus-visible {
+  outline: 2px solid #007a3d;
+  outline-offset: 2px;
 }
 
 .exp-btn-action:active {
-    transform: scale(0.98);
+  transform: scale(0.98);
 }
 
-/* Green Button */
+/* =========================================================
+   GREEN BUTTON
+========================================================= */
 
 .exp-btn-green {
-    background-color: #007a3d;
-    color: #ffffff;
-    border: none;
+  border: 1px solid #007a3d;
+  background: #007a3d;
+  color: #ffffff;
 }
 
 .exp-btn-green:hover {
-    background-color: #006331;
+  background: #006331;
+  border-color: #006331;
 }
 
-/* Dark Button */
+/* =========================================================
+   DARK BUTTON
+========================================================= */
 
 .exp-btn-dark {
-    background-color: #1e293b;
-    color: #ffffff;
-    border: none;
+  border: 1px solid #1e293b;
+  background: #1e293b;
+  color: #ffffff;
 }
 
 .exp-btn-dark:hover {
-    background-color: #0f172a;
+  background: #0f172a;
+  border-color: #0f172a;
 }
 
-/* Outline Button */
+/* =========================================================
+   OUTLINE BUTTON
+========================================================= */
 
 .exp-btn-outline {
-    background-color: #ffffff;
-    color: #1e293b;
-    border: 1px solid #e2e8f0;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #1e293b;
 }
 
 .exp-btn-outline:hover {
-    background-color: #f8fafc;
-    border-color: #cbd5e1;
+  background: #f8fafc;
+  border-color: #cbd5e1;
 }
 
-/* ==========================================
-   TABLE CSS REMOVED
-   RecentExpenses.css handles:
-   - exp-table-card
-   - exp-table-header
-   - exp-table-title
-   - exp-btn-view-all
-   - exp-table-wrapper
-   - exp-table
-   - exp-table th / td
-   - category badge
-   - payment method
-   - status
-   - table actions
-========================================== */
+/* =========================================================
+   LOADING / ERROR
+   Safe styles if these classes exist in JSX
+========================================================= */
 
+.exp-loading,
+.exp-error {
+  width: 100%;
+  padding: 24px;
 
-/* ==========================================
-   LARGE TABLET / SMALL DESKTOP
-========================================== */
+  box-sizing: border-box;
+
+  text-align: center;
+  border-radius: 10px;
+}
+
+.exp-loading {
+  color: #64748b;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.exp-error {
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+/* =========================================================
+   PAGINATION
+   Safe styles if pagination exists in JSX
+========================================================= */
+
+.exp-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px 0;
+
+  box-sizing: border-box;
+}
+
+.exp-pagination-info {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.exp-pagination-info strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.exp-pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+
+  min-width: 0;
+}
+
+.exp-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.exp-pagination-btn,
+.exp-pagination-page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+
+  background: #ffffff;
+  color: #475569;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.exp-pagination-btn:hover:not(:disabled),
+.exp-pagination-page:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.exp-pagination-page.active {
+  border-color: #007a3d;
+  background: #007a3d;
+  color: #ffffff;
+}
+
+.exp-pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   LARGE DESKTOP
+   1201px+
+========================================================= */
+
+@media (min-width: 1201px) {
+  .exp-page-container {
+    padding: 24px 30px;
+  }
+}
+
+/* =========================================================
+   LAPTOP / SMALL DESKTOP
+   1025px - 1200px
+========================================================= */
 
 @media (max-width: 1200px) {
-    .exp-page-container {
-        padding: 20px 24px;
-    }
+  .exp-page-container {
+    padding: 22px 24px;
+  }
 
-    .exp-stats-grid {
-        gap: 16px;
-    }
+  .exp-stats-grid {
+    gap: 16px;
+  }
 
-    .exp-stat-card {
-        padding: 18px;
-    }
+  .exp-stat-card {
+    padding: 18px;
+  }
 
-    .exp-stat-value {
-        font-size: 22px;
-    }
+  .exp-stat-value {
+    font-size: 22px;
+  }
 
-    .exp-action-row-1,
-    .exp-action-row-2 {
-        gap: 14px;
-    }
+  .exp-action-row-1,
+  .exp-action-row-2 {
+    gap: 14px;
+  }
 }
 
-
-/* ==========================================
+/* =========================================================
    TABLET
-========================================== */
+   769px - 1024px
+========================================================= */
 
 @media (max-width: 1024px) {
-    .exp-page-container {
-        padding: 20px;
-    }
+  .exp-page-container {
+    padding: 20px;
+  }
 
-    /* Stats */
+  /* Header */
 
-    .exp-stats-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .exp-header-bar {
+    margin-bottom: 18px;
+  }
 
-    .exp-stat-card:last-child {
-        grid-column: span 2;
-    }
+  /* Stats */
 
-    /* Actions */
+  .exp-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
 
-    .exp-action-row-1 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .exp-stat-card:last-child {
+    grid-column: span 2;
+  }
 
-    .exp-action-row-2 {
-        width: 100%;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  /* Actions */
+
+  .exp-action-row-1 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .exp-action-row-2 {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-
-/* ==========================================
+/* =========================================================
    MOBILE
-========================================== */
+   481px - 768px
+========================================================= */
 
 @media (max-width: 768px) {
-    .exp-page-container {
-        padding: 16px;
-    }
+  .exp-page-container {
+    padding: 16px;
+  }
 
-    /* Title */
+  /* Header */
 
-    .exp-title-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 16px;
-        margin-bottom: 20px;
-    }
+  .exp-header-bar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
 
-    .exp-page-title {
-        font-size: 22px;
-    }
+  .exp-header-left {
+    font-size: 14px;
+  }
 
-    .exp-page-subtitle {
-        font-size: 13px;
-    }
+  /* Title */
 
-    .exp-btn-add-owners {
-        width: 100%;
-    }
+  .exp-title-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
 
-    /* Stats */
+    margin-bottom: 20px;
+  }
 
-    .exp-stats-grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
-    }
+  .exp-page-title {
+    font-size: 22px;
+  }
 
-    .exp-stat-card:last-child {
-        grid-column: auto;
-    }
+  .exp-page-subtitle {
+    font-size: 13px;
+  }
 
-    .exp-stat-card {
-        padding: 18px;
-    }
+  .exp-btn-add-owners {
+    width: 100%;
+  }
 
-    .exp-stat-value {
-        font-size: 22px;
-    }
+  /* Stats */
 
-    /* Actions */
+  .exp-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
 
-    .exp-actions-container {
-        gap: 12px;
-        margin-bottom: 22px;
-    }
+  .exp-stat-card:last-child {
+    grid-column: auto;
+  }
 
-    .exp-action-row-1,
-    .exp-action-row-2 {
-        width: 100%;
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
+  .exp-stat-card {
+    min-height: 110px;
+    padding: 18px;
+  }
 
-    .exp-btn-action {
-        height: 46px;
-        font-size: 13px;
-    }
+  .exp-stat-value {
+    font-size: 22px;
+  }
+
+  /* Actions */
+
+  .exp-actions-container {
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .exp-action-row-1,
+  .exp-action-row-2 {
+    width: 100%;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .exp-btn-action {
+    min-height: 46px;
+    font-size: 13px;
+  }
+
+  /* Pagination */
+
+  .exp-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .exp-pagination-info {
+    text-align: center;
+  }
+
+  .exp-pagination-controls {
+    justify-content: center;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
 }
 
-
-/* ==========================================
+/* =========================================================
    SMALL MOBILE
-========================================== */
+   361px - 480px
+========================================================= */
 
 @media (max-width: 480px) {
-    .exp-page-container {
-        padding: 12px;
-    }
+  .exp-page-container {
+    padding: 12px;
+  }
 
-    .exp-page-title {
-        font-size: 20px;
-    }
+  /* Header */
 
-    .exp-page-subtitle {
-        font-size: 12px;
-    }
+  .exp-header-left {
+    gap: 7px;
+    font-size: 13px;
+  }
 
-    .exp-stat-card {
-        padding: 16px;
-    }
+  /* Title */
 
-    .exp-stat-label {
-        font-size: 10px;
-    }
+  .exp-page-title {
+    font-size: 20px;
+  }
 
-    .exp-stat-value {
-        font-size: 20px;
-    }
+  .exp-page-subtitle {
+    font-size: 12px;
+  }
 
-    .exp-stat-sub {
-        font-size: 11px;
-    }
+  /* Owner Button */
 
-    .exp-icon-box {
-        width: 34px;
-        height: 34px;
-        flex-basis: 34px;
-    }
+  .exp-btn-add-owners {
+    min-height: 42px;
+    padding: 10px 16px;
 
-    .exp-btn-add-owners {
-        padding: 10px 16px;
-        font-size: 13px;
-    }
+    font-size: 13px;
+  }
 
-    .exp-btn-action {
-        height: 44px;
-        padding: 0 12px;
-        font-size: 12px;
-        gap: 8px;
-    }
+  /* Stats */
+
+  .exp-stat-card {
+    min-height: 100px;
+    padding: 16px;
+  }
+
+  .exp-stat-label {
+    font-size: 10px;
+  }
+
+  .exp-stat-value {
+    margin-top: 8px;
+    font-size: 20px;
+  }
+
+  .exp-stat-sub {
+    font-size: 11px;
+  }
+
+  .exp-icon-box {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  /* Action Buttons */
+
+  .exp-btn-action {
+    min-height: 44px;
+    padding: 0 12px;
+
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  /* Pagination */
+
+  .exp-pagination-controls {
+    justify-content: flex-start;
+  }
+
+  .exp-pagination-btn,
+  .exp-pagination-page {
+    min-width: 34px;
+    height: 34px;
+
+    font-size: 12px;
+  }
 }
 
-
-/* ==========================================
+/* =========================================================
    VERY SMALL DEVICES
-========================================== */
+   360px and below
+========================================================= */
 
 @media (max-width: 360px) {
-    .exp-page-container {
-        padding: 10px;
-    }
+  .exp-page-container {
+    padding: 10px;
+  }
 
-    .exp-stat-card {
-        padding: 14px;
-    }
+  .exp-header-left {
+    font-size: 12px;
+  }
 
-    .exp-stat-value {
-        font-size: 18px;
-    }
+  .exp-page-title {
+    font-size: 19px;
+  }
 
-    .exp-btn-action {
-        font-size: 11px;
-    }
+  .exp-page-subtitle {
+    font-size: 11px;
+  }
+
+  .exp-stat-card {
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .exp-stat-label {
+    font-size: 9px;
+  }
+
+  .exp-stat-value {
+    font-size: 18px;
+  }
+
+  .exp-stat-sub {
+    font-size: 10px;
+  }
+
+  .exp-icon-box {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+  }
+
+  .exp-btn-add-owners {
+    font-size: 12px;
+  }
+
+  .exp-btn-action {
+    min-height: 42px;
+    padding: 0 10px;
+
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .exp-pagination {
+    margin-top: 14px;
+  }
+}
+
+/* =========================================================
+   TOUCH DEVICES
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .exp-btn-add-owners,
+  .exp-btn-action,
+  .exp-pagination-btn,
+  .exp-pagination-page {
+    min-height: 44px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .exp-btn-add-owners,
+  .exp-btn-action,
+  .exp-pagination-btn,
+  .exp-pagination-page {
+    transition: none;
+  }
 }

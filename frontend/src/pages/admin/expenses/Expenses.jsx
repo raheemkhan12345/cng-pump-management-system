@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PlusCircle, Layers, TrendingDown, Calendar } from "lucide-react";
 
 import AddNewExpenses from "../../../components/adminDashboardForms/addNewExpenseForm/AddNewExpenses";
@@ -37,10 +37,12 @@ const Expenses = () => {
   const [editingExpense, setEditingExpense] = useState(null);
 
   // =========================================================
-  // NORMAL EXPENSE DATA
+  // ALL EXPENSE DATA
+  // Backend returns all expenses.
+  // Frontend handles pagination.
   // =========================================================
 
-  const [expenses, setExpenses] = useState([]);
+  const [allExpenses, setAllExpenses] = useState([]);
 
   // =========================================================
   // RECOVERY EXPENSE DATA
@@ -62,7 +64,17 @@ const Expenses = () => {
   const [deletingExpenseId, setDeletingExpenseId] = useState(null);
 
   // =========================================================
+  // FRONTEND PAGINATION
+  // =========================================================
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Number of records displayed per page
+  const pageSize = 5;
+
+  // =========================================================
   // GET ALL NORMAL EXPENSES
+  // FRONTEND PAGINATION
   // =========================================================
 
   const fetchExpenses = useCallback(async () => {
@@ -70,6 +82,8 @@ const Expenses = () => {
       setIsLoading(true);
       setError("");
 
+      // Backend does NOT support pagination.
+      // Therefore, get all expenses once.
       const response = await getExpenses();
 
       console.log("========================================");
@@ -77,6 +91,10 @@ const Expenses = () => {
       console.log("========================================");
 
       let expenseData = [];
+
+      // -------------------------------------------------------
+      // GET EXPENSE ARRAY SAFELY
+      // -------------------------------------------------------
 
       if (Array.isArray(response?.data)) {
         expenseData = response.data;
@@ -88,9 +106,30 @@ const Expenses = () => {
         expenseData = response;
       }
 
-      console.log("Final Expense Data:", expenseData);
+      console.log("ALL EXPENSE DATA:", expenseData);
+      console.log("TOTAL EXPENSES:", expenseData.length);
 
-      setExpenses(expenseData);
+      // -------------------------------------------------------
+      // SAVE COMPLETE EXPENSE LIST
+      // -------------------------------------------------------
+
+      setAllExpenses(expenseData);
+
+      // -------------------------------------------------------
+      // KEEP CURRENT PAGE VALID
+      // Example:
+      // Page 2 has only 1 record.
+      // If that record gets deleted, return to page 1.
+      // -------------------------------------------------------
+
+      const calculatedTotalPages = Math.max(
+        Math.ceil(expenseData.length / pageSize),
+        1,
+      );
+
+      setCurrentPage((previousPage) =>
+        Math.min(previousPage, calculatedTotalPages),
+      );
     } catch (error) {
       console.error("Failed to fetch expenses:", error);
 
@@ -101,7 +140,8 @@ const Expenses = () => {
         "Failed to load expenses.";
 
       setError(errorMessage);
-      setExpenses([]);
+      setAllExpenses([]);
+      setCurrentPage(1);
     } finally {
       setIsLoading(false);
     }
@@ -131,7 +171,7 @@ const Expenses = () => {
         recoveryData = response;
       }
 
-      console.log("Final Recovery Expense Data:", recoveryData);
+      console.log("FINAL RECOVERY EXPENSE DATA:", recoveryData);
 
       setRecoveryExpensesData(recoveryData);
     } catch (error) {
@@ -147,13 +187,43 @@ const Expenses = () => {
   }, []);
 
   // =========================================================
-  // LOAD EXPENSES ON PAGE LOAD
+  // LOAD DATA ON PAGE LOAD
   // =========================================================
 
   useEffect(() => {
     fetchExpenses();
+  }, [fetchExpenses]);
+
+  useEffect(() => {
     fetchRecoveryExpenses();
-  }, [fetchExpenses, fetchRecoveryExpenses]);
+  }, [fetchRecoveryExpenses]);
+
+  // =========================================================
+  // FRONTEND PAGINATION CALCULATIONS
+  // =========================================================
+
+  const totalExpenses = allExpenses.length;
+
+  const totalPages = Math.max(Math.ceil(totalExpenses / pageSize), 1);
+
+  // ---------------------------------------------------------
+  // GET ONLY CURRENT PAGE EXPENSES
+  //
+  // Page 1:
+  // start = 0
+  // end = 5
+  //
+  // Page 2:
+  // start = 5
+  // end = 10
+  // ---------------------------------------------------------
+
+  const expenses = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+
+    return allExpenses.slice(startIndex, endIndex);
+  }, [allExpenses, currentPage]);
 
   // =========================================================
   // GET NORMAL EXPENSE AMOUNT
@@ -186,10 +256,14 @@ const Expenses = () => {
 
     const dateString = String(dateValue);
 
+    // Example:
+    // 2026-09-29T00:00:00.000Z
     if (dateString.includes("T")) {
       return dateString.split("T")[0];
     }
 
+    // Example:
+    // 2026-09-29
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
       return dateString;
     }
@@ -219,10 +293,13 @@ const Expenses = () => {
   const currentMonthNumber = today.getMonth() + 1;
 
   // =========================================================
-  // TODAY'S NORMAL EXPENSES
+  // TODAY'S EXPENSES
+  //
+  // IMPORTANT:
+  // Use allExpenses, NOT current-page expenses.
   // =========================================================
 
-  const todayExpenses = expenses
+  const todayExpenses = allExpenses
     .filter((expense) => {
       return getDateOnly(getDate(expense)) === todayDate;
     })
@@ -231,10 +308,13 @@ const Expenses = () => {
     }, 0);
 
   // =========================================================
-  // CURRENT MONTH NORMAL EXPENSES
+  // CURRENT MONTH EXPENSES
+  //
+  // IMPORTANT:
+  // Use allExpenses, NOT current-page expenses.
   // =========================================================
 
-  const monthExpenses = expenses
+  const monthExpenses = allExpenses
     .filter((expense) => {
       const expenseDate = getDateOnly(getDate(expense));
 
@@ -252,9 +332,6 @@ const Expenses = () => {
 
   // =========================================================
   // RECOVERY EXPENSE TOTAL
-  // =========================================================
-  // This amount now comes from:
-  // GET /recoveryExpense/get
   // =========================================================
 
   const recoveryExpenses = recoveryExpensesData.reduce((total, recovery) => {
@@ -287,6 +364,28 @@ const Expenses = () => {
   };
 
   // =========================================================
+  // PAGINATION HANDLERS
+  // =========================================================
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((previousPage) => previousPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((previousPage) => previousPage + 1);
+    }
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages && page !== currentPage) {
+      setCurrentPage(page);
+    }
+  };
+
+  // =========================================================
   // ADD EXPENSE
   // =========================================================
 
@@ -302,12 +401,13 @@ const Expenses = () => {
   const handleExpenseSuccess = async (expenseResponse) => {
     console.log("========================================");
     console.log("EXPENSE OPERATION SUCCESSFUL");
-    console.log("Expense Response:", expenseResponse);
+    console.log("EXPENSE RESPONSE:", expenseResponse);
     console.log("========================================");
 
     setIsModalOpen(false);
     setEditingExpense(null);
 
+    // Refresh complete expense list
     await fetchExpenses();
   };
 
@@ -318,7 +418,7 @@ const Expenses = () => {
   const handleEdit = (expense) => {
     console.log("========================================");
     console.log("EDIT EXPENSE");
-    console.log("Expense:", expense);
+    console.log("EXPENSE:", expense);
     console.log("========================================");
 
     setEditingExpense(expense);
@@ -353,25 +453,26 @@ const Expenses = () => {
 
       console.log("========================================");
       console.log("DELETE EXPENSE");
-      console.log("Expense ID:", expenseId);
-      console.log("Delete URL:", `/expense/${expenseId}`);
+      console.log("EXPENSE ID:", expenseId);
+      console.log("DELETE URL:", `/expense/${expenseId}`);
       console.log("========================================");
 
       const response = await deleteExpense(expenseId);
 
       console.log("========================================");
       console.log("EXPENSE DELETED SUCCESSFULLY");
-      console.log("Delete Response:", response);
+      console.log("DELETE RESPONSE:", response);
       console.log("========================================");
 
+      // Refresh all expenses
       await fetchExpenses();
     } catch (error) {
       console.error("========================================");
       console.error("FAILED TO DELETE EXPENSE");
-      console.error("Delete Error:", error);
-      console.error("Status:", error?.response?.status);
-      console.error("Server Response:", error?.response?.data);
-      console.error("Response Message:", error?.response?.data?.message);
+      console.error("DELETE ERROR:", error);
+      console.error("STATUS:", error?.response?.status);
+      console.error("SERVER RESPONSE:", error?.response?.data);
+      console.error("RESPONSE MESSAGE:", error?.response?.data?.message);
       console.error("========================================");
 
       const errorMessage =
@@ -394,15 +495,15 @@ const Expenses = () => {
     try {
       console.log("========================================");
       console.log("CREATE RECOVERY EXPENSE");
-      console.log("Recovery Form Data:", data);
+      console.log("RECOVERY FORM DATA:", data);
       console.log("========================================");
 
       const recoveryExpenseData = {
-        date: data.date,
-        category: data.category,
-        recoveryAmount: Number(data.recoveryAmount),
-        remarks: data.remarks,
-        paymentMode: data.paymentMode,
+        date: data?.date,
+        category: data?.category,
+        recoveryAmount: Number(data?.recoveryAmount),
+        remarks: data?.remarks,
+        paymentMode: data?.paymentMode,
       };
 
       console.log(
@@ -414,20 +515,19 @@ const Expenses = () => {
 
       console.log("========================================");
       console.log("RECOVERY EXPENSE CREATED SUCCESSFULLY");
-      console.log("Recovery Response:", response);
+      console.log("RECOVERY RESPONSE:", response);
       console.log("========================================");
 
       setIsRecoveryModalOpen(false);
 
-      // Refresh both normal expenses and recovery expenses
       await Promise.all([fetchExpenses(), fetchRecoveryExpenses()]);
     } catch (error) {
       console.error("========================================");
       console.error("FAILED TO CREATE RECOVERY EXPENSE");
-      console.error("Error:", error);
-      console.error("Status:", error?.response?.status);
+      console.error("ERROR:", error);
+      console.error("STATUS:", error?.response?.status);
       console.error(
-        "Server Response:",
+        "SERVER RESPONSE:",
         JSON.stringify(error?.response?.data, null, 2),
       );
       console.error("========================================");
@@ -459,14 +559,14 @@ const Expenses = () => {
     try {
       console.log("========================================");
       console.log("CREATE DIESEL EXPENSE");
-      console.log("Diesel Form Data:", data);
+      console.log("DIESEL FORM DATA:", data);
       console.log("========================================");
 
       const dieselExpenseData = {
-        date: data.date,
-        dieselQuantity: Number(data.dieselQuantity),
-        amount: Number(data.amount),
-        remarks: data.remarks,
+        date: data?.date,
+        dieselQuantity: Number(data?.dieselQuantity),
+        amount: Number(data?.amount),
+        remarks: data?.remarks,
       };
 
       console.log(
@@ -478,21 +578,20 @@ const Expenses = () => {
 
       console.log("========================================");
       console.log("DIESEL EXPENSE CREATED SUCCESSFULLY");
-      console.log("Diesel Response:", response);
+      console.log("DIESEL RESPONSE:", response);
       console.log("========================================");
 
-      // Close Diesel modal
       setIsDieselModalOpen(false);
 
-      // Refresh normal expenses
+      // Refresh complete expense list
       await fetchExpenses();
     } catch (error) {
       console.error("========================================");
       console.error("FAILED TO CREATE DIESEL EXPENSE");
-      console.error("Error:", error);
-      console.error("Status:", error?.response?.status);
+      console.error("ERROR:", error);
+      console.error("STATUS:", error?.response?.status);
       console.error(
-        "Server Response:",
+        "SERVER RESPONSE:",
         JSON.stringify(error?.response?.data, null, 2),
       );
       console.error("========================================");
@@ -577,7 +676,7 @@ const Expenses = () => {
         ==================================================== */}
 
         <div className="exp-stats-grid">
-          {/* Today's Expenses */}
+          {/* TODAY'S EXPENSES */}
 
           <div className="exp-stat-card">
             <div className="exp-stat-info">
@@ -599,7 +698,7 @@ const Expenses = () => {
             </div>
           </div>
 
-          {/* This Month's Expenses */}
+          {/* THIS MONTH'S EXPENSES */}
 
           <div className="exp-stat-card">
             <div className="exp-stat-info">
@@ -621,7 +720,7 @@ const Expenses = () => {
             </div>
           </div>
 
-          {/* Recovery Expenses */}
+          {/* RECOVERY EXPENSES */}
 
           <div className="exp-stat-card">
             <div className="exp-stat-info">
@@ -643,7 +742,7 @@ const Expenses = () => {
         ==================================================== */}
 
         <div className="exp-actions-container">
-          {/* Row 1 */}
+          {/* ROW 1 */}
 
           <div className="exp-action-row-1">
             <button
@@ -673,7 +772,7 @@ const Expenses = () => {
             </button>
           </div>
 
-          {/* Row 2 */}
+          {/* ROW 2 */}
 
           <div className="exp-action-row-2">
             <button
@@ -708,6 +807,65 @@ const Expenses = () => {
           onDelete={handleDelete}
           deletingExpenseId={deletingExpenseId}
         />
+
+        {/* ===================================================
+            PAGINATION
+        ==================================================== */}
+
+        {totalExpenses > 0 && (
+          <div className="exp-pagination">
+            <div className="exp-pagination-info">
+              Showing <strong>{expenses.length}</strong> of{" "}
+              <strong>{totalExpenses}</strong> expenses
+            </div>
+
+            <div className="exp-pagination-controls">
+              {/* PREVIOUS */}
+
+              <button
+                type="button"
+                className="exp-pagination-btn"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+
+              {/* PAGE NUMBERS */}
+
+              <div className="exp-pagination-pages">
+                {Array.from(
+                  {
+                    length: totalPages,
+                  },
+                  (_, index) => index + 1,
+                ).map((page) => (
+                  <button
+                    type="button"
+                    key={page}
+                    className={`exp-pagination-page ${
+                      currentPage === page ? "active" : ""
+                    }`}
+                    onClick={() => handlePageChange(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              {/* NEXT */}
+
+              <button
+                type="button"
+                className="exp-pagination-btn"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* =====================================================
@@ -748,7 +906,9 @@ const Expenses = () => {
       <RecordOwnerExpenseModal
         isOpen={isOwnerExpenseModalOpen}
         onClose={() => setIsOwnerExpenseModalOpen(false)}
-        onSubmit={(data) => console.log("Owner Expense Data:", data)}
+        onSubmit={(data) => {
+          console.log("Owner Expense Data:", data);
+        }}
       />
 
       {/* =====================================================
@@ -758,7 +918,9 @@ const Expenses = () => {
       <AddNewOwnerModal
         isOpen={isAddOwnerModalOpen}
         onClose={() => setIsAddOwnerModalOpen(false)}
-        onSubmit={(data) => console.log("New Owner Data:", data)}
+        onSubmit={(data) => {
+          console.log("New Owner Data:", data);
+        }}
       />
     </div>
   );
