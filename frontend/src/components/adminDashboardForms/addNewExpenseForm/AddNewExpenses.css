@@ -1,315 +1,572 @@
+/* =========================================================
+   MODAL OVERLAY
+========================================================= */
+
 .ane-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 12px;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 1000;
+
+  padding: 16px;
+
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
+/* =========================================================
+   MODAL CONTAINER
+========================================================= */
+
 .ane-modal-container {
-    background: #ffffff;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 480px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    animation: aneModalAppear 0.2s ease-out;
+  width: 100%;
+  max-width: 480px;
+
+  max-height: calc(100vh - 32px);
+
+  background: #ffffff;
+  border-radius: 12px;
+
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  animation: aneModalAppear 0.2s ease-out;
+
+  box-sizing: border-box;
 }
 
 @keyframes aneModalAppear {
-    from {
-        opacity: 0;
-        transform: scale(0.96);
-    }
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
 
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-/* Header */
+/* =========================================================
+   HEADER
+========================================================= */
 
 .ane-modal-header {
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #f1f5f9;
+  padding: 14px 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  border-bottom: 1px solid #f1f5f9;
+
+  flex-shrink: 0;
 }
 
 .ane-header-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
 }
 
 .ane-header-icon-box {
-    background-color: #fef2f2;
-    color: #ef4444;
-    padding: 6px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 32px;
+  height: 32px;
+
+  flex: 0 0 32px;
+
+  background-color: #fef2f2;
+  color: #ef4444;
+
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ane-header-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .ane-modal-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0;
+  font-size: 15px;
+  line-height: 1.3;
+
+  font-weight: 700;
+  color: #0f172a;
+
+  margin: 0;
+
+  overflow-wrap: anywhere;
 }
 
 .ane-modal-subtitle {
-    font-size: 11px;
-    color: #64748b;
-    margin: 1px 0 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+
+  color: #64748b;
+
+  margin: 2px 0 0;
+
+  overflow-wrap: anywhere;
 }
 
 .ane-close-btn {
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 6px;
-    transition: all 0.2s;
+  width: 30px;
+  height: 30px;
+
+  flex: 0 0 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: none;
+
+  color: #94a3b8;
+
+  cursor: pointer;
+
+  padding: 4px;
+  border-radius: 6px;
+
+  transition: all 0.2s ease;
 }
 
 .ane-close-btn:hover {
-    color: #0f172a;
-    background-color: #f1f5f9;
+  color: #0f172a;
+  background-color: #f1f5f9;
 }
 
-/* Body */
+.ane-close-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   MODAL BODY
+========================================================= */
 
 .ane-modal-body {
-    padding: 16px 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  padding: 16px 18px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+
+  overflow-y: auto;
+
+  min-height: 0;
+
+  box-sizing: border-box;
 }
+
+/* =========================================================
+   FORM ROW
+========================================================= */
 
 .ane-form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+  display: grid;
+
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+
+  gap: 12px;
 }
 
+/* =========================================================
+   FORM GROUP
+========================================================= */
+
 .ane-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
 }
 
 .ane-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #334155;
+  font-size: 12px;
+  line-height: 1.4;
+
+  font-weight: 600;
+
+  color: #334155;
+
+  overflow-wrap: anywhere;
 }
 
+/* =========================================================
+   INPUT / SELECT / TEXTAREA
+========================================================= */
+
 .ane-input-icon-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+
+  width: 100%;
+
+  display: flex;
+  align-items: center;
 }
 
 .ane-input-icon {
-    position: absolute;
-    right: 10px;
-    color: #64748b;
-    pointer-events: none;
+  position: absolute;
+
+  right: 10px;
+
+  color: #64748b;
+
+  pointer-events: none;
+
+  flex-shrink: 0;
 }
 
 .ane-input,
 .ane-select,
 .ane-textarea {
-    width: 100%;
-    padding: 7px 10px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 12px;
-    color: #0f172a;
-    outline: none;
-    background-color: #f8fafc;
-    transition: border-color 0.2s;
-    box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+
+  padding: 8px 10px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+
+  font-family: inherit;
+
+  font-size: 12px;
+  line-height: 1.4;
+
+  color: #0f172a;
+
+  outline: none;
+
+  background-color: #f8fafc;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  box-sizing: border-box;
+}
+
+.ane-input {
+  min-height: 34px;
+}
+
+.ane-select {
+  min-height: 34px;
+
+  cursor: pointer;
+
+  appearance: auto;
 }
 
 .ane-input:focus,
 .ane-select:focus,
 .ane-textarea:focus {
-    border-color: #055a36;
-    background-color: #ffffff;
+  border-color: #055a36;
+
+  background-color: #ffffff;
+
+  box-shadow: 0 0 0 2px rgba(5, 90, 54, 0.08);
 }
 
-.ane-amount-wrapper {
-    display: flex;
-    align-items: center;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    background-color: #f8fafc;
-    overflow: hidden;
+.ane-input:disabled,
+.ane-select:disabled,
+.ane-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.ane-currency-prefix {
-    padding-left: 10px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #64748b;
-}
-
-.ane-input-amount {
-    border: none !important;
-    background: transparent !important;
-    padding-left: 6px;
+.ane-input::placeholder,
+.ane-textarea::placeholder {
+  color: #94a3b8;
 }
 
 /* =========================================================
-   ADD NEW CATEGORY
+   AMOUNT
+========================================================= */
+
+.ane-amount-wrapper {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+
+  background-color: #f8fafc;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+.ane-currency-prefix {
+  flex: 0 0 auto;
+
+  padding-left: 10px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  color: #64748b;
+
+  white-space: nowrap;
+}
+
+.ane-input-amount {
+  flex: 1;
+  min-width: 0;
+
+  border: none !important;
+
+  background: transparent !important;
+
+  padding-left: 6px;
+
+  box-shadow: none !important;
+}
+
+/* =========================================================
+   ADD NEW CATEGORY BUTTON
 ========================================================= */
 
 .ane-add-category-btn {
-    width: fit-content;
-    margin-top: 2px;
-    padding: 5px 8px;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    border: none;
-    background: transparent;
-    color: #055a36;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: all 0.2s ease;
+  width: fit-content;
+  max-width: 100%;
+
+  margin-top: 2px;
+
+  padding: 5px 8px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #055a36;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  border-radius: 5px;
+
+  transition: all 0.2s ease;
+
+  box-sizing: border-box;
 }
 
 .ane-add-category-btn:hover:not(:disabled) {
-    background-color: #f0fdf4;
+  background-color: #f0fdf4;
 }
 
 .ane-add-category-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-/* New Category Box */
+/* =========================================================
+   NEW CATEGORY BOX
+========================================================= */
 
 .ane-new-category-box {
-    margin-top: 3px;
-    padding: 9px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    background-color: #f8fafc;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    animation: aneCategoryAppear 0.15s ease-out;
+  width: 100%;
+
+  margin-top: 3px;
+
+  padding: 9px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  background-color: #f8fafc;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  box-sizing: border-box;
+
+  animation: aneCategoryAppear 0.15s ease-out;
 }
 
 @keyframes aneCategoryAppear {
-    from {
-        opacity: 0;
-        transform: translateY(-3px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .ane-new-category-input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+
+  width: 100%;
+
+  display: flex;
+  align-items: center;
 }
 
 .ane-new-category-icon {
-    position: absolute;
-    left: 9px;
-    color: #64748b;
-    pointer-events: none;
+  position: absolute;
+
+  left: 9px;
+
+  color: #64748b;
+
+  pointer-events: none;
+
+  flex-shrink: 0;
 }
 
 .ane-new-category-input {
-    width: 100%;
-    padding: 7px 10px 7px 30px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    background-color: #ffffff;
-    color: #0f172a;
-    font-size: 12px;
-    outline: none;
-    box-sizing: border-box;
-    transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  max-width: 100%;
+
+  min-height: 34px;
+
+  padding: 7px 10px 7px 30px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+
+  background-color: #ffffff;
+
+  color: #0f172a;
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+  outline: none;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .ane-new-category-input:focus {
-    border-color: #055a36;
-    box-shadow: 0 0 0 2px rgba(5, 90, 54, 0.08);
+  border-color: #055a36;
+
+  box-shadow: 0 0 0 2px rgba(5, 90, 54, 0.08);
 }
 
 .ane-new-category-input::placeholder {
-    color: #94a3b8;
+  color: #94a3b8;
 }
 
-/* New Category Buttons */
+/* =========================================================
+   NEW CATEGORY ACTIONS
+========================================================= */
 
 .ane-new-category-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 6px;
+  width: 100%;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  gap: 6px;
+
+  flex-wrap: wrap;
 }
 
 .ane-category-cancel-btn,
 .ane-category-add-btn {
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    transition: all 0.2s ease;
+  min-height: 30px;
+
+  border-radius: 6px;
+
+  padding: 6px 10px;
+
+  font-family: inherit;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+
+  transition: all 0.2s ease;
+
+  box-sizing: border-box;
 }
 
 .ane-category-cancel-btn {
-    border: 1px solid #cbd5e1;
-    background-color: #ffffff;
-    color: #475569;
+  border: 1px solid #cbd5e1;
+
+  background-color: #ffffff;
+
+  color: #475569;
 }
 
 .ane-category-cancel-btn:hover:not(:disabled) {
-    background-color: #f1f5f9;
+  background-color: #f1f5f9;
 }
 
 .ane-category-add-btn {
-    border: none;
-    background-color: #055a36;
-    color: #ffffff;
+  border: none;
+
+  background-color: #055a36;
+
+  color: #ffffff;
 }
 
 .ane-category-add-btn:hover:not(:disabled) {
-    background-color: #04472b;
+  background-color: #04472b;
 }
 
 .ane-category-cancel-btn:disabled,
 .ane-category-add-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+
+  cursor: not-allowed;
 }
 
 /* =========================================================
@@ -317,110 +574,200 @@
 ========================================================= */
 
 .ane-payment-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+
+  gap: 10px;
 }
 
 .ane-payment-card {
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    padding: 8px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    background-color: #ffffff;
-    transition: all 0.2s;
+  min-width: 0;
+
+  border: 1px solid #cbd5e1;
+
+  border-radius: 8px;
+
+  padding: 9px 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  cursor: pointer;
+
+  background-color: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  box-sizing: border-box;
+}
+
+.ane-payment-card:hover {
+  border-color: #94a3b8;
 }
 
 .ane-payment-card.ane-active {
-    border-color: #10b981;
-    background-color: #f0fdf4;
+  border-color: #10b981;
+
+  background-color: #f0fdf4;
+
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.05);
 }
 
 .ane-card-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
 }
 
 .ane-card-icon {
-    color: #475569;
+  flex: 0 0 auto;
+
+  color: #475569;
 }
 
 .ane-active .ane-card-icon {
-    color: #059669;
+  color: #059669;
 }
 
 .ane-card-title {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    color: #0f172a;
+  display: block;
+
+  font-size: 12px;
+  line-height: 1.3;
+
+  font-weight: 700;
+
+  color: #0f172a;
+
+  overflow-wrap: anywhere;
 }
 
 .ane-card-sub {
-    display: block;
-    font-size: 10px;
-    color: #64748b;
+  display: block;
+
+  font-size: 10px;
+  line-height: 1.3;
+
+  color: #64748b;
+
+  overflow-wrap: anywhere;
 }
 
 .ane-check-badge {
-    width: 16px;
-    height: 16px;
-    background-color: #10b981;
-    color: #ffffff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
+  width: 16px;
+  height: 16px;
+
+  flex: 0 0 16px;
+
+  background-color: #10b981;
+
+  color: #ffffff;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 10px;
 }
+
+/* =========================================================
+   TEXTAREA
+========================================================= */
 
 .ane-textarea {
-    resize: vertical;
-    min-height: 55px;
+  resize: vertical;
+
+  min-height: 70px;
+
+  max-height: 180px;
 }
 
-/* Footer */
+/* =========================================================
+   FOOTER
+========================================================= */
 
 .ane-modal-footer {
-    padding: 12px 18px;
-    background-color: #f8fafc;
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    border-top: 1px solid #f1f5f9;
+  padding: 12px 18px;
+
+  background-color: #f8fafc;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  border-top: 1px solid #f1f5f9;
+
+  flex-shrink: 0;
+
+  box-sizing: border-box;
+}
+
+.ane-btn-cancel,
+.ane-btn-submit {
+  min-height: 32px;
+
+  padding: 7px 14px;
+
+  border-radius: 6px;
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  box-sizing: border-box;
+
+  white-space: nowrap;
+
+  transition: all 0.2s ease;
 }
 
 .ane-btn-cancel {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    color: #334155;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 12px;
-    cursor: pointer;
+  background: #ffffff;
+
+  border: 1px solid #cbd5e1;
+
+  color: #334155;
+}
+
+.ane-btn-cancel:hover:not(:disabled) {
+  background-color: #f1f5f9;
 }
 
 .ane-btn-submit {
-    background-color: #0f172a;
-    color: #ffffff;
-    border: none;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
+  background-color: #0f172a;
+
+  color: #ffffff;
+
+  border: none;
 }
 
-.ane-btn-submit:hover {
-    background-color: #1e293b;
+.ane-btn-submit:hover:not(:disabled) {
+  background-color: #1e293b;
 }
 
 /* =========================================================
@@ -429,36 +776,322 @@
 
 .ane-btn-submit:disabled,
 .ane-btn-cancel:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+
+  cursor: not-allowed;
 }
 
 /* =========================================================
-   RESPONSIVE
+   TABLET
+   769px - 1024px
+========================================================= */
+
+@media (max-width: 1024px) {
+  .ane-modal-overlay {
+    padding: 14px;
+  }
+
+  .ane-modal-container {
+    max-width: 500px;
+    max-height: calc(100vh - 28px);
+  }
+}
+
+/* =========================================================
+   MOBILE
+   521px - 768px
+========================================================= */
+
+@media (max-width: 768px) {
+  .ane-modal-overlay {
+    padding: 12px;
+  }
+
+  .ane-modal-container {
+    max-width: 100%;
+
+    max-height: calc(100vh - 24px);
+
+    border-radius: 10px;
+  }
+
+  .ane-modal-header {
+    padding: 13px 15px;
+  }
+
+  .ane-modal-body {
+    padding: 14px 15px;
+
+    gap: 11px;
+  }
+
+  .ane-modal-footer {
+    padding: 11px 15px;
+  }
+
+  .ane-form-row {
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   420px and below
 ========================================================= */
 
 @media (max-width: 520px) {
-    .ane-modal-overlay {
-        padding: 8px;
-    }
+  .ane-modal-overlay {
+    padding: 8px;
+  }
 
-    .ane-modal-container {
-        max-width: 100%;
-    }
+  .ane-modal-container {
+    width: 100%;
 
-    .ane-form-row {
-        grid-template-columns: 1fr;
-    }
+    max-width: 100%;
 
-    .ane-payment-grid {
-        grid-template-columns: 1fr;
-    }
+    max-height: calc(100vh - 16px);
 
-    .ane-modal-body {
-        padding: 14px;
-    }
+    border-radius: 9px;
+  }
 
-    .ane-modal-footer {
-        padding: 10px 14px;
-    }
+  .ane-modal-header {
+    padding: 11px 12px;
+
+    gap: 8px;
+  }
+
+  .ane-header-info {
+    gap: 8px;
+  }
+
+  .ane-header-icon-box {
+    width: 30px;
+    height: 30px;
+
+    flex-basis: 30px;
+  }
+
+  .ane-header-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .ane-modal-title {
+    font-size: 14px;
+  }
+
+  .ane-modal-subtitle {
+    font-size: 10px;
+  }
+
+  .ane-close-btn {
+    width: 28px;
+    height: 28px;
+
+    flex-basis: 28px;
+  }
+
+  .ane-modal-body {
+    padding: 12px;
+
+    gap: 10px;
+  }
+
+  .ane-form-row {
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+  }
+
+  .ane-payment-grid {
+    grid-template-columns: 1fr;
+
+    gap: 8px;
+  }
+
+  .ane-payment-card {
+    padding: 9px;
+  }
+
+  .ane-card-title {
+    font-size: 11px;
+  }
+
+  .ane-card-sub {
+    font-size: 9px;
+  }
+
+  .ane-label {
+    font-size: 11px;
+  }
+
+  .ane-input,
+  .ane-select,
+  .ane-textarea,
+  .ane-new-category-input {
+    font-size: 12px;
+  }
+
+  .ane-new-category-actions {
+    justify-content: stretch;
+  }
+
+  .ane-category-cancel-btn,
+  .ane-category-add-btn {
+    flex: 1;
+  }
+
+  .ane-modal-footer {
+    padding: 10px 12px;
+
+    gap: 7px;
+  }
+
+  .ane-btn-cancel,
+  .ane-btn-submit {
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 7px 9px;
+
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+   360px and below
+========================================================= */
+
+@media (max-width: 360px) {
+  .ane-modal-overlay {
+    padding: 5px;
+  }
+
+  .ane-modal-container {
+    max-height: calc(100vh - 10px);
+
+    border-radius: 8px;
+  }
+
+  .ane-modal-header {
+    padding: 10px;
+  }
+
+  .ane-modal-body {
+    padding: 10px;
+  }
+
+  .ane-modal-footer {
+    padding: 9px 10px;
+  }
+
+  .ane-header-icon-box {
+    display: none;
+  }
+
+  .ane-modal-title {
+    font-size: 13px;
+  }
+
+  .ane-modal-subtitle {
+    font-size: 9px;
+  }
+
+  .ane-input,
+  .ane-select {
+    min-height: 33px;
+
+    padding: 7px 8px;
+  }
+
+  .ane-payment-card {
+    padding: 8px;
+  }
+
+  .ane-card-left {
+    gap: 6px;
+  }
+
+  .ane-card-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .ane-btn-cancel,
+  .ane-btn-submit {
+    padding: 7px 6px;
+
+    font-size: 10px;
+  }
+}
+
+/* =========================================================
+   SHORT SCREEN / LANDSCAPE PHONE
+========================================================= */
+
+@media (max-height: 650px) {
+  .ane-modal-overlay {
+    align-items: flex-start;
+
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .ane-modal-container {
+    max-height: calc(100vh - 16px);
+  }
+
+  .ane-modal-header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .ane-modal-body {
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    gap: 8px;
+  }
+
+  .ane-modal-footer {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .ane-textarea {
+    min-height: 55px;
+  }
+}
+
+/* =========================================================
+   TOUCH DEVICES
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .ane-close-btn {
+    min-width: 32px;
+    min-height: 32px;
+  }
+
+  .ane-add-category-btn {
+    min-height: 32px;
+  }
+
+  .ane-payment-card {
+    min-height: 48px;
+  }
+
+  .ane-btn-cancel,
+  .ane-btn-submit {
+    min-height: 36px;
+  }
+
+  .ane-category-cancel-btn,
+  .ane-category-add-btn {
+    min-height: 34px;
+  }
 }

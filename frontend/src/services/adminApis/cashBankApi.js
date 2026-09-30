@@ -10,17 +10,40 @@ export const getCashBank = async () => {
   return response.data;
 };
 
+// =========================================================
 // CREATE CASH & BANK TRANSFER
+// =========================================================
 
 export const createCashBankTransfer = async (transferData) => {
-  const response = await axiosInstance.post("/cashBank/transfer", transferData);
+  const response = await axiosInstance.post(
+    "/cashBank/transfer",
+    transferData
+  );
+
   return response.data;
 };
 
-// DELETE CASH AND BANK TRANSFER DETAIL.
+// =========================================================
+// CREATE OPENING BALANCE
+// =========================================================
+
+export const createOpeningBalance = async (openingBalanceData) => {
+  const response = await axiosInstance.post(
+    "/cashBank/openingBalance",
+    openingBalanceData
+  );
+
+  return response.data;
+};
+
+// =========================================================
+// DELETE CASH AND BANK TRANSACTION DETAIL
+// =========================================================
 
 export const deleteCashBankTransaction = async (id) => {
-  const response = await axiosInstance.delete(`/cashBank/deleteTransaction/${id}`);
+  const response = await axiosInstance.delete(
+    `/cashBank/deleteTransaction/${id}`
+  );
 
   return response.data;
 };
