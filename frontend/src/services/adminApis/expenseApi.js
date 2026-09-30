@@ -111,6 +111,38 @@ export const createDieselExpense = async (dieselExpenseData) => {
   return response.data;
 };
 
+// =========================================================
+// GET ALL DIESEL EXPENSES
+// GET /dieselExpense/get
+// =========================================================
+
+export const getDieselExpenses = async () => {
+  const response = await axiosInstance.get(
+    "/dieselExpense/get"
+  );
+
+  return response.data;
+};
+
+// UPDATE DIESEL EXPENSE
+export const updateDieselExpense = async (id, data) => {
+  const response = await axiosInstance.put(
+    `/dieselExpense/${id}`,
+    data,
+  );
+
+  return response.data;
+};
+
+// DELETE DIESEL EXPENSE
+export const deleteDieselExpense = async (id) => {
+  const response = await axiosInstance.delete(
+    `/dieselExpense/${id}`,
+  );
+
+  return response.data;
+};
+
 
 // =========================================================
 // CREATE NEW OWNER

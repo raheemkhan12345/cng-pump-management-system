@@ -1,16 +1,65 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, CheckCircle2 } from "lucide-react";
 import "./AddDieselExpenseModal.css";
 
-const AddDieselExpenseModal = ({ isOpen, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    date: "",
-    dieselQuantity: "",
-    amount: "",
-    remarks: "",
-  });
+const initialFormData = {
+  date: "",
+  dieselQuantity: "",
+  amount: "",
+  remarks: "",
+};
 
-  if (!isOpen) return null;
+const AddDieselExpenseModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  editingExpense = null,
+}) => {
+  const [formData, setFormData] = useState(initialFormData);
+
+  // =========================================================
+  // CHECK EDIT MODE
+  // =========================================================
+
+  const isEditMode = Boolean(editingExpense);
+
+  // =========================================================
+  // LOAD EDITING DATA
+  // =========================================================
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    if (editingExpense) {
+      setFormData({
+        date: editingExpense?.date
+          ? String(editingExpense.date).substring(0, 10)
+          : "",
+
+        dieselQuantity:
+          editingExpense?.dieselQuantity ??
+          editingExpense?.quantity ??
+          editingExpense?.liters ??
+          "",
+
+        amount: editingExpense?.amount ?? "",
+
+        remarks:
+          editingExpense?.remarks ??
+          editingExpense?.details ??
+          editingExpense?.description ??
+          "",
+      });
+    } else {
+      setFormData(initialFormData);
+    }
+  }, [isOpen, editingExpense]);
+
+  // =========================================================
+  // HANDLE INPUT CHANGE
+  // =========================================================
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,50 +70,97 @@ const AddDieselExpenseModal = ({ isOpen, onClose, onSubmit }) => {
     }));
   };
 
+  // =========================================================
+  // HANDLE SUBMIT
+  // =========================================================
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!formData.date) return;
-    if (!formData.dieselQuantity) return;
-    if (!formData.amount) return;
+    // -------------------------------------------------------
+    // Basic validation
+    // -------------------------------------------------------
 
-    // Backend API exact payload
+    if (!formData.date) {
+      return;
+    }
+
+    if (!formData.dieselQuantity) {
+      return;
+    }
+
+    if (!formData.amount) {
+      return;
+    }
+
+    // -------------------------------------------------------
+    // Backend API payload
+    // -------------------------------------------------------
+
     const dieselExpenseData = {
       date: formData.date,
+
       dieselQuantity: Number(formData.dieselQuantity),
+
       amount: Number(formData.amount),
-      remarks: formData.remarks,
+
+      remarks: formData.remarks.trim(),
     };
 
     console.log("========================================");
-    console.log("Diesel Expense Payload:", dieselExpenseData);
+    console.log(
+      isEditMode
+        ? "Update Diesel Expense Payload:"
+        : "Create Diesel Expense Payload:",
+      dieselExpenseData,
+    );
+    console.log("Editing Expense:", editingExpense);
     console.log("========================================");
+
+    // -------------------------------------------------------
+    // Send data to parent
+    // -------------------------------------------------------
 
     if (onSubmit) {
       onSubmit(dieselExpenseData);
     }
-
-    onClose();
-
-    // Reset form after successful submit
-    setFormData({
-      date: "",
-      dieselQuantity: "",
-      amount: "",
-      remarks: "",
-    });
   };
+
+  // =========================================================
+  // HANDLE CLOSE
+  // =========================================================
+
+  const handleClose = () => {
+    setFormData(initialFormData);
+
+    if (onClose) {
+      onClose();
+    }
+  };
+
+  // =========================================================
+  // MODAL CLOSED
+  // =========================================================
+
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="dem-overlay">
       <div className="dem-modal-container">
-        {/* Header */}
+        {/* ===================================================
+            HEADER
+        ==================================================== */}
+
         <div className="dem-header">
-          <h2 className="dem-title">Add Diesel Expense</h2>
+          <h2 className="dem-title">
+            {isEditMode ? "Edit Diesel Expense" : "Add Diesel Expense"}
+          </h2>
 
           <button
             className="dem-close-btn"
-            onClick={onClose}
+            onClick={handleClose}
             type="button"
             aria-label="Close"
           >
@@ -72,9 +168,15 @@ const AddDieselExpenseModal = ({ isOpen, onClose, onSubmit }) => {
           </button>
         </div>
 
-        {/* Form Body */}
+        {/* ===================================================
+            FORM
+        ==================================================== */}
+
         <form onSubmit={handleSubmit} className="dem-form">
-          {/* Date */}
+          {/* =================================================
+              DATE
+          ================================================== */}
+
           <div className="dem-field">
             <label className="dem-label">Date</label>
 
@@ -88,9 +190,13 @@ const AddDieselExpenseModal = ({ isOpen, onClose, onSubmit }) => {
             />
           </div>
 
-          {/* Diesel Quantity & Amount */}
+          {/* =================================================
+              DIESEL QUANTITY & AMOUNT
+          ================================================== */}
+
           <div className="dem-grid-2">
             {/* Diesel Quantity */}
+
             <div className="dem-field">
               <label className="dem-label">Diesel Quantity (Liters)</label>
 
@@ -112,6 +218,7 @@ const AddDieselExpenseModal = ({ isOpen, onClose, onSubmit }) => {
             </div>
 
             {/* Amount */}
+
             <div className="dem-field">
               <label className="dem-label">Amount (PKR)</label>
 
@@ -133,7 +240,10 @@ const AddDieselExpenseModal = ({ isOpen, onClose, onSubmit }) => {
             </div>
           </div>
 
-          {/* Remarks */}
+          {/* =================================================
+              REMARKS
+          ================================================== */}
+
           <div className="dem-field">
             <label className="dem-label">Detail / Remarks</label>
 
@@ -147,15 +257,25 @@ const AddDieselExpenseModal = ({ isOpen, onClose, onSubmit }) => {
             />
           </div>
 
-          {/* Footer Actions */}
+          {/* =================================================
+              FOOTER ACTIONS
+          ================================================== */}
+
           <div className="dem-footer">
-            <button type="button" className="dem-btn-cancel" onClick={onClose}>
+            <button
+              type="button"
+              className="dem-btn-cancel"
+              onClick={handleClose}
+            >
               Cancel
             </button>
 
             <button type="submit" className="dem-btn-submit">
               <CheckCircle2 size={18} />
-              <span>Record Diesel Expense</span>
+
+              <span>
+                {isEditMode ? "Update Diesel Expense" : "Record Diesel Expense"}
+              </span>
             </button>
           </div>
         </form>
