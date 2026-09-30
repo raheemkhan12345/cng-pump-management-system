@@ -288,17 +288,7 @@ const Ledger = () => {
     return filteredTransactions.slice(startIndex, endIndex);
   }, [filteredTransactions, currentPage, pageSize]);
 
-  // =========================================================
-  // Date Change
-  // =========================================================
-  const handleDateChange = (e) => {
-    const selectedDate = e.target.value;
 
-    console.log("Date Selected:", selectedDate);
-
-    setFilterDate(selectedDate);
-    setCurrentPage(1);
-  };
 
   // =========================================================
   // Search Change
@@ -314,7 +304,6 @@ const Ledger = () => {
   // =========================================================
   const handleReset = () => {
     setSearchTerm("");
-    setFilterDate("");
     setCurrentPage(1);
   };
 
@@ -408,12 +397,7 @@ const Ledger = () => {
             </div>
           </div>
 
-          {/* Date */}
-          <div className="ledger-filter-group">
-            <label>Date</label>
-
-            <input type="date" value={filterDate} onChange={handleDateChange} />
-          </div>
+          
 
           {/* Reset */}
           <div className="ledger-filter-action">
