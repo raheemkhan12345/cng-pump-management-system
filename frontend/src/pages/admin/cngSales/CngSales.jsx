@@ -68,8 +68,6 @@ const CngSales = () => {
 
       const response = await getAllSales();
 
-      console.log("Get All Sales API Response:", response);
-
       // =====================================================
       // GET SALES ARRAY
       // =====================================================
@@ -88,8 +86,6 @@ const CngSales = () => {
         sales = response.data.data;
       }
 
-      console.log("Sales Array:", sales);
-
       // =====================================================
       // TODAY DATE
       // =====================================================
@@ -107,8 +103,6 @@ const CngSales = () => {
 
         return String(sale.date).slice(0, 10) === today;
       });
-
-      console.log("Today's Sales:", todaySales);
 
       // =====================================================
       // CALCULATE TODAY TOTAL AMOUNT
@@ -241,7 +235,6 @@ const CngSales = () => {
   // =========================================================
 
   const handleSaleAdded = async (response) => {
-    console.log("New Sale Added:", response);
 
     // =======================================================
     // FETCH LATEST REAL DATA

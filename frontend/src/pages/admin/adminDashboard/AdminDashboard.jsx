@@ -11,47 +11,35 @@ import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState({});
-
   const [recentTransactions, setRecentTransactions] = useState([]);
-
   const [isLoading, setIsLoading] = useState(true);
-
   const [error, setError] = useState("");
 
-  /**
-   * ==========================================
-   * GET DASHBOARD DATA
-   * ==========================================
-   */
+  // =========================================================
+  // CURRENT MONTH & YEAR
+  // =========================================================
+
+  const currentDate = new Date();
+
+  const currentMonthYear = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+  }).format(currentDate);
+
+  // =========================================================
+  // GET DASHBOARD DATA
+  // =========================================================
+
   const fetchDashboard = useCallback(async () => {
     try {
       setIsLoading(true);
       setError("");
 
-      console.log("========================================");
-      console.log("GET DASHBOARD");
-      console.log("GET DASHBOARD API REQUEST");
-      console.log("========================================");
-
       const response = await getDashboard();
 
-      console.log("========================================");
-      console.log("GET DASHBOARD API RESPONSE:");
-      console.log(response);
-      console.log("========================================");
-
-      /**
-       * ======================================
-       * EXTRACT DASHBOARD DATA
-       * ======================================
-       *
-       * Supports common response formats:
-       *
-       * response.data
-       * response.dashboard
-       * response.dashboardData
-       * response
-       */
+      // =====================================================
+      // EXTRACT DASHBOARD DATA
+      // =====================================================
 
       let dashboard = {};
 
@@ -79,11 +67,9 @@ const AdminDashboard = () => {
         dashboard = response;
       }
 
-      /**
-       * ======================================
-       * EXTRACT RECENT TRANSACTIONS
-       * ======================================
-       */
+      // =====================================================
+      // EXTRACT RECENT TRANSACTIONS
+      // =====================================================
 
       let transactions = [];
 
@@ -99,29 +85,9 @@ const AdminDashboard = () => {
         transactions = response.transactions;
       }
 
-      console.log("FINAL DASHBOARD DATA:", dashboard);
-
-      console.log("FINAL RECENT TRANSACTIONS:", transactions);
-
       setDashboardData(dashboard);
-
       setRecentTransactions(transactions);
     } catch (error) {
-      console.error("========================================");
-
-      console.error("FAILED TO GET DASHBOARD");
-
-      console.error("ERROR:", error);
-
-      console.error("STATUS:", error?.response?.status);
-
-      console.error(
-        "SERVER RESPONSE:",
-        JSON.stringify(error?.response?.data, null, 2),
-      );
-
-      console.error("========================================");
-
       const errorMessage =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
@@ -129,29 +95,25 @@ const AdminDashboard = () => {
         "Failed to load dashboard.";
 
       setError(errorMessage);
-
       setDashboardData({});
-
       setRecentTransactions([]);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  /**
-   * ==========================================
-   * FETCH DASHBOARD ON PAGE LOAD
-   * ==========================================
-   */
+  // =========================================================
+  // FETCH DASHBOARD ON PAGE LOAD
+  // =========================================================
+
   useEffect(() => {
     fetchDashboard();
   }, [fetchDashboard]);
 
-  /**
-   * ==========================================
-   * LOADING
-   * ==========================================
-   */
+  // =========================================================
+  // LOADING
+  // =========================================================
+
   if (isLoading) {
     return (
       <div className="admin-dashboard-wrapper">
@@ -160,11 +122,10 @@ const AdminDashboard = () => {
     );
   }
 
-  /**
-   * ==========================================
-   * ERROR
-   * ==========================================
-   */
+  // =========================================================
+  // ERROR
+  // =========================================================
+
   if (error) {
     return (
       <div className="admin-dashboard-wrapper">
@@ -179,22 +140,28 @@ const AdminDashboard = () => {
     );
   }
 
-  /**
-   * ==========================================
-   * DASHBOARD
-   * ==========================================
-   */
+  // =========================================================
+  // DASHBOARD
+  // =========================================================
+
   return (
     <div className="admin-dashboard-wrapper">
-      {/* Top Header Filter & Action Bar */}
+      {/* =====================================================
+          TOP HEADER FILTER & ACTION BAR
+      ====================================================== */}
+
       <div className="dashboard-action-bar">
+        {/* DYNAMIC DATE */}
+
         <div className="date-filter-pill">
           <Calendar size={15} />
 
-          <span>Viewing reports for August 2026</span>
+          <span>Viewing reports for {currentMonthYear}</span>
 
           <span className="dropdown-arrow-badge">▾</span>
         </div>
+
+        {/* SUPER DASHBOARD */}
 
         <button type="button" className="btn-super-admin">
           <div className="icon-circle">
@@ -205,10 +172,16 @@ const AdminDashboard = () => {
         </button>
       </div>
 
-      {/* Dashboard Stats */}
+      {/* =====================================================
+          DASHBOARD STATS
+      ====================================================== */}
+
       <DashboardStats dashboardData={dashboardData} />
 
-      {/* Recent Transactions */}
+      {/* =====================================================
+          RECENT TRANSACTIONS
+      ====================================================== */}
+
       <RecentTransactions transactions={recentTransactions} />
     </div>
   );

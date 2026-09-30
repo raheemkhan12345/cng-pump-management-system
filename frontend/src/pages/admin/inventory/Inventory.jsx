@@ -34,8 +34,6 @@ const Inventory = () => {
 
       const response = await getAllInventory();
 
-      console.log("Inventory API Response:", response);
-
       const items =
         response?.data || response?.inventory || response?.items || [];
 
@@ -112,11 +110,10 @@ const Inventory = () => {
         remarks: formData.remarks?.trim() || "N/A",
       };
 
-      console.log("Create Inventory Payload:", payload);
 
       const response = await createInventory(payload);
 
-      console.log("Create Inventory Response:", response);
+      window.alert("Inventory item added successfully.", response);
 
       await fetchInventory();
 
@@ -161,9 +158,6 @@ const Inventory = () => {
         remarks: formData.remarks?.trim() || "N/A",
       };
 
-      console.log("ID:", selectedItem.id);
-      console.log("Payload:", updatedItem);
-
       await updateInventory(selectedItem.id, updatedItem);
 
       await fetchInventory();
@@ -192,11 +186,9 @@ const Inventory = () => {
     try {
       setIsSubmitting(true);
 
-      console.log("Delete Inventory ID:", id);
-
       const response = await deleteInventory(id);
 
-      console.log("Delete Inventory Response:", response);
+      window.alert("Inventory item deleted successfully.", response);
 
       // Backend se fresh inventory data lao
       await fetchInventory();

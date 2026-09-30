@@ -55,19 +55,13 @@ const CashBank = () => {
 
       const response = await getCashBank();
 
-      console.log("Cash Bank API Response:", response);
-
       const apiData = response?.data ?? response ?? {};
-
-      console.log("Cash Bank API Data:", apiData);
 
       // =====================================================
       // BALANCES
       // =====================================================
 
       const balanceData = apiData?.balance ?? {};
-
-      console.log("Cash Bank Balance:", balanceData);
 
       const totalCash =
         Number(
@@ -107,8 +101,6 @@ const CashBank = () => {
       } else if (Array.isArray(response?.data?.transactions)) {
         transactionData = response.data.transactions;
       }
-
-      console.log("Cash Bank Transactions:", transactionData);
 
       // =====================================================
       // NORMALIZE TRANSACTIONS
@@ -208,10 +200,6 @@ const CashBank = () => {
       });
 
       setTransactions(formattedTransactions);
-
-      console.log("Final Cash Balance:", totalCash);
-      console.log("Final Bank Balance:", totalBank);
-      console.log("Final Cash & Bank Transactions:", formattedTransactions);
     } catch (error) {
       console.error("Failed to fetch Cash & Bank data:", error);
 
@@ -237,8 +225,6 @@ const CashBank = () => {
     try {
       setIsSubmitting(true);
       setError("");
-
-      console.log("Cash Bank Transfer Payload:", formData);
 
       const response = await createCashBankTransfer(formData);
 
@@ -278,18 +264,6 @@ const CashBank = () => {
     try {
       setIsSubmitting(true);
       setError("");
-
-      console.log("Opening Balance Payload:", formData);
-
-      /*
-       * Opening Balance API will be connected here.
-       *
-       * Example:
-       *
-       * const response = await createOpeningBalance(formData);
-       *
-       * console.log("Opening Balance Response:", response);
-       */
 
       // Refresh Cash & Bank data
       await fetchCashBankData();
@@ -398,10 +372,7 @@ const CashBank = () => {
     try {
       setError("");
 
-      console.log("Deleting Cash & Bank transaction:", transactionId);
-
       const response = await deleteCashBankTransaction(transactionId);
-
       console.log("Delete Cash & Bank Response:", response);
 
       setTransactions((currentTransactions) =>

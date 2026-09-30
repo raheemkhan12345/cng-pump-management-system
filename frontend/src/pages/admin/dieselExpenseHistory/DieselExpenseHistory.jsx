@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   TrendingUp,
   Fuel,
@@ -126,7 +126,6 @@ const DieselExpenseHistory = () => {
   // =========================================================
 
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
 
   // =========================================================
@@ -164,11 +163,6 @@ const DieselExpenseHistory = () => {
 
       const response = await getDieselExpenses();
 
-      console.log("========================================");
-      console.log("GET DIESEL EXPENSE API RESPONSE:");
-      console.log(response);
-      console.log("========================================");
-
       let expenses = [];
 
       // -------------------------------------------------------
@@ -192,9 +186,6 @@ const DieselExpenseHistory = () => {
       } else if (Array.isArray(response?.data?.expenses)) {
         expenses = response.data.expenses;
       }
-
-      console.log("FINAL DIESEL EXPENSE DATA:", expenses);
-      console.log("TOTAL DIESEL EXPENSES:", expenses.length);
 
       setDieselExpenses(expenses);
 
@@ -231,18 +222,6 @@ const DieselExpenseHistory = () => {
         setSelectedMonth("");
       }
     } catch (err) {
-      console.error("========================================");
-      console.error("FAILED TO GET DIESEL EXPENSES");
-      console.error("ERROR:", err);
-      console.error("STATUS:", err?.response?.status);
-
-      console.error(
-        "SERVER RESPONSE:",
-        JSON.stringify(err?.response?.data, null, 2),
-      );
-
-      console.error("========================================");
-
       setError(
         err?.response?.data?.message ||
           err?.response?.data?.error ||
@@ -269,23 +248,21 @@ const DieselExpenseHistory = () => {
   // =========================================================
 
   const normalizedExpenses = useMemo(() => {
-    return dieselExpenses.map((item, index) => {
+    return dieselExpenses.map((item) => {
+      const realId =
+        item?._id ||
+        item?.id ||
+        item?.expenseId ||
+        item?.dieselExpenseId ||
+        item?.dieselExpense?._id ||
+        item?.dieselExpense?.id ||
+        null;
+
       return {
-        // -----------------------------------------------------
-        // ID
-        // -----------------------------------------------------
+        // REAL BACKEND ID
+        id: realId,
 
-        id:
-          item?.id ||
-          item?._id ||
-          item?.expenseId ||
-          item?.dieselExpenseId ||
-          index + 1,
-
-        // -----------------------------------------------------
         // DATE
-        // -----------------------------------------------------
-
         date:
           item?.date ||
           item?.expenseDate ||
@@ -293,10 +270,7 @@ const DieselExpenseHistory = () => {
           item?.createdAt ||
           "",
 
-        // -----------------------------------------------------
         // QUANTITY
-        // -----------------------------------------------------
-
         quantity:
           item?.quantity ??
           item?.liters ??
@@ -307,10 +281,7 @@ const DieselExpenseHistory = () => {
           item?.dieselQuantity ??
           0,
 
-        // -----------------------------------------------------
         // AMOUNT
-        // -----------------------------------------------------
-
         amount:
           item?.amount ??
           item?.totalAmount ??
@@ -319,10 +290,7 @@ const DieselExpenseHistory = () => {
           item?.total ??
           0,
 
-        // -----------------------------------------------------
         // DETAILS
-        // -----------------------------------------------------
-
         details:
           item?.details ||
           item?.remarks ||
@@ -332,10 +300,7 @@ const DieselExpenseHistory = () => {
           item?.detail ||
           "-",
 
-        // -----------------------------------------------------
-        // ORIGINAL DATA
-        // -----------------------------------------------------
-
+        // ORIGINAL API DATA
         originalData: item,
       };
     });
@@ -350,7 +315,6 @@ const DieselExpenseHistory = () => {
 
     normalizedExpenses.forEach((item) => {
       const month = getMonthYear(item.date);
-
       const key = getMonthKey(item.date);
 
       if (month && key) {
@@ -367,7 +331,6 @@ const DieselExpenseHistory = () => {
       }
     });
 
-    // Latest month first
     months.sort((a, b) => b.key.localeCompare(a.key));
 
     return months;
@@ -420,20 +383,6 @@ const DieselExpenseHistory = () => {
   // =========================================================
   // DAILY DIESEL RECORD
   // =========================================================
-  //
-  // Gets the latest date from the currently selected month.
-  //
-  // Example:
-  //
-  // 28-09-2026 = 500 L / Rs. 150,000
-  // 27-09-2026 = 400 L / Rs. 120,000
-  //
-  // DAILY DIESEL SALE will show:
-  //
-  // Rs. 150,000
-  // 500 Liters
-  //
-  // =========================================================
 
   const dailyDieselRecord = useMemo(() => {
     if (filteredExpenses.length === 0) {
@@ -479,10 +428,7 @@ const DieselExpenseHistory = () => {
   // =========================================================
 
   const handleAddDieselExpense = () => {
-    console.log("Opening Add Diesel Expense Modal");
-
     setSelectedDieselExpense(null);
-
     setIsDieselModalOpen(true);
   };
 
@@ -491,13 +437,10 @@ const DieselExpenseHistory = () => {
   // =========================================================
 
   const handleEdit = (item) => {
-    console.log("========================================");
-    console.log("EDIT DIESEL EXPENSE");
-    console.log("SELECTED ITEM:", item);
-    console.log("========================================");
-
     const editingData = {
       ...item.originalData,
+
+      _id: item.originalData?._id || item.originalData?.id || item.id,
 
       id: item.id,
 
@@ -507,13 +450,18 @@ const DieselExpenseHistory = () => {
 
       amount: item.amount,
 
-      remarks: item.details,
+      remarks: item.details === "-" ? "" : item.details,
     };
 
-    console.log("EDITING DIESEL DATA:", editingData);
+    if (!item.id) {
+      window.alert(
+        "Diesel expense ID is missing. This record cannot be edited.",
+      );
+
+      return;
+    }
 
     setSelectedDieselExpense(editingData);
-
     setIsDieselModalOpen(true);
   };
 
@@ -522,8 +470,11 @@ const DieselExpenseHistory = () => {
   // =========================================================
 
   const handleCloseDieselModal = () => {
-    setIsDieselModalOpen(false);
+    if (isSubmitting) {
+      return;
+    }
 
+    setIsDieselModalOpen(false);
     setSelectedDieselExpense(null);
   };
 
@@ -535,35 +486,48 @@ const DieselExpenseHistory = () => {
     try {
       setIsSubmitting(true);
 
-      console.log("========================================");
-      console.log("DIESEL EXPENSE SUBMIT");
-      console.log("MODE:", selectedDieselExpense ? "UPDATE" : "CREATE");
-      console.log("FORM DATA:", data);
-      console.log("========================================");
+      // =====================================================
+      // VALIDATE FORM DATA
+      // =====================================================
+
+      if (!data?.date) {
+        window.alert("Please select a date.");
+        return;
+      }
+
+      if (
+        data?.dieselQuantity === undefined ||
+        data?.dieselQuantity === null ||
+        data?.dieselQuantity === ""
+      ) {
+        window.alert("Please enter diesel quantity.");
+        return;
+      }
+
+      if (
+        data?.amount === undefined ||
+        data?.amount === null ||
+        data?.amount === ""
+      ) {
+        window.alert("Please enter diesel amount.");
+        return;
+      }
 
       // =====================================================
       // API PAYLOAD
       // =====================================================
 
       const dieselExpenseData = {
-        date: data?.date,
-
-        dieselQuantity: Number(data?.dieselQuantity),
-
-        amount: Number(data?.amount),
-
+        date: data.date,
+        dieselQuantity: Number(data.dieselQuantity),
+        amount: Number(data.amount),
         remarks: data?.remarks?.trim() || "",
       };
-
-      console.log(
-        "FINAL DIESEL API PAYLOAD:",
-        JSON.stringify(dieselExpenseData, null, 2),
-      );
 
       let response;
 
       // =====================================================
-      // UPDATE
+      // UPDATE EXISTING DIESEL EXPENSE
       // =====================================================
 
       if (selectedDieselExpense) {
@@ -574,38 +538,28 @@ const DieselExpenseHistory = () => {
           selectedDieselExpense?.dieselExpenseId;
 
         if (!dieselExpenseId) {
-          window.alert("Diesel expense ID is missing. Cannot update.");
+          window.alert(
+            "Diesel expense ID is missing. Cannot update this record.",
+          );
 
           return;
         }
-
-        console.log("UPDATE DIESEL EXPENSE ID:", dieselExpenseId);
-
-        console.log("UPDATE URL:", `/dieselExpense/${dieselExpenseId}`);
 
         response = await updateDieselExpense(
           dieselExpenseId,
           dieselExpenseData,
         );
 
-        console.log("========================================");
-        console.log("DIESEL EXPENSE UPDATED SUCCESSFULLY");
-        console.log("UPDATE RESPONSE:", response);
-        console.log("========================================");
+        window.alert("Diesel expense updated successfully.");
       }
 
       // =====================================================
-      // CREATE
+      // CREATE NEW DIESEL EXPENSE
       // =====================================================
       else {
-        console.log("CREATING NEW DIESEL EXPENSE");
-
         response = await createDieselExpense(dieselExpenseData);
 
-        console.log("========================================");
-        console.log("DIESEL EXPENSE CREATED SUCCESSFULLY");
-        console.log("CREATE RESPONSE:", response);
-        console.log("========================================");
+        window.alert("Diesel expense created successfully.");
       }
 
       // =====================================================
@@ -613,7 +567,6 @@ const DieselExpenseHistory = () => {
       // =====================================================
 
       setIsDieselModalOpen(false);
-
       setSelectedDieselExpense(null);
 
       // =====================================================
@@ -622,18 +575,6 @@ const DieselExpenseHistory = () => {
 
       await fetchDieselExpenses();
     } catch (err) {
-      console.error("========================================");
-      console.error("FAILED TO CREATE / UPDATE DIESEL EXPENSE");
-      console.error("ERROR:", err);
-      console.error("STATUS:", err?.response?.status);
-
-      console.error(
-        "SERVER RESPONSE:",
-        JSON.stringify(err?.response?.data, null, 2),
-      );
-
-      console.error("========================================");
-
       const errorMessage =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
@@ -651,14 +592,18 @@ const DieselExpenseHistory = () => {
   // =========================================================
 
   const handleDelete = async (id) => {
+    // =======================================================
+    // VALIDATE ID
+    // =======================================================
+
     if (!id) {
-      window.alert("Diesel expense ID is missing. Cannot delete.");
+      window.alert("Diesel expense ID is missing. Cannot delete this record.");
 
       return;
     }
 
     // =======================================================
-    // CONFIRM
+    // CONFIRM DELETE
     // =======================================================
 
     const confirmed = window.confirm(
@@ -672,37 +617,20 @@ const DieselExpenseHistory = () => {
     try {
       setDeletingId(id);
 
-      console.log("========================================");
-      console.log("DELETE DIESEL EXPENSE");
-      console.log("DIESEL EXPENSE ID:", id);
-      console.log("DELETE URL:", `/dieselExpense/${id}`);
-      console.log("========================================");
+      // =====================================================
+      // DELETE API
+      // =====================================================
 
-      const response = await deleteDieselExpense(id);
+      await deleteDieselExpense(id);
 
-      console.log("========================================");
-      console.log("DIESEL EXPENSE DELETED SUCCESSFULLY");
-      console.log("DELETE RESPONSE:", response);
-      console.log("========================================");
+      window.alert("Diesel expense deleted successfully.");
 
       // =====================================================
-      // REFRESH LIST
+      // REFRESH DATA
       // =====================================================
 
       await fetchDieselExpenses();
     } catch (err) {
-      console.error("========================================");
-      console.error("FAILED TO DELETE DIESEL EXPENSE");
-      console.error("ERROR:", err);
-      console.error("STATUS:", err?.response?.status);
-
-      console.error(
-        "SERVER RESPONSE:",
-        JSON.stringify(err?.response?.data, null, 2),
-      );
-
-      console.error("========================================");
-
       const errorMessage =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
@@ -732,9 +660,7 @@ const DieselExpenseHistory = () => {
       ==================================================== */}
 
       <div className="metrics-grid">
-        {/* =================================================
-            DAILY DIESEL SALE
-        ================================================== */}
+        {/* DAILY DIESEL SALE */}
 
         <div className="metric-card">
           <div className="metric-header">
@@ -756,9 +682,7 @@ const DieselExpenseHistory = () => {
           <div className="metric-bg-shape"></div>
         </div>
 
-        {/* =================================================
-            TOTAL LITERS
-        ================================================== */}
+        {/* TOTAL LITERS */}
 
         <div className="metric-card">
           <div className="metric-header">
@@ -774,9 +698,7 @@ const DieselExpenseHistory = () => {
           <div className="metric-bg-shape"></div>
         </div>
 
-        {/* =================================================
-            TOTAL EXPENSE
-        ================================================== */}
+        {/* TOTAL EXPENSE */}
 
         <div className="metric-card">
           <div className="metric-header">
@@ -794,7 +716,7 @@ const DieselExpenseHistory = () => {
       </div>
 
       {/* ===================================================
-          ADD DIESEL BUTTON
+          FILTER + ADD BUTTON
       ==================================================== */}
 
       <div
@@ -807,9 +729,7 @@ const DieselExpenseHistory = () => {
           flexWrap: "wrap",
         }}
       >
-        {/* =================================================
-            MONTH SELECT
-        ================================================== */}
+        {/* MONTH SELECT */}
 
         <div className="date-picker-btn">
           <Calendar size={18} className="calendar-icon" />
@@ -832,9 +752,7 @@ const DieselExpenseHistory = () => {
           </select>
         </div>
 
-        {/* =================================================
-            ADD BUTTON
-        ================================================== */}
+        {/* ADD BUTTON */}
 
         <button
           type="button"
@@ -851,9 +769,7 @@ const DieselExpenseHistory = () => {
       ==================================================== */}
 
       <div className="table-card">
-        {/* =================================================
-            TABLE HEADER
-        ================================================== */}
+        {/* TABLE HEADER */}
 
         <div className="table-header-row">
           <div className="title-with-pill">
@@ -879,9 +795,7 @@ const DieselExpenseHistory = () => {
           </div>
         </div>
 
-        {/* =================================================
-            ERROR
-        ================================================== */}
+        {/* ERROR */}
 
         {error && (
           <div
@@ -897,30 +811,22 @@ const DieselExpenseHistory = () => {
           </div>
         )}
 
-        {/* =================================================
-            TABLE
-        ================================================== */}
+        {/* TABLE */}
 
         <div className="table-responsive">
           <table className="diesel-table">
             <thead>
               <tr>
                 <th>DATE</th>
-
                 <th>QUANTITY(L)</th>
-
                 <th>AMOUNT(PKR)</th>
-
                 <th>DETAIL / REMARKS</th>
-
                 <th className="text-right">ACTIONS</th>
               </tr>
             </thead>
 
             <tbody>
-              {/* =================================================
-                  LOADING
-              ================================================== */}
+              {/* LOADING */}
 
               {loading ? (
                 <tr>
@@ -935,9 +841,7 @@ const DieselExpenseHistory = () => {
                   </td>
                 </tr>
               ) : filteredExpenses.length === 0 ? (
-                /* =================================================
-                    EMPTY
-                ================================================== */
+                /* EMPTY */
 
                 <tr>
                   <td
@@ -951,12 +855,10 @@ const DieselExpenseHistory = () => {
                   </td>
                 </tr>
               ) : (
-                /* =================================================
-                    RECORDS
-                ================================================== */
+                /* RECORDS */
 
                 filteredExpenses.map((row) => (
-                  <tr key={row.id}>
+                  <tr key={row.id || `${row.date}-${row.amount}`}>
                     {/* DATE */}
 
                     <td>
@@ -993,7 +895,9 @@ const DieselExpenseHistory = () => {
                         className="icon-btn"
                         title="Edit"
                         onClick={() => handleEdit(row)}
-                        disabled={isSubmitting || deletingId === row.id}
+                        disabled={
+                          !row.id || isSubmitting || deletingId === row.id
+                        }
                       >
                         <Edit2 size={16} />
                       </button>
@@ -1005,7 +909,9 @@ const DieselExpenseHistory = () => {
                         className="icon-btn"
                         title="Delete"
                         onClick={() => handleDelete(row.id)}
-                        disabled={deletingId === row.id}
+                        disabled={
+                          !row.id || deletingId === row.id || isSubmitting
+                        }
                       >
                         <Trash2 size={16} />
                       </button>
@@ -1017,9 +923,7 @@ const DieselExpenseHistory = () => {
           </table>
         </div>
 
-        {/* =================================================
-            FOOTER
-        ================================================== */}
+        {/* FOOTER */}
 
         <div className="table-footer">
           <span>

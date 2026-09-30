@@ -15,8 +15,6 @@ import {
   createRecoveryExpense,
   getRecoveryExpenses,
   createDieselExpense,
-  updateDieselExpense,
-  deleteDieselExpense,
   createOwner,
   getOwners,
   createOwnerExpense,
@@ -30,13 +28,9 @@ const Expenses = () => {
   // =========================================================
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
-
   const [isDieselModalOpen, setIsDieselModalOpen] = useState(false);
-
   const [isOwnerExpenseModalOpen, setIsOwnerExpenseModalOpen] = useState(false);
-
   const [isAddOwnerModalOpen, setIsAddOwnerModalOpen] = useState(false);
 
   // =========================================================
@@ -44,12 +38,6 @@ const Expenses = () => {
   // =========================================================
 
   const [editingExpense, setEditingExpense] = useState(null);
-
-  // =========================================================
-  // EDIT DIESEL EXPENSE
-  // =========================================================
-
-  const [selectedDieselExpense, setSelectedDieselExpense] = useState(null);
 
   // =========================================================
   // ALL NORMAL EXPENSE DATA
@@ -74,7 +62,6 @@ const Expenses = () => {
   // =========================================================
 
   const [isLoading, setIsLoading] = useState(true);
-
   const [error, setError] = useState("");
 
   // =========================================================
@@ -84,19 +71,13 @@ const Expenses = () => {
   const [deletingExpenseId, setDeletingExpenseId] = useState(null);
 
   // =========================================================
-  // DIESEL DELETE STATE
-  // =========================================================
-
-  const [deletingDieselExpenseId, setDeletingDieselExpenseId] = useState(null);
-
-  // =========================================================
   // DIESEL SUBMITTING STATE
   // =========================================================
 
   const [isDieselSubmitting, setIsDieselSubmitting] = useState(false);
 
   // =========================================================
-  // OWNER EXPENSE LOADING STATE
+  // OWNER EXPENSE SUBMITTING STATE
   // =========================================================
 
   const [isOwnerExpenseSubmitting, setIsOwnerExpenseSubmitting] =
@@ -121,10 +102,6 @@ const Expenses = () => {
 
       const response = await getExpenses();
 
-      console.log("========================================");
-      console.log("GET EXPENSE API RESPONSE:", response);
-      console.log("========================================");
-
       let expenseData = [];
 
       if (Array.isArray(response?.data)) {
@@ -137,9 +114,6 @@ const Expenses = () => {
         expenseData = response;
       }
 
-      console.log("ALL EXPENSE DATA:", expenseData);
-      console.log("TOTAL EXPENSES:", expenseData.length);
-
       setAllExpenses(expenseData);
 
       const calculatedTotalPages = Math.max(
@@ -151,8 +125,6 @@ const Expenses = () => {
         Math.min(previousPage, calculatedTotalPages),
       );
     } catch (error) {
-      console.error("Failed to fetch expenses:", error);
-
       const errorMessage =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
@@ -175,10 +147,6 @@ const Expenses = () => {
     try {
       const response = await getRecoveryExpenses();
 
-      console.log("========================================");
-      console.log("GET RECOVERY EXPENSE API RESPONSE:", response);
-      console.log("========================================");
-
       let recoveryData = [];
 
       if (Array.isArray(response?.data)) {
@@ -191,16 +159,15 @@ const Expenses = () => {
         recoveryData = response;
       }
 
-      console.log("FINAL RECOVERY EXPENSE DATA:", recoveryData);
-
       setRecoveryExpensesData(recoveryData);
     } catch (error) {
-      console.error("Failed to fetch recovery expenses:", error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to load recovery expenses.";
 
-      console.error(
-        "Recovery API Response:",
-        JSON.stringify(error?.response?.data, null, 2),
-      );
+      window.alert(errorMessage);
 
       setRecoveryExpensesData([]);
     }
@@ -213,16 +180,7 @@ const Expenses = () => {
 
   const fetchOwners = useCallback(async () => {
     try {
-      console.log("========================================");
-      console.log("GET OWNERS");
-      console.log("GET OWNER API REQUEST");
-      console.log("========================================");
-
       const response = await getOwners();
-
-      console.log("========================================");
-      console.log("GET OWNER API RESPONSE:", response);
-      console.log("========================================");
 
       let ownerData = [];
 
@@ -242,20 +200,15 @@ const Expenses = () => {
         ownerData = response;
       }
 
-      console.log("FINAL OWNER DATA:", ownerData);
-      console.log("TOTAL OWNERS:", ownerData.length);
-
       setOwners(ownerData);
     } catch (error) {
-      console.error("========================================");
-      console.error("FAILED TO GET OWNERS");
-      console.error("ERROR:", error);
-      console.error("STATUS:", error?.response?.status);
-      console.error(
-        "SERVER RESPONSE:",
-        JSON.stringify(error?.response?.data, null, 2),
-      );
-      console.error("========================================");
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to load owners.";
+
+      window.alert(errorMessage);
 
       setOwners([]);
     }
@@ -357,7 +310,6 @@ const Expenses = () => {
   ].join("-");
 
   const currentYear = today.getFullYear();
-
   const currentMonthNumber = today.getMonth() + 1;
 
   // =========================================================
@@ -460,12 +412,7 @@ const Expenses = () => {
   // NORMAL EXPENSE SUCCESS
   // =========================================================
 
-  const handleExpenseSuccess = async (expenseResponse) => {
-    console.log("========================================");
-    console.log("EXPENSE OPERATION SUCCESSFUL");
-    console.log("EXPENSE RESPONSE:", expenseResponse);
-    console.log("========================================");
-
+  const handleExpenseSuccess = async () => {
     setIsModalOpen(false);
     setEditingExpense(null);
 
@@ -477,11 +424,6 @@ const Expenses = () => {
   // =========================================================
 
   const handleEdit = (expense) => {
-    console.log("========================================");
-    console.log("EDIT EXPENSE");
-    console.log("EXPENSE:", expense);
-    console.log("========================================");
-
     setEditingExpense(expense);
     setIsModalOpen(true);
   };
@@ -494,8 +436,6 @@ const Expenses = () => {
     const expenseId = expense?._id || expense?.id || expense?.expenseId;
 
     if (!expenseId) {
-      console.error("Delete Expense Error: Expense ID is missing.", expense);
-
       window.alert("Expense ID is missing. Cannot delete this expense.");
 
       return;
@@ -512,29 +452,12 @@ const Expenses = () => {
     try {
       setDeletingExpenseId(expenseId);
 
-      console.log("========================================");
-      console.log("DELETE EXPENSE");
-      console.log("EXPENSE ID:", expenseId);
-      console.log("DELETE URL:", `/expense/${expenseId}`);
-      console.log("========================================");
+      await deleteExpense(expenseId);
 
-      const response = await deleteExpense(expenseId);
-
-      console.log("========================================");
-      console.log("EXPENSE DELETED SUCCESSFULLY");
-      console.log("DELETE RESPONSE:", response);
-      console.log("========================================");
+      window.alert("Expense deleted successfully.");
 
       await fetchExpenses();
     } catch (error) {
-      console.error("========================================");
-      console.error("FAILED TO DELETE EXPENSE");
-      console.error("DELETE ERROR:", error);
-      console.error("STATUS:", error?.response?.status);
-      console.error("SERVER RESPONSE:", error?.response?.data);
-      console.error("RESPONSE MESSAGE:", error?.response?.data?.message);
-      console.error("========================================");
-
       const errorMessage =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
@@ -553,11 +476,6 @@ const Expenses = () => {
 
   const handleRecoveryExpense = async (data) => {
     try {
-      console.log("========================================");
-      console.log("CREATE RECOVERY EXPENSE");
-      console.log("RECOVERY FORM DATA:", data);
-      console.log("========================================");
-
       const recoveryExpenseData = {
         date: data?.date,
         category: data?.category,
@@ -566,32 +484,14 @@ const Expenses = () => {
         paymentMode: data?.paymentMode,
       };
 
-      console.log(
-        "RECOVERY API REQUEST:",
-        JSON.stringify(recoveryExpenseData, null, 2),
-      );
+      await createRecoveryExpense(recoveryExpenseData);
 
-      const response = await createRecoveryExpense(recoveryExpenseData);
-
-      console.log("========================================");
-      console.log("RECOVERY EXPENSE CREATED SUCCESSFULLY");
-      console.log("RECOVERY RESPONSE:", response);
-      console.log("========================================");
+      window.alert("Recovery expense created successfully.");
 
       setIsRecoveryModalOpen(false);
 
       await Promise.all([fetchExpenses(), fetchRecoveryExpenses()]);
     } catch (error) {
-      console.error("========================================");
-      console.error("FAILED TO CREATE RECOVERY EXPENSE");
-      console.error("ERROR:", error);
-      console.error("STATUS:", error?.response?.status);
-      console.error(
-        "SERVER RESPONSE:",
-        JSON.stringify(error?.response?.data, null, 2),
-      );
-      console.error("========================================");
-
       const errorMessage =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
@@ -616,7 +516,6 @@ const Expenses = () => {
   // =========================================================
 
   const handleAddDieselExpense = () => {
-    setSelectedDieselExpense(null);
     setIsDieselModalOpen(true);
   };
 
@@ -626,22 +525,16 @@ const Expenses = () => {
 
   const handleCloseDieselModal = () => {
     setIsDieselModalOpen(false);
-    setSelectedDieselExpense(null);
   };
 
   // =========================================================
-  // CREATE / UPDATE DIESEL EXPENSE
+  // CREATE DIESEL EXPENSE
+  // UPDATE / DELETE IS HANDLED IN DieselExpenseHistory
   // =========================================================
 
   const handleDieselExpense = async (data) => {
     try {
       setIsDieselSubmitting(true);
-
-      console.log("========================================");
-      console.log("DIESEL EXPENSE OPERATION");
-      console.log("MODE:", selectedDieselExpense ? "UPDATE" : "CREATE");
-      console.log("DIESEL FORM DATA:", data);
-      console.log("========================================");
 
       const dieselExpenseData = {
         date: data?.date,
@@ -650,157 +543,23 @@ const Expenses = () => {
         remarks: data?.remarks || "",
       };
 
-      console.log(
-        "DIESEL API REQUEST:",
-        JSON.stringify(dieselExpenseData, null, 2),
-      );
+      await createDieselExpense(dieselExpenseData);
 
-      let response;
-
-      // =====================================================
-      // UPDATE
-      // =====================================================
-
-      if (selectedDieselExpense) {
-        const dieselExpenseId =
-          selectedDieselExpense?._id ||
-          selectedDieselExpense?.id ||
-          selectedDieselExpense?.dieselExpenseId;
-
-        if (!dieselExpenseId) {
-          window.alert("Diesel expense ID is missing. Cannot update.");
-
-          return;
-        }
-
-        console.log("DIESEL UPDATE ID:", dieselExpenseId);
-
-        response = await updateDieselExpense(
-          dieselExpenseId,
-          dieselExpenseData,
-        );
-
-        console.log("DIESEL EXPENSE UPDATED SUCCESSFULLY:", response);
-      }
-
-      // =====================================================
-      // CREATE
-      // =====================================================
-      else {
-        response = await createDieselExpense(dieselExpenseData);
-
-        console.log("DIESEL EXPENSE CREATED SUCCESSFULLY:", response);
-      }
-
-      // =====================================================
-      // CLOSE MODAL
-      // =====================================================
+      window.alert("Diesel expense created successfully.");
 
       setIsDieselModalOpen(false);
-      setSelectedDieselExpense(null);
-
-      // =====================================================
-      // REFRESH NORMAL EXPENSE DATA
-      // =====================================================
 
       await fetchExpenses();
     } catch (error) {
-      console.error("========================================");
-      console.error("FAILED TO CREATE / UPDATE DIESEL EXPENSE");
-      console.error("ERROR:", error);
-      console.error("STATUS:", error?.response?.status);
-      console.error(
-        "SERVER RESPONSE:",
-        JSON.stringify(error?.response?.data, null, 2),
-      );
-      console.error("========================================");
-
       const errorMessage =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
         error?.message ||
-        "Failed to save diesel expense.";
+        "Failed to create diesel expense.";
 
       window.alert(errorMessage);
     } finally {
       setIsDieselSubmitting(false);
-    }
-  };
-
-  // =========================================================
-  // EDIT DIESEL EXPENSE
-  // =========================================================
-
-  const handleEditDieselExpense = (expense) => {
-    console.log("========================================");
-    console.log("EDIT DIESEL EXPENSE");
-    console.log("DIESEL EXPENSE:", expense);
-    console.log("========================================");
-
-    setSelectedDieselExpense(expense);
-    setIsDieselModalOpen(true);
-  };
-
-  // =========================================================
-  // DELETE DIESEL EXPENSE
-  // =========================================================
-
-  const handleDeleteDieselExpense = async (expense) => {
-    const dieselExpenseId =
-      expense?._id || expense?.id || expense?.dieselExpenseId;
-
-    if (!dieselExpenseId) {
-      console.error("Delete Diesel Expense Error: ID missing.", expense);
-
-      window.alert("Diesel expense ID is missing. Cannot delete this expense.");
-
-      return;
-    }
-
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this diesel expense?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      setDeletingDieselExpenseId(dieselExpenseId);
-
-      console.log("========================================");
-      console.log("DELETE DIESEL EXPENSE");
-      console.log("DIESEL EXPENSE ID:", dieselExpenseId);
-      console.log("========================================");
-
-      const response = await deleteDieselExpense(dieselExpenseId);
-
-      console.log("========================================");
-      console.log("DIESEL EXPENSE DELETED SUCCESSFULLY");
-      console.log("DELETE RESPONSE:", response);
-      console.log("========================================");
-
-      await fetchExpenses();
-    } catch (error) {
-      console.error("========================================");
-      console.error("FAILED TO DELETE DIESEL EXPENSE");
-      console.error("ERROR:", error);
-      console.error("STATUS:", error?.response?.status);
-      console.error(
-        "SERVER RESPONSE:",
-        JSON.stringify(error?.response?.data, null, 2),
-      );
-      console.error("========================================");
-
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        error?.message ||
-        "Failed to delete diesel expense.";
-
-      window.alert(errorMessage);
-    } finally {
-      setDeletingDieselExpenseId(null);
     }
   };
 
@@ -810,44 +569,23 @@ const Expenses = () => {
 
   const handleAddOwner = async (data) => {
     try {
-      console.log("========================================");
-      console.log("CREATE NEW OWNER");
-      console.log("OWNER FORM DATA:", data);
-      console.log("========================================");
-
       const ownerData = {
         ownerName: data?.ownerName?.trim(),
       };
 
       if (!ownerData.ownerName) {
         window.alert("Please enter an owner name.");
-
         return;
       }
 
-      console.log("OWNER API REQUEST:", JSON.stringify(ownerData, null, 2));
+      await createOwner(ownerData);
 
-      const response = await createOwner(ownerData);
-
-      console.log("========================================");
-      console.log("OWNER CREATED SUCCESSFULLY");
-      console.log("OWNER RESPONSE:", response);
-      console.log("========================================");
+      window.alert("Owner created successfully.");
 
       setIsAddOwnerModalOpen(false);
 
       await fetchOwners();
     } catch (error) {
-      console.error("========================================");
-      console.error("FAILED TO CREATE OWNER");
-      console.error("ERROR:", error);
-      console.error("STATUS:", error?.response?.status);
-      console.error(
-        "SERVER RESPONSE:",
-        JSON.stringify(error?.response?.data, null, 2),
-      );
-      console.error("========================================");
-
       const errorMessage =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
@@ -867,11 +605,6 @@ const Expenses = () => {
     try {
       setIsOwnerExpenseSubmitting(true);
 
-      console.log("========================================");
-      console.log("CREATE OWNER EXPENSE");
-      console.log("OWNER EXPENSE DATA:", data);
-      console.log("========================================");
-
       const ownerExpenseData = {
         date: data?.date,
         amount: Number(data?.amount),
@@ -881,32 +614,14 @@ const Expenses = () => {
         remarks: data?.remarks || "",
       };
 
-      console.log(
-        "OWNER EXPENSE API REQUEST:",
-        JSON.stringify(ownerExpenseData, null, 2),
-      );
+      await createOwnerExpense(ownerExpenseData);
 
-      const response = await createOwnerExpense(ownerExpenseData);
-
-      console.log("========================================");
-      console.log("OWNER EXPENSE CREATED SUCCESSFULLY");
-      console.log("OWNER EXPENSE RESPONSE:", response);
-      console.log("========================================");
+      window.alert("Owner expense created successfully.");
 
       setIsOwnerExpenseModalOpen(false);
 
       await fetchExpenses();
     } catch (error) {
-      console.error("========================================");
-      console.error("FAILED TO CREATE OWNER EXPENSE");
-      console.error("ERROR:", error);
-      console.error("STATUS:", error?.response?.status);
-      console.error(
-        "SERVER RESPONSE:",
-        JSON.stringify(error?.response?.data, null, 2),
-      );
-      console.error("========================================");
-
       const errorMessage =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
@@ -1203,14 +918,14 @@ const Expenses = () => {
       />
 
       {/* =====================================================
-          ADD / EDIT DIESEL EXPENSE MODAL
+          ADD DIESEL EXPENSE MODAL
       ====================================================== */}
 
       <AddDieselExpenseModal
         isOpen={isDieselModalOpen}
         onClose={handleCloseDieselModal}
         onSubmit={handleDieselExpense}
-        editingExpense={selectedDieselExpense}
+        editingExpense={null}
         isSubmitting={isDieselSubmitting}
       />
 

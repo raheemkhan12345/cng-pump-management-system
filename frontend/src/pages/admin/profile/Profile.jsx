@@ -22,8 +22,6 @@ const Profile = () => {
 
       const response = await getAdminProfile();
 
-      console.log("Admin Profile API Response:", response);
-
       const profileData = response?.data || response?.profile || response;
 
       setProfile(profileData);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getOwnerExpenses } from "../../../services/adminApis/expenseApi";
 import "./OwnerExpenses.css";
 
@@ -121,17 +121,7 @@ const OwnerExpenses = () => {
       setIsLoading(true);
       setError("");
 
-      console.log("========================================");
-      console.log("GET OWNER EXPENSES");
-      console.log("GET OWNER EXPENSE API REQUEST");
-      console.log("========================================");
-
       const response = await getOwnerExpenses();
-
-      console.log("========================================");
-      console.log("GET OWNER EXPENSE API RESPONSE:");
-      console.log(response);
-      console.log("========================================");
 
       // -------------------------------------------------------
       // Extract API array safely
@@ -157,10 +147,9 @@ const OwnerExpenses = () => {
         expenses = response.data.expenses;
       }
 
-      console.log("FINAL OWNER EXPENSE DATA:", expenses);
-
       setOwnerExpenses(expenses);
     } catch (error) {
+      // Keep error logging for debugging
       console.error("========================================");
       console.error("FAILED TO GET OWNER EXPENSES");
       console.error("ERROR:", error);
@@ -468,13 +457,9 @@ const OwnerExpenses = () => {
                   <thead>
                     <tr>
                       <th>Date</th>
-
                       <th>Category</th>
-
                       <th>Description</th>
-
                       <th>Status</th>
-
                       <th className="text-right">Amount (Rs.)</th>
                     </tr>
                   </thead>

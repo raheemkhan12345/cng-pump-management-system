@@ -73,8 +73,6 @@ const SalesReport = () => {
 
       const response = await getAllSales();
 
-      console.log("Sales Report API Response:", response);
-
       // =====================================================
       // EXTRACT SALES ARRAY
       // =====================================================
@@ -93,7 +91,6 @@ const SalesReport = () => {
         sales = response.data.data;
       }
 
-      console.log("Sales Report Sales Array:", sales);
 
       // =====================================================
       // NORMALIZE DATA
@@ -377,7 +374,6 @@ const SalesReport = () => {
   // =========================================================
 
   const handleEdit = (item) => {
-    console.log("Selected Sale For Edit:", item);
 
     setSelectedTransaction(item);
 
@@ -432,15 +428,12 @@ const SalesReport = () => {
         notes: updatedData.notes || "",
       };
 
-      console.log("Update Sale Request:", saleData);
-
       // =====================================================
       // PUT API
       // =====================================================
 
       const response = await updateSale(updatedData.id, saleData);
 
-      console.log("Update Sale API Response:", response);
 
       // =====================================================
       // CLOSE MODAL
@@ -462,7 +455,7 @@ const SalesReport = () => {
 
       setCurrentPage(1);
     } catch (error) {
-      console.error("Update Sale Error:", error);
+      window.alert("Error updating sale.");
 
       const message =
         error?.response?.data?.message ||
@@ -470,7 +463,7 @@ const SalesReport = () => {
         error?.message ||
         "Failed to update sale.";
 
-      alert(message);
+      window.alert(message);
     } finally {
       setIsUpdating(false);
     }
@@ -482,7 +475,6 @@ const SalesReport = () => {
 
   const handleDelete = async (item) => {
     if (!item?.id) {
-      console.error("Sale ID missing:", item);
 
       alert("Sale ID is missing.");
 
@@ -509,15 +501,12 @@ const SalesReport = () => {
     try {
       setDeletingSaleId(item.id);
 
-      console.log("Deleting Sale ID:", item.id);
-
       // =====================================================
       // DELETE API
       // =====================================================
 
       const response = await deleteSale(item.id);
 
-      console.log("Delete Sale API Response:", response);
 
       // =====================================================
       // REMOVE FROM LOCAL STATE
@@ -539,7 +528,7 @@ const SalesReport = () => {
         setCurrentPage(newTotalPages);
       }
 
-      console.log("Sale deleted successfully.");
+      window.alert("Sale deleted successfully.");
     } catch (error) {
       console.error("Delete Sale Error:", error);
 

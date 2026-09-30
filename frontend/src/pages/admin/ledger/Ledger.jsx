@@ -36,15 +36,11 @@ const Ledger = () => {
       // =====================================================
       const firstResponse = await getLedger(1, pageSize);
 
-      console.log("Ledger First Page Response:", firstResponse);
-
       const firstTransactions = Array.isArray(firstResponse?.transaction)
         ? firstResponse.transaction
         : [];
 
       const totalPages = Number(firstResponse?.pagination?.totalPages) || 1;
-
-      console.log("Total Backend Pages:", totalPages);
 
       // =====================================================
       // If only one page exists
@@ -76,10 +72,6 @@ const Ledger = () => {
       // Combine ALL transactions
       // =====================================================
       const allTransactions = [...firstTransactions, ...remainingTransactions];
-
-      console.log("All Ledger Transactions:", allTransactions);
-
-      console.log("Total Transactions Loaded:", allTransactions.length);
 
       setTransactions(allTransactions);
     } catch (err) {

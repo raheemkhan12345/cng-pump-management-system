@@ -90,8 +90,6 @@ const Loans = () => {
     try {
       const response = await getAllLoans();
 
-      console.log("Get All Loans API Response:", response);
-
       // =====================================================
       // FIND API DATA
       // =====================================================
@@ -111,8 +109,6 @@ const Loans = () => {
             : Array.isArray(response?.loans)
               ? response.loans
               : [];
-
-      console.log("Loans API Data:", loansArray);
 
       // =====================================================
       // FORMAT API DATA
@@ -210,8 +206,6 @@ const Loans = () => {
         };
       });
 
-      console.log("Formatted Loans:", formattedLoans);
-
       setLoanTransactions(formattedLoans);
 
       // =====================================================
@@ -221,8 +215,6 @@ const Loans = () => {
       setCurrentPage(1);
     } catch (error) {
       console.error("Failed to fetch loans:", error);
-
-      console.error("Get All Loans API Error Response:", error?.response?.data);
 
       setLoanTransactions([]);
     } finally {
@@ -287,20 +279,8 @@ const Loans = () => {
         name: newLoanData.personName.trim(),
 
         amount: Number(newLoanData.amount),
-
-        // Frontend:
-        // cash / bank
-        //
-        // Backend:
-        // cash / bank transfer
         paymentType: convertPaymentModeToApi(newLoanData.paymentMode),
       };
-
-      console.log("==========================================");
-      console.log("CREATE LOAN PAYLOAD");
-      console.log("==========================================");
-
-      console.log(JSON.stringify(payload, null, 2));
 
       // =====================================================
       // CREATE API
@@ -322,11 +302,10 @@ const Loans = () => {
 
       setIsModalOpen(false);
 
-      console.log("Loan created successfully.");
+      window.alert("Loan created successfully.");
     } catch (error) {
-      console.error("==========================================");
+     
       console.error("CREATE LOAN FAILED");
-      console.error("==========================================");
 
       console.error("Axios Error:", error);
 
@@ -348,8 +327,6 @@ const Loans = () => {
     if (isSubmitting) {
       return;
     }
-
-    console.log("Selected Loan For Edit:", loan);
 
     // =====================================================
     // CONVERT TABLE DATE
@@ -391,8 +368,6 @@ const Loans = () => {
           ? "bank"
           : "cash",
     };
-
-    console.log("Selected Loan Data For Edit Modal:", selectedLoanData);
 
     setSelectedLoan(selectedLoanData);
 
@@ -453,11 +428,6 @@ const Loans = () => {
 
         amount: Number(updatedLoanData.amount),
 
-        // Frontend:
-        // cash / bank
-        //
-        // Backend:
-        // cash / bank transfer
         paymentType: convertPaymentModeToApi(updatedLoanData.paymentMode),
       };
 
@@ -495,9 +465,8 @@ const Loans = () => {
 
       console.log("Loan updated successfully.");
     } catch (error) {
-      console.error("==========================================");
+    
       console.error("UPDATE LOAN FAILED");
-      console.error("==========================================");
 
       console.error("Axios Error:", error);
 
@@ -577,22 +546,10 @@ const Loans = () => {
       setIsSubmitting(true);
 
       // =====================================================
-      // DELETE API LOGS
-      // =====================================================
-
-      console.log("DELETE LOAN");
-
-      console.log("Delete Loan ID:", loan.id);
-
-      console.log("Delete Loan Name:", loan.staffName);
-
-      // =====================================================
       // DELETE API
       // =====================================================
 
       const response = await deleteLoan(loan.id);
-
-      console.log("Delete Loan API Response:", response);
 
       // =====================================================
       // REFRESH LOANS
@@ -600,7 +557,7 @@ const Loans = () => {
 
       await fetchLoans();
 
-      console.log("Loan deleted successfully.");
+      window.alert("Loan deleted successfully.",response);
     } catch (error) {
       console.error("DELETE LOAN FAILED");
 
