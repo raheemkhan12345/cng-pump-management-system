@@ -163,13 +163,13 @@ const AdminDashboard = () => {
 
         {/* SUPER DASHBOARD */}
 
-        <button type="button" className="btn-super-admin">
+        {/* <button type="button" className="btn-super-admin">
           <div className="icon-circle">
             <Undo2 size={14} />
           </div>
 
           <span>Super Dashboard</span>
-        </button>
+        </button> */}
       </div>
 
       {/* =====================================================

@@ -130,7 +130,7 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
       // ==========================================
 
       if (onAddPump) {
-        onAddPump(response?.data || response?.admin || response);
+        onAddPump(formData, response);
       }
 
       // ==========================================

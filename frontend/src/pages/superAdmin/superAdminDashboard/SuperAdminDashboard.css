@@ -119,7 +119,7 @@
 }
 
 .add-pump-btn:hover:not(:disabled) {
-  background: #f1f5f9;
+  background: #a2afbce6;
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
