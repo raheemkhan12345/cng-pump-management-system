@@ -194,18 +194,10 @@ const Ledger = () => {
 
       paymentPool:
         item?.paymentPool ||
-        item?.payment_pool ||
-        item?.paymentMethod ||
-        item?.payment_method ||
         "—",
 
       volKg:
-        item?.volKg ??
-        item?.vol_kg ??
-        item?.volumeKg ??
-        item?.volume_kg ??
-        item?.cngVolume ??
-        item?.cng_volume ??
+        item?.volume ??
         "—",
     };
   };
@@ -279,8 +271,6 @@ const Ledger = () => {
 
     return filteredTransactions.slice(startIndex, endIndex);
   }, [filteredTransactions, currentPage, pageSize]);
-
-
 
   // =========================================================
   // Search Change
@@ -389,8 +379,6 @@ const Ledger = () => {
             </div>
           </div>
 
-          
-
           {/* Reset */}
           <div className="ledger-filter-action">
             <button className="ledger-reset-btn" onClick={handleReset}>
@@ -448,13 +436,7 @@ const Ledger = () => {
                     <td className="ledger-td-date">{item.date}</td>
 
                     <td>
-                      <span
-                        className={`ledger-badge ${getTypeBadgeClass(
-                          item.type,
-                        )}`}
-                      >
-                        {item.type}
-                      </span>
+                      <span className="ledger-badge">{item.type}</span>
                     </td>
 
                     <td className="ledger-td-head">{item.specificHead}</td>
