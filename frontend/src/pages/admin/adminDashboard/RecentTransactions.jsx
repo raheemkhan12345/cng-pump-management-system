@@ -1,8 +1,15 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { CheckCircle2 } from "lucide-react";
 
 import "./RecentTransactions.css";
+
+/**
+ * ==========================================
+ * PAGINATION
+ * ==========================================
+ */
+const ITEMS_PER_PAGE = 5;
 
 /**
  * ==========================================
@@ -149,13 +156,87 @@ const getTransactionStatus = (transaction) => {
   return transaction?.status || "Completed";
 };
 
+/**
+ * ==========================================
+ * RECENT TRANSACTIONS
+ * ==========================================
+ */
 const RecentTransactions = ({ transactions = [] }) => {
+  // =========================================================
+  // Pagination State
+  // =========================================================
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // =========================================================
+  // Total Pages
+  // =========================================================
+  const totalPages =
+    transactions.length === 0
+      ? 1
+      : Math.ceil(transactions.length / ITEMS_PER_PAGE);
+
+  // =========================================================
+  // Reset To Page 1 When Transactions Change
+  // =========================================================
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [transactions]);
+
+  // =========================================================
+  // Current Page Transactions
+  // =========================================================
+  const paginatedTransactions = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+
+    return transactions.slice(startIndex, endIndex);
+  }, [transactions, currentPage]);
+
+  // =========================================================
+  // Previous Page
+  // =========================================================
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  // =========================================================
+  // Next Page
+  // =========================================================
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  // =========================================================
+  // Showing From
+  // =========================================================
+  const showingFrom =
+    transactions.length === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
+
+  // =========================================================
+  // Showing To
+  // =========================================================
+  const showingTo =
+    transactions.length === 0
+      ? 0
+      : Math.min(currentPage * ITEMS_PER_PAGE, transactions.length);
+
   return (
     <div className="dashboard-section-card table-section-card">
+      {/* =====================================================
+          HEADER
+      ====================================================== */}
       <div className="table-header-flex">
         <h3 className="section-title">Recent Transactions</h3>
       </div>
 
+      {/* =====================================================
+          TABLE
+      ====================================================== */}
       <div className="table-wrapper">
         <table className="transactions-table">
           <thead>
@@ -170,8 +251,8 @@ const RecentTransactions = ({ transactions = [] }) => {
           </thead>
 
           <tbody>
-            {transactions.length > 0 ? (
-              transactions.map((tx, index) => {
+            {paginatedTransactions.length > 0 ? (
+              paginatedTransactions.map((tx, index) => {
                 const type = getTransactionType(tx);
 
                 const typeClass = getTypeClass(type);
@@ -185,26 +266,35 @@ const RecentTransactions = ({ transactions = [] }) => {
                 const status = getTransactionStatus(tx);
 
                 const transactionId =
-                  tx?._id || tx?.id || tx?.transactionId || index;
+                  tx?._id ||
+                  tx?.id ||
+                  tx?.transactionId ||
+                  `${currentPage}-${index}`;
 
                 return (
                   <tr key={transactionId}>
+                    {/* DATE */}
                     <td className="date-cell">
                       {formatDate(
                         tx?.date || tx?.createdAt || tx?.transactionDate,
                       )}
                     </td>
 
+                    {/* TYPE */}
                     <td>
                       <span className={`type-badge ${typeClass}`}>{type}</span>
                     </td>
 
+                    {/* DETAILS */}
                     <td className="details-cell">{details}</td>
 
+                    {/* AMOUNT */}
                     <td className="amount-cell">{formatCurrency(amount)}</td>
 
+                    {/* POOL */}
                     <td className="pool-cell">{pool}</td>
 
+                    {/* STATUS */}
                     <td>
                       <span className="status-badge">
                         <CheckCircle2 size={13} />
@@ -231,6 +321,42 @@ const RecentTransactions = ({ transactions = [] }) => {
           </tbody>
         </table>
       </div>
+
+      {/* =====================================================
+          PAGINATION FOOTER
+      ====================================================== */}
+      {transactions.length > 0 && (
+        <div className="transactions-pagination">
+          {/* Showing Text */}
+          <span className="transactions-pagination-text">
+            Showing <b>{showingFrom}</b> to <b>{showingTo}</b> of{" "}
+            <b>{transactions.length}</b> transactions
+          </span>
+
+          {/* Buttons */}
+          <div className="transactions-pagination-buttons">
+            <button
+              className="transactions-page-btn"
+              onClick={handlePrevious}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+
+            <span className="transactions-page-number">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+              className="transactions-page-btn"
+              onClick={handleNext}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
