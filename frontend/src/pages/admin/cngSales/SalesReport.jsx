@@ -528,7 +528,6 @@ const SalesReport = () => {
         setCurrentPage(newTotalPages);
       }
 
-      window.alert("Sale deleted successfully.");
     } catch (error) {
       console.error("Delete Sale Error:", error);
 

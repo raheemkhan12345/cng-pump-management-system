@@ -111,43 +111,17 @@ const RecordNewSaleModal = ({ isOpen, onClose, onSaleAdded }) => {
         notes: remarks.trim(),
       };
 
-      console.log("Adding New Sale:", saleData);
-
       // =====================================================
       // API CALL
       // =====================================================
 
       const response = await addSale(saleData);
 
-      console.log("Add Sale API Response:", response);
-
-      // =====================================================
-      // SUCCESS
-      // =====================================================
-
-      /*
-        Backend response:
-
-        {
-          message: "Sale recorded successfully"
-        }
-
-        Backend success field return nahi kar raha,
-        isliye response.success check nahi karna.
-      */
-
-      console.log("Sale recorded successfully:", response?.message);
+      window.alert("Sale recorded successfully:", response?.message);
 
       // =====================================================
       // SEND SALE DATA TO PARENT
       // =====================================================
-
-      /*
-        API response mein sale details nahi aa rahi,
-        isliye original saleData parent ko send kar rahe hain.
-
-        CngSales.jsx is data se stats update karega.
-      */
 
       if (onSaleAdded) {
         onSaleAdded(saleData);

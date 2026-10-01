@@ -167,7 +167,6 @@ const AddNewExpenses = ({
                 : [];
 
         setCategories(categoryData);
-
       } catch (error) {
         console.log("========================================");
         console.log("Failed to fetch expense categories.");
@@ -318,7 +317,7 @@ const AddNewExpenses = ({
     });
 
     if (categoryAlreadyExists) {
-      console.error("Category Error: This category already exists.");
+      window.alert("Category Error: This category already exists.");
       return;
     }
 
@@ -331,7 +330,7 @@ const AddNewExpenses = ({
 
       const response = await createExpenseCategory(categoryData);
 
-      window.alert("Expense Category Created Successfully!",response);
+      window.alert("Expense Category Created Successfully!", response);
 
       // =====================================================
       // GET CREATED CATEGORY
@@ -459,15 +458,6 @@ const AddNewExpenses = ({
       remarks,
     };
 
-    console.log("========================================");
-    console.log(
-      isEditMode
-        ? "UPDATE EXPENSE API REQUEST:"
-        : "CREATE EXPENSE API REQUEST:",
-    );
-    console.log(expenseData);
-    console.log("========================================");
-
     try {
       setIsSubmitting(true);
 
@@ -489,8 +479,6 @@ const AddNewExpenses = ({
           return;
         }
 
-        console.log("Updating Expense ID:", expenseId);
-
         response = await updateExpense(expenseId, expenseData);
       } else {
         // ===================================================
@@ -504,15 +492,11 @@ const AddNewExpenses = ({
       // SUCCESS
       // =====================================================
 
-      console.log("========================================");
-      console.log(
+      window.alert(
         isEditMode
           ? "Expense updated successfully!"
           : "Expense added successfully!",
       );
-      console.log("Expense Response:", response);
-      console.log("========================================");
-
       if (onSuccess) {
         await onSuccess(response);
       }
