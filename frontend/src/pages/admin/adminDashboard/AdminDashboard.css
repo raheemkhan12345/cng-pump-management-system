@@ -53,7 +53,7 @@
 
   padding: 6px 10px 6px 12px;
 
-  background: #92979c;
+  background: #cacccd;
 
   border: 1px solid #e2e8f0;
 
@@ -73,7 +73,7 @@
 }
 
 .date-filter-pill:hover {
-  background: #cacccd;
+  background: #92979c;
 
   border-color: #cbd5e1;
 
