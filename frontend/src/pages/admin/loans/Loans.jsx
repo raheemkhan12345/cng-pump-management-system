@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   Plus,
@@ -23,6 +23,7 @@ import {
 } from "../../../services/adminApis/loanApi";
 
 import "./Loans.css";
+
 // =========================================================
 // CONSTANTS
 // =========================================================
@@ -35,6 +36,10 @@ const EMPTY_LOAN_STATS = {
   thisMonthRecovery: 0,
   activeLoanStaff: 0,
 };
+
+// =========================================================
+// COMPONENT
+// =========================================================
 
 const Loans = () => {
   // =========================================================
@@ -63,6 +68,12 @@ const Loans = () => {
   const [loanTransactions, setLoanTransactions] = useState([]);
 
   // =========================================================
+  // LOAN SUMMARY
+  // =========================================================
+
+  const [loanStats, setLoanStats] = useState(EMPTY_LOAN_STATS);
+
+  // =========================================================
   // PAYMENT TYPE HELPERS
   // =========================================================
 
@@ -83,12 +94,36 @@ const Loans = () => {
   };
 
   // =========================================================
+  // FORMAT DATE FOR TABLE
+  // =========================================================
+
+  const formatDateForTable = (date) => {
+    if (!date) {
+      return "-";
+    }
+
+    const rawDate = String(date).split("T")[0];
+
+    const dateParts = rawDate.split("-");
+
+    if (dateParts.length === 3) {
+      return dateParts.reverse().join("-");
+    }
+
+    return rawDate;
+  };
+
+  // =========================================================
   // GET ALL LOANS
   // =========================================================
 
   const fetchLoans = useCallback(async () => {
     try {
+      setIsLoading(true);
+
       const response = await getAllLoans();
+
+      console.log("GET ALL LOANS RESPONSE:", response);
 
       // =====================================================
       // FIND API DATA
@@ -97,21 +132,35 @@ const Loans = () => {
       const apiData = response?.data ?? response ?? {};
 
       // =====================================================
-      // SUPPORT COMMON RESPONSE STRUCTURES
+      // LOANS ARRAY
       // =====================================================
 
-      const loansArray = Array.isArray(apiData)
-        ? apiData
-        : Array.isArray(apiData?.loans)
-          ? apiData.loans
+      const loansArray = Array.isArray(apiData?.loans)
+        ? apiData.loans
+        : Array.isArray(apiData)
+          ? apiData
           : Array.isArray(apiData?.data)
             ? apiData.data
-            : Array.isArray(response?.loans)
-              ? response.loans
-              : [];
+            : [];
 
       // =====================================================
-      // FORMAT API DATA
+      // BACKEND SUMMARY
+      // =====================================================
+
+      const summary = apiData?.summary || {};
+
+      setLoanStats({
+        thisMonthLoan: Number(summary?.thisMonthLoan) || 0,
+
+        totalLoansGiven: Number(summary?.totalLoanGiven) || 0,
+
+        thisMonthRecovery: Number(summary?.thisMonthLoanReceived) || 0,
+
+        activeLoanStaff: Number(summary?.activeLoanStaff) || 0,
+      });
+
+      // =====================================================
+      // FORMAT LOANS
       // =====================================================
 
       const formattedLoans = loansArray.map((loan, index) => {
@@ -125,19 +174,7 @@ const Loans = () => {
         // DATE
         // ---------------------------------------------------
 
-        let formattedDate = "-";
-
-        if (loan?.date) {
-          const rawDate = String(loan.date).split("T")[0];
-
-          const dateParts = rawDate.split("-");
-
-          if (dateParts.length === 3) {
-            formattedDate = dateParts.reverse().join("-");
-          } else {
-            formattedDate = rawDate;
-          }
-        }
+        const formattedDate = formatDateForTable(loan?.date);
 
         // ---------------------------------------------------
         // LOAN TYPE
@@ -161,21 +198,34 @@ const Loans = () => {
           loan?.name || loan?.personName || loan?.staffName || "-";
 
         // ---------------------------------------------------
-        // AMOUNT
+        // ORIGINAL LOAN AMOUNT
         // ---------------------------------------------------
 
         const amount = Number(loan?.amount) || 0;
 
         // ---------------------------------------------------
         // REMAINING BALANCE
+        //
+        // IMPORTANT:
+        // Backend sends remainingBalance.
         // ---------------------------------------------------
 
         const remainingBalance = Number(
-          loan?.remainingBal ??
-            loan?.remainingBalance ??
+          loan?.remainingBalance ??
+            loan?.remainingBal ??
             loan?.balance ??
             amount,
         );
+
+        // ---------------------------------------------------
+        // STATUS
+        //
+        // Prefer backend status.
+        // Otherwise calculate from remaining balance.
+        // ---------------------------------------------------
+
+        const status =
+          loan?.status || (remainingBalance <= 0 ? "paid" : "active");
 
         // ---------------------------------------------------
         // PAYMENT TYPE
@@ -196,6 +246,9 @@ const Loans = () => {
           amount,
           remainingBal: remainingBalance,
 
+          // Backend status
+          status,
+
           // Edit form data
           loanType:
             loan?.loanType === "loan_received" ? "loan_received" : "loan_given",
@@ -203,6 +256,11 @@ const Loans = () => {
           personName,
 
           paymentMode,
+
+          // Keep original transactions if needed later
+          transactions: Array.isArray(loan?.transactions)
+            ? loan.transactions
+            : [],
         };
       });
 
@@ -217,6 +275,8 @@ const Loans = () => {
       console.error("Failed to fetch loans:", error);
 
       setLoanTransactions([]);
+
+      setLoanStats(EMPTY_LOAN_STATS);
     } finally {
       setIsLoading(false);
     }
@@ -227,19 +287,25 @@ const Loans = () => {
   // =========================================================
 
   useEffect(() => {
-    const loadLoans = async () => {
-      await fetchLoans();
-    };
-
-    loadLoans();
+    fetchLoans();
   }, [fetchLoans]);
 
   // =========================================================
   // LOAN STATUS
   // =========================================================
 
-  const getLoanStatus = (remainingBal) => {
-    return Number(remainingBal) <= 0 ? "Paid" : "Active";
+  const getLoanStatus = (loan) => {
+    // Backend status has priority
+    if (loan?.status === "paid") {
+      return "Paid";
+    }
+
+    if (loan?.status === "active") {
+      return "Active";
+    }
+
+    // Fallback
+    return Number(loan?.remainingBal) <= 0 ? "Paid" : "Active";
   };
 
   // =========================================================
@@ -279,8 +345,11 @@ const Loans = () => {
         name: newLoanData.personName.trim(),
 
         amount: Number(newLoanData.amount),
+
         paymentType: convertPaymentModeToApi(newLoanData.paymentMode),
       };
+
+      console.log("CREATE LOAN PAYLOAD:", JSON.stringify(payload, null, 2));
 
       // =====================================================
       // CREATE API
@@ -304,7 +373,6 @@ const Loans = () => {
 
       window.alert("Loan created successfully.");
     } catch (error) {
-     
       console.error("CREATE LOAN FAILED");
 
       console.error("Axios Error:", error);
@@ -325,6 +393,16 @@ const Loans = () => {
 
   const handleEdit = (loan) => {
     if (isSubmitting) {
+      return;
+    }
+
+    // =====================================================
+    // PREVENT EDITING PAID LOAN
+    // =====================================================
+
+    if (loan?.status === "paid" || Number(loan?.remainingBal) <= 0) {
+      window.alert("This loan is already fully paid and cannot be updated.");
+
       return;
     }
 
@@ -359,8 +437,6 @@ const Loans = () => {
 
       amount: loan.amount ?? "",
 
-      // Frontend only:
-      // cash / bank
       paymentMode:
         loan.paymentMode === "bank transfer" ||
         loan.paymentMode === "bank_transfer" ||
@@ -368,6 +444,8 @@ const Loans = () => {
           ? "bank"
           : "cash",
     };
+
+    console.log("Selected Loan For Edit:", selectedLoanData);
 
     setSelectedLoan(selectedLoanData);
 
@@ -435,10 +513,6 @@ const Loans = () => {
 
       console.log("Update Loan ID:", selectedLoan.id);
 
-      console.log("Frontend Payment Mode:", updatedLoanData.paymentMode);
-
-      console.log("Backend Payment Type:", payload.paymentType);
-
       console.log("Update Loan Payload:", JSON.stringify(payload, null, 2));
 
       // =====================================================
@@ -465,7 +539,6 @@ const Loans = () => {
 
       console.log("Loan updated successfully.");
     } catch (error) {
-    
       console.error("UPDATE LOAN FAILED");
 
       console.error("Axios Error:", error);
@@ -482,10 +555,6 @@ const Loans = () => {
         "Failed to update loan. Please try again.";
 
       console.error("Update Loan API Error Message:", errorMessage);
-
-      // ==========================================
-      // SHOW BACKEND ERROR TO USER
-      // ==========================================
 
       alert(errorMessage);
     } finally {
@@ -551,13 +620,15 @@ const Loans = () => {
 
       const response = await deleteLoan(loan.id);
 
+      console.log("Delete Loan API Response:", response);
+
       // =====================================================
       // REFRESH LOANS
       // =====================================================
 
       await fetchLoans();
 
-      window.alert("Loan deleted successfully.",response);
+      window.alert("Loan deleted successfully.");
     } catch (error) {
       console.error("DELETE LOAN FAILED");
 
@@ -583,119 +654,6 @@ const Loans = () => {
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-PK").format(Number(amount) || 0);
   };
-
-  // =========================================================
-  // LOAN STATISTICS
-  // =========================================================
-
-  const loanStats = useMemo(() => {
-    const today = new Date();
-
-    const currentMonth = today.getMonth();
-
-    const currentYear = today.getFullYear();
-
-    // =======================================================
-    // THIS MONTH LOAN
-    // =======================================================
-
-    const thisMonthLoan = loanTransactions
-      .filter((transaction) => {
-        if (transaction.type !== "Loan Given") {
-          return false;
-        }
-
-        if (!transaction.date || transaction.date === "-") {
-          return false;
-        }
-
-        const dateParts = transaction.date.split("-");
-
-        if (dateParts.length !== 3) {
-          return false;
-        }
-
-        const transactionDate = new Date(
-          `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00`,
-        );
-
-        return (
-          transactionDate.getMonth() === currentMonth &&
-          transactionDate.getFullYear() === currentYear
-        );
-      })
-      .reduce(
-        (total, transaction) => total + Number(transaction.amount || 0),
-        0,
-      );
-
-    // =======================================================
-    // TOTAL LOANS GIVEN
-    // =======================================================
-
-    const totalLoansGiven = loanTransactions
-      .filter((transaction) => transaction.type === "Loan Given")
-      .reduce(
-        (total, transaction) => total + Number(transaction.amount || 0),
-        0,
-      );
-
-    // =======================================================
-    // THIS MONTH LOAN RECEIVED
-    // =======================================================
-
-    const thisMonthRecovery = loanTransactions
-      .filter((transaction) => {
-        if (transaction.type !== "Loan Received") {
-          return false;
-        }
-
-        if (!transaction.date || transaction.date === "-") {
-          return false;
-        }
-
-        const dateParts = transaction.date.split("-");
-
-        if (dateParts.length !== 3) {
-          return false;
-        }
-
-        const transactionDate = new Date(
-          `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T00:00:00`,
-        );
-
-        return (
-          transactionDate.getMonth() === currentMonth &&
-          transactionDate.getFullYear() === currentYear
-        );
-      })
-      .reduce(
-        (total, transaction) => total + Number(transaction.amount || 0),
-        0,
-      );
-
-    // =======================================================
-    // ACTIVE LOAN STAFF
-    // =======================================================
-
-    const activeStaff = new Set(
-      loanTransactions
-        .filter((transaction) => Number(transaction.remainingBal) > 0)
-        .map((transaction) => transaction.staffName),
-    );
-
-    return {
-      ...EMPTY_LOAN_STATS,
-
-      thisMonthLoan,
-
-      totalLoansGiven,
-
-      thisMonthRecovery,
-
-      activeLoanStaff: activeStaff.size,
-    };
-  }, [loanTransactions]);
 
   // =========================================================
   // PAGINATION
@@ -914,7 +872,7 @@ const Loans = () => {
                 </tr>
               ) : currentTransactions.length > 0 ? (
                 currentTransactions.map((item) => {
-                  const status = getLoanStatus(item.remainingBal);
+                  const status = getLoanStatus(item);
 
                   return (
                     <tr key={item.id}>
@@ -973,7 +931,11 @@ const Loans = () => {
                           title="Edit"
                           aria-label={`Edit loan for ${item.staffName}`}
                           onClick={() => handleEdit(item)}
-                          disabled={isSubmitting}
+                          disabled={
+                            isSubmitting ||
+                            item.status === "paid" ||
+                            Number(item.remainingBal) <= 0
+                          }
                         >
                           <Pencil size={11} />
                         </button>
