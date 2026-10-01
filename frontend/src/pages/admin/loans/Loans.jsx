@@ -123,8 +123,6 @@ const Loans = () => {
 
       const response = await getAllLoans();
 
-      console.log("GET ALL LOANS RESPONSE:", response);
-
       // =====================================================
       // FIND API DATA
       // =====================================================
@@ -349,8 +347,6 @@ const Loans = () => {
         paymentType: convertPaymentModeToApi(newLoanData.paymentMode),
       };
 
-      console.log("CREATE LOAN PAYLOAD:", JSON.stringify(payload, null, 2));
-
       // =====================================================
       // CREATE API
       // =====================================================
@@ -509,19 +505,11 @@ const Loans = () => {
         paymentType: convertPaymentModeToApi(updatedLoanData.paymentMode),
       };
 
-      console.log("UPDATE LOAN");
-
-      console.log("Update Loan ID:", selectedLoan.id);
-
-      console.log("Update Loan Payload:", JSON.stringify(payload, null, 2));
-
       // =====================================================
       // UPDATE API
       // =====================================================
 
       const response = await updateLoan(selectedLoan.id, payload);
-
-      console.log("Update Loan API Response:", response);
 
       // =====================================================
       // REFRESH LOANS
@@ -537,7 +525,7 @@ const Loans = () => {
 
       setSelectedLoan(null);
 
-      console.log("Loan updated successfully.");
+      window.alert("Loan updated successfully.", response);
     } catch (error) {
       console.error("UPDATE LOAN FAILED");
 
@@ -620,15 +608,13 @@ const Loans = () => {
 
       const response = await deleteLoan(loan.id);
 
-      console.log("Delete Loan API Response:", response);
-
       // =====================================================
       // REFRESH LOANS
       // =====================================================
 
       await fetchLoans();
 
-      window.alert("Loan deleted successfully.");
+      window.alert("Loan deleted successfully.", response);
     } catch (error) {
       console.error("DELETE LOAN FAILED");
 
