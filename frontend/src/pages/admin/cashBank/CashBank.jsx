@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FaArrowDown,
   FaArrowUp,
@@ -48,9 +48,12 @@ const CashBank = () => {
   // FETCH CASH & BANK DATA
   // =========================================================
 
-  const fetchCashBankData = useCallback(async () => {
+  const fetchCashBankData = useCallback(async (showLoader = true) => {
     try {
-      setIsLoading(true);
+      if (showLoader) {
+        setIsLoading(true);
+      }
+
       setError("");
 
       const response = await getCashBank();
@@ -210,10 +213,13 @@ const CashBank = () => {
         "Failed to load Cash & Bank data.";
 
       setError(message);
+
       setBalances(EMPTY_BALANCES);
       setTransactions([]);
     } finally {
-      setIsLoading(false);
+      if (showLoader) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
@@ -231,10 +237,12 @@ const CashBank = () => {
       console.log("Cash Bank Transfer Response:", response);
 
       // =====================================================
-      // REFRESH DATA AFTER SUCCESSFUL TRANSFER
+      // SILENT UPDATE
+      // No page refresh
+      // No loading screen
       // =====================================================
 
-      await fetchCashBankData();
+      await fetchCashBankData(false);
 
       // =====================================================
       // CLOSE MODAL
@@ -260,26 +268,37 @@ const CashBank = () => {
   // CREATE OPENING BALANCE
   // =========================================================
 
-  const handleOpeningBalanceSubmit = async (formData) => {
+  const handleOpeningBalanceSuccess = async (response) => {
     try {
       setIsSubmitting(true);
       setError("");
 
-      // Refresh Cash & Bank data
-      await fetchCashBankData();
+      console.log("Opening Balance Created:", response);
 
-      // Close modal
+      // =====================================================
+      // SILENTLY FETCH LATEST DATA
+      //
+      // Important:
+      // false = don't show page loading screen
+      // =====================================================
+
+      await fetchCashBankData(false);
+
+      // =====================================================
+      // CLOSE MODAL
+      // =====================================================
+
       setShowOpeningBalanceModal(false);
     } catch (error) {
-      console.error("Failed to create Opening Balance:", error);
+      console.error("Failed to update Cash & Bank data:", error);
 
       const message =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
         error?.message ||
-        "Failed to create Opening Balance.";
+        "Failed to update Cash & Bank data.";
 
-      alert(message);
+      setError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -373,11 +392,22 @@ const CashBank = () => {
       setError("");
 
       const response = await deleteCashBankTransaction(transactionId);
+
       console.log("Delete Cash & Bank Response:", response);
+
+      // =====================================================
+      // UPDATE TRANSACTIONS IMMEDIATELY
+      // =====================================================
 
       setTransactions((currentTransactions) =>
         currentTransactions.filter((tx) => tx.id !== transactionId),
       );
+
+      // =====================================================
+      // SILENTLY GET UPDATED BALANCES
+      // =====================================================
+
+      await fetchCashBankData(false);
 
       alert("Transaction deleted successfully.");
     } catch (error) {
@@ -426,7 +456,7 @@ const CashBank = () => {
           <div className="cb-error">
             <p>{error}</p>
 
-            <button type="button" onClick={fetchCashBankData}>
+            <button type="button" onClick={() => fetchCashBankData()}>
               Try Again
             </button>
           </div>
@@ -490,9 +520,9 @@ const CashBank = () => {
 
         {/* CASH & OPENING BALANCE ACTIONS */}
 
-        {/* CASH & OPENING BALANCE ACTIONS */}
         <div className="cb-action-buttons-grid">
           {/* TRANSFER CASH */}
+
           <button
             type="button"
             className="cb-btn-action-dark"
@@ -502,6 +532,7 @@ const CashBank = () => {
           </button>
 
           {/* OPENING BALANCE FORM */}
+
           <button
             type="button"
             className="cb-btn-action-dark"
@@ -527,11 +558,8 @@ const CashBank = () => {
               <thead>
                 <tr>
                   <th>Date</th>
-
                   <th>Type</th>
-
                   <th className="cb-text-right">Amount (Rs.)</th>
-
                   <th className="cb-text-center">Actions</th>
                 </tr>
               </thead>
@@ -545,6 +573,7 @@ const CashBank = () => {
                       <td>
                         <div className="cb-type-cell">
                           {getTransactionIcon(tx.typeIcon)}
+
                           <span>{tx.type}</span>
                         </div>
                       </td>
@@ -593,7 +622,7 @@ const CashBank = () => {
       <OpeningBalanceModal
         isOpen={showOpeningBalanceModal}
         onClose={() => setShowOpeningBalanceModal(false)}
-        onSubmit={handleOpeningBalanceSubmit}
+        onSuccess={handleOpeningBalanceSuccess}
         isSubmitting={isSubmitting}
       />
     </div>
