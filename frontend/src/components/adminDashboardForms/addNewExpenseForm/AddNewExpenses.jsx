@@ -156,10 +156,6 @@ const AddNewExpenses = ({
 
         const response = await getExpenseCategories();
 
-        console.log("========================================");
-        console.log("Expense Categories API Response:", response);
-        console.log("========================================");
-
         const categoryData = Array.isArray(response?.expenseCategories)
           ? response.expenseCategories
           : Array.isArray(response?.categories)
@@ -172,7 +168,6 @@ const AddNewExpenses = ({
 
         setCategories(categoryData);
 
-        console.log("Expense Categories:", categoryData);
       } catch (error) {
         console.log("========================================");
         console.log("Failed to fetch expense categories.");
@@ -334,16 +329,9 @@ const AddNewExpenses = ({
         name: trimmedCategoryName,
       };
 
-      console.log("========================================");
-      console.log("Create Expense Category Request:", categoryData);
-      console.log("========================================");
-
       const response = await createExpenseCategory(categoryData);
 
-      console.log("========================================");
-      console.log("Expense Category Created Successfully!");
-      console.log("Create Category Response:", response);
-      console.log("========================================");
+      window.alert("Expense Category Created Successfully!",response);
 
       // =====================================================
       // GET CREATED CATEGORY

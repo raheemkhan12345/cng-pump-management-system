@@ -792,12 +792,6 @@ const Expenses = () => {
 
               <span>Add Recovery Expense</span>
             </button>
-
-            <button type="button" className="exp-btn-action exp-btn-outline">
-              <Layers size={18} />
-
-              <span>View Expense Categories</span>
-            </button>
           </div>
 
           {/* ROW 2 */}
