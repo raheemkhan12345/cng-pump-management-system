@@ -605,7 +605,7 @@ const AddNewExpenses = ({
                     step="0.01"
                     value={amount}
                     onChange={(event) => setAmount(event.target.value)}
-                    placeholder="0.00"
+                    placeholder="0"
                     className="ane-input ane-input-amount"
                     disabled={isSubmitting}
                   />

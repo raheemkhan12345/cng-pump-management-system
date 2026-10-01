@@ -316,8 +316,8 @@
   outline: none;
   background: transparent;
   padding: 0 16px;
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 400;
   color: #0f172a;
   letter-spacing: 0.02em;
 }

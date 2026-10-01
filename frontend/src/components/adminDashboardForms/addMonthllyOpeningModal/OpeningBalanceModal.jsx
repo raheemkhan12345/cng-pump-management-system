@@ -448,7 +448,7 @@ const OpeningBalanceModal = ({ isOpen = false, onClose, onSuccess }) => {
                 className="amount-input"
                 value={openingAmount}
                 onChange={handleAmountChange}
-                placeholder="Enter amount"
+                placeholder="0"
               />
             </div>
           </div>

@@ -321,7 +321,7 @@ const RecordNewSaleModal = ({ isOpen, onClose, onSaleAdded }) => {
             <textarea
               id="sale-notes"
               rows="3"
-              placeholder="Add any relevant notes..."
+              placeholder="Text here..."
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               disabled={isSubmitting}
