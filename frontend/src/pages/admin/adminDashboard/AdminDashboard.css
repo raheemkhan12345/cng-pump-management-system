@@ -1,80 +1,664 @@
+/* =========================================================
+   ADMIN DASHBOARD WRAPPER
+========================================================= */
+
 .admin-dashboard-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: #0f172a;
+  width: 100%;
+  max-width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+
+  box-sizing: border-box;
+
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+
+  color: #0f172a;
 }
+
+/* =========================================================
+   ACTION BAR
+========================================================= */
 
 .dashboard-action-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  width: 100%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 15px;
+
+  box-sizing: border-box;
 }
 
-/* Date Filter Box */
+/* =========================================================
+   DATE FILTER PILL
+========================================================= */
+
 .date-filter-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background-color: #d1d5db;
-    /* Light grey background */
-    padding: 8px 12px;
-    border-radius: 6px;
-    /* Slightly rounded rectangle */
-    font-size: 13px;
-    font-weight: 500;
-    color: #374151;
-    cursor: pointer;
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 9px;
+
+  min-height: 42px;
+  max-width: 100%;
+
+  padding: 6px 10px 6px 12px;
+
+  background: #92979c;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 10px;
+
+  color: #303844;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.dropdown-arrow-badge {
-    background-color: #000000;
-    color: #ffffff;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 10px;
-    margin-left: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.date-filter-pill:hover {
+  background: #cacccd;
+
+  border-color: #cbd5e1;
+
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
 }
 
-/* Super Dashboard Button */
+/* =========================================================
+   CALENDAR ICON
+========================================================= */
+
+.date-filter-pill svg {
+  flex-shrink: 0;
+
+  color: #475569;
+}
+
+/* =========================================================
+   VIEWING REPORTS TEXT
+========================================================= */
+
+.date-filter-pill > span:not(.dropdown-arrow-badge) {
+  white-space: nowrap;
+}
+
+/* =========================================================
+   MONTH SELECT WRAPPER
+========================================================= */
+
+.month-select-wrapper {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  min-width: 145px;
+  max-width: 220px;
+
+  flex-shrink: 1;
+}
+
+/* =========================================================
+   MONTH SELECT
+========================================================= */
+
+.dashboard-month-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  width: 100%;
+  min-width: 145px;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  padding: 7px 25px 7px 4px;
+
+  color: #0f172a;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  font-family: inherit;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   DROPDOWN ICON
+========================================================= */
+
+.dropdown-icon {
+  position: absolute;
+
+  right: 5px;
+
+  color: #475569;
+
+  pointer-events: none;
+
+  flex-shrink: 0;
+
+  transition: transform 0.2s ease;
+}
+
+/* =========================================================
+   MONTH OPTIONS
+========================================================= */
+
+.dashboard-month-select option {
+  background: #ffffff;
+
+  color: #0f172a;
+
+  font-size: 13px;
+
+  font-weight: 500;
+}
+
+/* =========================================================
+   MONTH SELECT FOCUS
+========================================================= */
+
+.dashboard-month-select:focus {
+  outline: none;
+}
+
+.dashboard-month-select:focus-visible {
+  outline: 2px solid #94a3b8;
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.dashboard-loading {
+  width: 100%;
+
+  min-height: 200px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 12px;
+
+  color: #64748b;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.dashboard-error {
+  width: 100%;
+
+  min-height: 180px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  padding: 25px;
+
+  background: #ffffff;
+
+  border: 1px solid #fecaca;
+
+  border-radius: 12px;
+
+  color: #991b1b;
+
+  text-align: center;
+
+  box-sizing: border-box;
+}
+
+.dashboard-error p {
+  margin: 0;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+.dashboard-error button {
+  border: none;
+
+  padding: 9px 18px;
+
+  background: #0f172a;
+
+  color: #ffffff;
+
+  border-radius: 7px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.dashboard-error button:hover {
+  background: #1e293b;
+}
+
+.dashboard-error button:active {
+  transform: scale(0.98);
+}
+
+/* =========================================================
+   SUPER DASHBOARD BUTTON
+========================================================= */
+
 .btn-super-admin {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background-color: #1f2937;
-    /* Dark navy/grey */
-    color: #ffffff;
-    border: 1.5px solid #06b6d4;
-    /* Cyan border */
-    padding: 6px 16px 6px 6px;
-    /* Reduced left padding for circular icon */
-    border-radius: 50px;
-    /* Fully rounded pill shape */
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+
+  gap: 10px;
+
+  background-color: #1f2937;
+
+  color: #ffffff;
+
+  border: 1.5px solid #06b6d4;
+
+  padding: 6px 16px 6px 6px;
+
+  border-radius: 50px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
 }
 
 .btn-super-admin:hover {
-    background-color: #111827;
-    border-color: #22d3ee;
+  background-color: #111827;
+
+  border-color: #22d3ee;
 }
 
-/* Circular Icon Container */
+/* =========================================================
+   SUPER DASHBOARD ICON
+========================================================= */
+
 .icon-circle {
-    background-color: #06b6d4;
-    /* Bright cyan circle background */
-    color: #0f172a;
-    /* Dark arrow color */
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
+  background-color: #06b6d4;
+
+  color: #0f172a;
+
+  width: 26px;
+  height: 26px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   TABLE / CARD SAFETY
+========================================================= */
+
+.admin-dashboard-wrapper > * {
+  max-width: 100%;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   LARGE TABLET / SMALL DESKTOP
+   1024px
+========================================================= */
+
+@media (max-width: 1024px) {
+  .admin-dashboard-wrapper {
+    gap: 18px;
+  }
+
+  .dashboard-action-bar {
+    gap: 12px;
+  }
+
+  .date-filter-pill {
+    min-height: 40px;
+
+    padding: 6px 9px 6px 11px;
+  }
+
+  .month-select-wrapper {
+    min-width: 135px;
+  }
+
+  .dashboard-month-select {
+    min-width: 135px;
+
+    font-size: 12.5px;
+  }
+}
+
+/* =========================================================
+   TABLET
+   768px
+========================================================= */
+
+@media (max-width: 768px) {
+  .admin-dashboard-wrapper {
+    gap: 16px;
+  }
+
+  .dashboard-action-bar {
+    width: 100%;
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 10px;
+  }
+
+  .date-filter-pill {
+    width: 100%;
+
+    justify-content: flex-start;
+
+    min-height: 44px;
+
+    padding: 7px 10px;
+  }
+
+  .date-filter-pill > span:not(.dropdown-arrow-badge) {
+    font-size: 12px;
+  }
+
+  .month-select-wrapper {
+    flex: 1;
+
+    min-width: 0;
+
+    max-width: none;
+  }
+
+  .dashboard-month-select {
+    width: 100%;
+
+    min-width: 0;
+
+    max-width: none;
+
+    font-size: 13px;
+
+    padding-left: 3px;
+  }
+
+  .dropdown-icon {
+    right: 5px;
+  }
+
+  .btn-super-admin {
+    width: 100%;
+
     justify-content: center;
+
+    min-height: 42px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   600px
+========================================================= */
+
+@media (max-width: 600px) {
+  .admin-dashboard-wrapper {
+    gap: 14px;
+  }
+
+  .dashboard-action-bar {
+    gap: 9px;
+  }
+
+  .date-filter-pill {
+    min-height: 46px;
+
+    gap: 7px;
+
+    padding: 7px 8px;
+
+    border-radius: 9px;
+  }
+
+  .date-filter-pill svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .date-filter-pill > span:not(.dropdown-arrow-badge) {
+    font-size: 11px;
+  }
+
+  .month-select-wrapper {
+    min-width: 0;
+  }
+
+  .dashboard-month-select {
+    width: 100%;
+
+    min-width: 0;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    padding: 7px 27px 7px 2px;
+  }
+
+  .dropdown-icon {
+    right: 4px;
+
+    width: 12px;
+    height: 12px;
+  }
+
+  .dashboard-loading {
+    min-height: 160px;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+  }
+
+  .dashboard-error {
+    min-height: 160px;
+
+    padding: 20px;
+
+    border-radius: 10px;
+  }
+
+  .dashboard-error p {
+    font-size: 13px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   480px
+========================================================= */
+
+@media (max-width: 480px) {
+  .admin-dashboard-wrapper {
+    gap: 12px;
+  }
+
+  .date-filter-pill {
+    display: flex;
+
+    width: 100%;
+
+    min-height: 44px;
+
+    gap: 6px;
+
+    padding: 6px 7px;
+  }
+
+  .date-filter-pill > span:not(.dropdown-arrow-badge) {
+    white-space: nowrap;
+
+    font-size: 10.5px;
+  }
+
+  .month-select-wrapper {
+    flex: 1;
+
+    width: 100%;
+
+    min-width: 0;
+  }
+
+  .dashboard-month-select {
+    width: 100%;
+
+    min-width: 0;
+
+    font-size: 11.5px;
+
+    padding-right: 23px;
+  }
+
+  .dropdown-icon {
+    right: 4px;
+
+    width: 11px;
+    height: 11px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+   360px
+========================================================= */
+
+@media (max-width: 360px) {
+  .admin-dashboard-wrapper {
+    gap: 10px;
+  }
+
+  .date-filter-pill {
+    display: flex;
+
+    gap: 6px;
+  }
+
+  /*
+     Hide "Viewing reports for" on very small screens.
+     The selected month itself remains visible.
+  */
+
+  .date-filter-pill > span:not(.dropdown-arrow-badge) {
+    display: none;
+  }
+
+  .month-select-wrapper {
+    flex: 1;
+
+    width: 100%;
+
+    min-width: 0;
+  }
+
+  .dashboard-month-select {
+    width: 100%;
+
+    min-width: 0;
+
+    font-size: 12px;
+
+    padding-left: 2px;
+
+    padding-right: 23px;
+  }
+
+  .dropdown-icon {
+    right: 4px;
+
+    width: 11px;
+    height: 11px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.dashboard-month-select:focus-visible {
+  outline: 2px solid #94a3b8;
+
+  outline-offset: 2px;
+}
+
+.btn-super-admin:focus-visible,
+.dashboard-error button:focus-visible {
+  outline: 2px solid #94a3b8;
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .date-filter-pill,
+  .btn-super-admin,
+  .dashboard-error button,
+  .dropdown-icon {
+    transition: none;
+  }
 }

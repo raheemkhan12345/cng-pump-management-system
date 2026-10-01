@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import  { useEffect, useMemo, useState } from "react";
 
 import { CheckCircle2 } from "lucide-react";
 
@@ -37,7 +37,7 @@ const formatDate = (value) => {
   }
 
   /**
-   * If backend already sends:
+   * Backend already sends:
    * 19-08-2026
    */
   if (/^\d{2}-\d{2}-\d{4}$/.test(String(value))) {
@@ -79,7 +79,11 @@ const getTypeClass = (type) => {
     return "badge-loan";
   }
 
-  if (normalizedType.includes("transfer")) {
+  if (
+    normalizedType.includes("transfer") ||
+    normalizedType.includes("cash") ||
+    normalizedType.includes("bank")
+  ) {
     return "badge-transfer";
   }
 
@@ -140,6 +144,7 @@ const getTransactionAmount = (transaction) => {
 const getTransactionPool = (transaction) => {
   return (
     transaction?.pool ||
+    transaction?.paymentPool ||
     transaction?.paymentMode ||
     transaction?.paymentMethod ||
     transaction?.account ||
@@ -167,16 +172,50 @@ const RecentTransactions = ({ transactions = [] }) => {
   // =========================================================
   const [currentPage, setCurrentPage] = useState(1);
 
+  /**
+   * =========================================================
+   * SAFETY
+   *
+   * Make sure transactions is always an array.
+   * =========================================================
+   */
+  const safeTransactions = useMemo(() => {
+    return Array.isArray(transactions) ? transactions : [];
+  }, [transactions]);
+
+  /**
+   * =========================================================
+   * SORT TRANSACTIONS
+   *
+   * Backend should already return the selected month's
+   * transactions, but we sort them again here so the
+   * newest transaction always appears first.
+   * =========================================================
+   */
+  const sortedTransactions = useMemo(() => {
+    return [...safeTransactions].sort((a, b) => {
+      const dateA = new Date(
+        a?.date || a?.createdAt || a?.transactionDate || 0,
+      ).getTime();
+
+      const dateB = new Date(
+        b?.date || b?.createdAt || b?.transactionDate || 0,
+      ).getTime();
+
+      return dateB - dateA;
+    });
+  }, [safeTransactions]);
+
   // =========================================================
   // Total Pages
   // =========================================================
   const totalPages =
-    transactions.length === 0
+    sortedTransactions.length === 0
       ? 1
-      : Math.ceil(transactions.length / ITEMS_PER_PAGE);
+      : Math.ceil(sortedTransactions.length / ITEMS_PER_PAGE);
 
   // =========================================================
-  // Reset To Page 1 When Transactions Change
+  // Reset To Page 1 When Selected Month Data Changes
   // =========================================================
   useEffect(() => {
     setCurrentPage(1);
@@ -190,8 +229,8 @@ const RecentTransactions = ({ transactions = [] }) => {
 
     const endIndex = startIndex + ITEMS_PER_PAGE;
 
-    return transactions.slice(startIndex, endIndex);
-  }, [transactions, currentPage]);
+    return sortedTransactions.slice(startIndex, endIndex);
+  }, [sortedTransactions, currentPage]);
 
   // =========================================================
   // Previous Page
@@ -215,15 +254,17 @@ const RecentTransactions = ({ transactions = [] }) => {
   // Showing From
   // =========================================================
   const showingFrom =
-    transactions.length === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
+    sortedTransactions.length === 0
+      ? 0
+      : (currentPage - 1) * ITEMS_PER_PAGE + 1;
 
   // =========================================================
   // Showing To
   // =========================================================
   const showingTo =
-    transactions.length === 0
+    sortedTransactions.length === 0
       ? 0
-      : Math.min(currentPage * ITEMS_PER_PAGE, transactions.length);
+      : Math.min(currentPage * ITEMS_PER_PAGE, sortedTransactions.length);
 
   return (
     <div className="dashboard-section-card table-section-card">
@@ -314,7 +355,7 @@ const RecentTransactions = ({ transactions = [] }) => {
                     padding: "30px",
                   }}
                 >
-                  No recent transactions found.
+                  No transactions found for this month.
                 </td>
               </tr>
             )}
@@ -325,12 +366,12 @@ const RecentTransactions = ({ transactions = [] }) => {
       {/* =====================================================
           PAGINATION FOOTER
       ====================================================== */}
-      {transactions.length > 0 && (
+      {sortedTransactions.length > 0 && (
         <div className="transactions-pagination">
           {/* Showing Text */}
           <span className="transactions-pagination-text">
             Showing <b>{showingFrom}</b> to <b>{showingTo}</b> of{" "}
-            <b>{transactions.length}</b> transactions
+            <b>{sortedTransactions.length}</b> transactions
           </span>
 
           {/* Buttons */}
