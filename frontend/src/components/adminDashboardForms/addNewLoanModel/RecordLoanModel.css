@@ -1,231 +1,741 @@
+/* =========================================================
+   MODAL OVERLAY
+========================================================= */
+
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 16px;
-    /* Mobile par screen edges se spacing ke liye */
-    overflow-y: auto;
-    /* Agar modal screen se bada ho toh overlay scroll ho sake */
+  position: fixed;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  background-color: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 1000;
+
+  padding: 16px;
+
+  box-sizing: border-box;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  -webkit-overflow-scrolling: touch;
 }
+
+/* =========================================================
+   MODAL CONTAINER
+========================================================= */
 
 .modal-container {
-    background: #ffffff;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 550px;
-    max-height: 90vh;
-    /* Screen height ke 90% tak restrict karega */
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+  width: 100%;
+  max-width: 550px;
+  min-width: 0;
+
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+
+  background: #ffffff;
+
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+
+  margin: auto;
 }
 
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 24px;
-    border-bottom: 1px solid #e5e7eb;
-    flex-shrink: 0;
-    /* Header visible rahega scroll ke dauran */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  width: 100%;
+  min-width: 0;
+
+  padding: 16px 24px;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  flex-shrink: 0;
+
+  box-sizing: border-box;
 }
 
 .modal-header h2 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #111827;
-    margin: 0;
+  min-width: 0;
+
+  font-size: 1.125rem;
+  line-height: 1.4;
+
+  font-weight: 600;
+
+  color: #111827;
+
+  margin: 0;
+
+  overflow-wrap: anywhere;
 }
 
 .modal-close-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #6b7280;
+  width: 34px;
+  height: 34px;
+
+  min-width: 34px;
+  min-height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: none;
+
+  border: none;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+
+  color: #6b7280;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
+
+.modal-close-btn:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.modal-close-btn:focus-visible {
+  outline: 2px solid #94a3b8;
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   MODAL BODY
+========================================================= */
 
 .modal-body {
-    padding: 20px 24px;
-    overflow-y: auto;
-    /* Body content ke andar scrolling enable karta hai */
-    flex-grow: 1;
+  width: 100%;
+  min-width: 0;
+
+  padding: 20px 24px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  flex-grow: 1;
+
+  box-sizing: border-box;
+
+  -webkit-overflow-scrolling: touch;
 }
 
+/* =========================================================
+   FORM GRID
+========================================================= */
+
 .form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+  width: 100%;
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 16px;
 }
 
 .full-width {
-    grid-column: span 2;
+  grid-column: span 2;
+}
+
+/* =========================================================
+   FORM GROUP
+========================================================= */
+
+.form-group {
+  min-width: 0;
 }
 
 .form-group label {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #4b5563;
-    margin-bottom: 6px;
-    letter-spacing: 0.05em;
+  display: block;
+
+  min-width: 0;
+
+  font-size: 0.75rem;
+  line-height: 1.4;
+
+  font-weight: 600;
+
+  color: #4b5563;
+
+  margin-bottom: 6px;
+
+  letter-spacing: 0.05em;
+
+  overflow-wrap: anywhere;
 }
 
+/* =========================================================
+   INPUT WITH ICON
+========================================================= */
+
 .input-with-icon {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
 }
 
 .input-icon {
-    position: absolute;
-    left: 12px;
-    color: #9ca3af;
+  position: absolute;
+
+  left: 12px;
+
+  color: #9ca3af;
+
+  pointer-events: none;
+
+  flex-shrink: 0;
 }
 
 .input-with-icon input,
 .form-group select,
 .form-group textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    outline: none;
+  width: 100%;
+  min-width: 0;
+
+  padding: 10px 12px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 6px;
+
+  font-family: inherit;
+
+  font-size: 0.875rem;
+
+  outline: none;
+
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+
+  color: #111827;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .input-with-icon input {
-    padding-left: 38px;
+  padding-left: 38px;
 }
 
-.amount-input-box {
-    display: flex;
-    align-items: center;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    overflow: hidden;
+.input-with-icon input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #047857;
+
+  box-shadow: 0 0 0 2px rgba(4, 120, 87, 0.1);
 }
 
-.currency-prefix {
-    background: #f3f4f6;
-    padding: 10px 14px;
-    font-size: 0.875rem;
-    color: #374151;
-    font-weight: 500;
-    border-right: 1px solid #d1d5db;
-}
+.form-group textarea {
+  resize: vertical;
 
-.amount-input-box input {
-    border: none;
-    padding: 10px 12px;
-    width: 100%;
-    outline: none;
-}
-
-.payment-options {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-}
-
-.payment-card {
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 12px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    background: #fff;
-    transition: all 0.2s ease;
-}
-
-.payment-card p {
-    margin: 0;
-    font-size: 0.75rem;
-    color: #6b7280;
-}
-
-.payment-card strong {
-    font-size: 0.875rem;
-    display: block;
-}
-
-.payment-card.selected {
-    border-color: #047857;
-    background-color: #ecfdf5;
-    color: #047857;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.btn-cancel {
-    padding: 8px 16px;
-    border: 1px solid #d1d5db;
-    background: #fff;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.btn-submit {
-    padding: 8px 16px;
-    background: #047857;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
+  min-height: 90px;
 }
 
 /* =========================================================
-   Mobile Responsiveness Media Query
+   AMOUNT INPUT
 ========================================================= */
+
+.amount-input-box {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: stretch;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 6px;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+}
+
+.currency-prefix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: #f3f4f6;
+
+  padding: 10px 14px;
+
+  font-size: 0.875rem;
+
+  color: #374151;
+
+  font-weight: 500;
+
+  border-right: 1px solid #d1d5db;
+
+  white-space: nowrap;
+
+  box-sizing: border-box;
+}
+
+.amount-input-box input {
+  width: 100%;
+  min-width: 0;
+
+  border: none;
+
+  padding: 10px 12px;
+
+  outline: none;
+
+  font-family: inherit;
+
+  font-size: 0.875rem;
+
+  color: #111827;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   PAYMENT OPTIONS
+========================================================= */
+
+.payment-options {
+  width: 100%;
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+.payment-card {
+  width: 100%;
+  min-width: 0;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 8px;
+
+  padding: 12px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  cursor: pointer;
+
+  background: #fff;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.payment-card:hover {
+  border-color: #94a3b8;
+}
+
+.payment-card:active {
+  transform: scale(0.99);
+}
+
+.payment-card p {
+  min-width: 0;
+
+  margin: 0;
+
+  font-size: 0.75rem;
+  line-height: 1.4;
+
+  color: #6b7280;
+
+  overflow-wrap: anywhere;
+}
+
+.payment-card strong {
+  display: block;
+
+  min-width: 0;
+
+  font-size: 0.875rem;
+  line-height: 1.4;
+
+  overflow-wrap: anywhere;
+}
+
+.payment-card.selected {
+  border-color: #047857;
+
+  background-color: #ecfdf5;
+
+  color: #047857;
+}
+
+/* =========================================================
+   MODAL FOOTER
+========================================================= */
+
+.modal-footer {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 12px;
+
+  margin-top: 20px;
+
+  box-sizing: border-box;
+}
+
+.btn-cancel,
+.btn-submit {
+  min-height: 40px;
+
+  box-sizing: border-box;
+
+  font-family: inherit;
+
+  font-size: 0.875rem;
+
+  cursor: pointer;
+
+  border-radius: 6px;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.btn-cancel {
+  padding: 8px 16px;
+
+  border: 1px solid #d1d5db;
+
+  background: #fff;
+
+  color: #374151;
+}
+
+.btn-cancel:hover {
+  background-color: #f9fafb;
+}
+
+.btn-submit {
+  padding: 8px 16px;
+
+  background: #047857;
+
+  color: #fff;
+
+  border: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+}
+
+.btn-submit:hover {
+  background-color: #036b4c;
+}
+
+.btn-cancel:active,
+.btn-submit:active {
+  transform: scale(0.98);
+}
+
+.btn-cancel:focus-visible,
+.btn-submit:focus-visible {
+  outline: 2px solid #94a3b8;
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   TABLET / MOBILE
+   <= 640px
+========================================================= */
+
 @media (max-width: 640px) {
-    .modal-overlay {
-        padding: 10px;
-    }
+  .modal-overlay {
+    padding: 10px;
 
-    .modal-body {
-        padding: 16px;
-    }
+    align-items: flex-start;
+  }
 
-    .form-grid {
-        grid-template-columns: 1fr;
-        /* Single column layout on mobile */
-    }
+  .modal-container {
+    max-width: 100%;
 
-    .full-width {
-        grid-column: span 1;
-    }
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
 
-    .payment-options {
-        grid-template-columns: 1fr;
-        /* Stack payment cards on smaller screens */
-    }
+    border-radius: 10px;
 
-    .modal-footer {
-        flex-direction: column-reverse;
-        /* Cancel button niche, submit uper */
-        gap: 8px;
-    }
+    margin: auto 0;
+  }
 
-    .btn-cancel,
-    .btn-submit {
-        width: 100%;
-        justify-content: center;
-    }
+  .modal-header {
+    padding: 14px 16px;
+  }
+
+  .modal-header h2 {
+    font-size: 1rem;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+
+    gap: 14px;
+  }
+
+  .full-width {
+    grid-column: span 1;
+  }
+
+  .payment-options {
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+  }
+
+  .payment-card {
+    min-height: 54px;
+
+    padding: 12px;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+
+    gap: 8px;
+
+    margin-top: 16px;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    width: 100%;
+
+    min-height: 44px;
+
+    justify-content: center;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   <= 480px
+========================================================= */
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 8px;
+  }
+
+  .modal-container {
+    max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px);
+
+    border-radius: 9px;
+  }
+
+  .modal-header {
+    padding: 13px 14px;
+  }
+
+  .modal-header h2 {
+    font-size: 0.95rem;
+  }
+
+  .modal-close-btn {
+    width: 36px;
+    height: 36px;
+
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .modal-body {
+    padding: 14px;
+  }
+
+  .form-grid {
+    gap: 12px;
+  }
+
+  .form-group label {
+    font-size: 0.7rem;
+  }
+
+  .input-with-icon input,
+  .form-group select,
+  .form-group textarea,
+  .amount-input-box input {
+    font-size: 0.8125rem;
+  }
+
+  .currency-prefix {
+    padding: 10px 12px;
+
+    font-size: 0.8125rem;
+  }
+
+  .payment-card {
+    padding: 11px;
+  }
+
+  .modal-footer {
+    margin-top: 14px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+   <= 360px
+========================================================= */
+
+@media (max-width: 360px) {
+  .modal-overlay {
+    padding: 6px;
+  }
+
+  .modal-container {
+    max-height: calc(100vh - 12px);
+    max-height: calc(100dvh - 12px);
+  }
+
+  .modal-header {
+    padding: 12px;
+  }
+
+  .modal-body {
+    padding: 12px;
+  }
+
+  .modal-header h2 {
+    font-size: 0.9rem;
+  }
+
+  .modal-close-btn {
+    width: 34px;
+    height: 34px;
+
+    min-width: 34px;
+    min-height: 34px;
+  }
+
+  .form-grid {
+    gap: 11px;
+  }
+
+  .payment-options {
+    gap: 8px;
+  }
+
+  .payment-card {
+    padding: 10px;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    min-height: 44px;
+
+    font-size: 0.8125rem;
+  }
+}
+
+/* =========================================================
+   TOUCH DEVICES
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .modal-close-btn {
+    width: 44px;
+    height: 44px;
+
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    min-height: 44px;
+  }
+
+  .payment-card {
+    min-height: 54px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .payment-card,
+  .btn-cancel,
+  .btn-submit,
+  .modal-close-btn {
+    transition: none;
+  }
 }

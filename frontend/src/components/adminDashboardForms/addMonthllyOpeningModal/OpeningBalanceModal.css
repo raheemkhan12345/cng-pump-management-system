@@ -1,12 +1,16 @@
-/* Overlay backdrop */
+/* =========================================================
+   OVERLAY BACKDROP
+========================================================= */
+
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
   background-color: rgba(15, 23, 42, 0.45);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,13 +24,18 @@
     "Segoe UI",
     Roboto,
     sans-serif;
+  overflow-y: auto;
 }
 
-/* Modal Card */
+/* =========================================================
+   MODAL CARD
+========================================================= */
+
 .modal-card {
   background-color: #ffffff;
   width: 100%;
   max-width: 680px;
+  max-height: calc(100dvh - 32px);
   border-radius: 20px;
   box-shadow:
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
@@ -34,22 +43,30 @@
   padding: 28px 32px;
   position: relative;
   box-sizing: border-box;
-  max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Modal Header */
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 16px;
   padding-bottom: 20px;
   border-bottom: 1px solid #f1f5f9;
   margin-bottom: 24px;
+  min-width: 0;
 }
 
 .title-wrapper {
-  padding-right: 16px;
+  min-width: 0;
+  flex: 1;
+  padding-right: 4px;
 }
 
 .modal-title {
@@ -58,6 +75,7 @@
   font-weight: 800;
   color: #0f172a;
   line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 .modal-subtitle {
@@ -65,9 +83,13 @@
   font-size: 0.85rem;
   color: #64748b;
   line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .close-btn {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
   background: transparent;
   border: none;
   color: #64748b;
@@ -88,8 +110,18 @@
   color: #0f172a;
 }
 
-/* Form Groups & Typography */
+.close-btn:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   FORM GROUPS & TYPOGRAPHY
+========================================================= */
+
 .form-group {
+  width: 100%;
+  min-width: 0;
   margin-bottom: 22px;
 }
 
@@ -100,6 +132,7 @@
   margin-bottom: 10px;
   flex-wrap: wrap;
   gap: 6px;
+  min-width: 0;
 }
 
 .form-label {
@@ -108,6 +141,7 @@
   color: #1e293b;
   display: block;
   margin-bottom: 8px;
+  line-height: 1.4;
 }
 
 .label-row .form-label {
@@ -121,16 +155,25 @@
 .helper-text {
   font-size: 0.775rem;
   color: #64748b;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
-/* Balance Type Button Cards */
+/* =========================================================
+   BALANCE TYPE BUTTON CARDS
+========================================================= */
+
 .balance-options-grid {
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
+  min-width: 0;
 }
 
 .type-card-btn {
+  min-width: 0;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -145,6 +188,9 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .type-card-btn:hover {
@@ -169,24 +215,34 @@
   flex-shrink: 0;
 }
 
-/* 2 Column Form Row */
+/* =========================================================
+   2 COLUMN FORM ROW
+========================================================= */
+
 .form-row-2col {
+  width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+  min-width: 0;
 }
 
-/* Input Fields with Left Icon */
+/* =========================================================
+   INPUT FIELDS WITH LEFT ICON
+========================================================= */
+
 .input-with-icon {
   position: relative;
   display: flex;
   align-items: center;
   width: 100%;
+  min-width: 0;
 }
 
 .input-icon {
   color: #64748b;
   transition: color 0.2s ease;
+  flex-shrink: 0;
 }
 
 .select-icon {
@@ -201,7 +257,10 @@
   align-items: center;
 }
 
-/* Calendar Button Trigger */
+/* =========================================================
+   CALENDAR BUTTON TRIGGER
+========================================================= */
+
 .calendar-icon-btn {
   position: absolute;
   left: 6px;
@@ -227,8 +286,13 @@
   color: #0f172a;
 }
 
+/* =========================================================
+   FORM CONTROL
+========================================================= */
+
 .form-control {
   width: 100%;
+  min-width: 0;
   height: 46px;
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
@@ -254,14 +318,17 @@
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%3C64748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364758b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
   padding-right: 40px;
-  padding-left: 44px !important; /* Forces text to sit safely to the right of the icon */
+  padding-left: 44px !important;
 }
 
-/* Date control specific overrides */
+/* =========================================================
+   DATE CONTROL
+========================================================= */
+
 .date-control {
   cursor: pointer;
 }
@@ -276,15 +343,21 @@
   opacity: 1;
 }
 
-/* Opening Amount Input Box */
+/* =========================================================
+   OPENING AMOUNT INPUT BOX
+========================================================= */
+
 .amount-input-wrapper {
   display: flex;
   align-items: center;
+  width: 100%;
+  min-width: 0;
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
   overflow: hidden;
   height: 52px;
+  box-sizing: border-box;
   transition:
     border-color 0.2s,
     background-color 0.2s;
@@ -307,10 +380,12 @@
   justify-content: center;
   border-right: 1px solid #e2e8f0;
   letter-spacing: 0.05em;
+  flex-shrink: 0;
 }
 
 .amount-input {
   width: 100%;
+  min-width: 0;
   height: 100%;
   border: none;
   outline: none;
@@ -320,9 +395,13 @@
   font-weight: 400;
   color: #0f172a;
   letter-spacing: 0.02em;
+  box-sizing: border-box;
 }
 
-/* Modal Actions */
+/* =========================================================
+   MODAL ACTIONS
+========================================================= */
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -352,6 +431,7 @@
 .btn-submit {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   background-color: #047857;
   color: #ffffff;
@@ -369,16 +449,125 @@
   background-color: #065f46;
 }
 
-/* Responsive Styles */
-@media (max-width: 640px) {
+.ct-submit-icon,
+.submit-icon {
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1440px) {
   .modal-card {
+    max-width: 700px;
+    padding: 30px 34px;
+  }
+
+  .modal-title {
+    font-size: 1.45rem;
+  }
+}
+
+/* =========================================================
+   LAPTOP / TABLET
+========================================================= */
+
+@media (max-width: 1024px) {
+  .modal-card {
+    max-width: 640px;
+    padding: 26px 28px;
+  }
+
+  .balance-options-grid {
+    gap: 8px;
+  }
+
+  .form-row-2col {
+    gap: 14px;
+  }
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 14px;
+  }
+
+  .modal-card {
+    max-width: 620px;
+    max-height: calc(100dvh - 28px);
+    padding: 24px;
+    border-radius: 18px;
+  }
+
+  .modal-header {
+    margin-bottom: 20px;
+    padding-bottom: 18px;
+  }
+
+  .modal-title {
+    font-size: 1.3rem;
+  }
+
+  .modal-subtitle {
+    font-size: 0.82rem;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .balance-options-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 640px) {
+  .modal-overlay {
+    align-items: center;
+    padding: 12px;
+  }
+
+  .modal-card {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - 24px);
     padding: 20px;
     border-radius: 16px;
   }
 
+  .modal-header {
+    gap: 10px;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+  }
+
+  .modal-subtitle {
+    font-size: 0.8rem;
+  }
+
   .balance-options-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
+  }
+
+  .type-card-btn {
+    min-height: 44px;
+    padding: 11px 8px;
+    font-size: 0.75rem;
   }
 
   .form-row-2col {
@@ -386,20 +575,266 @@
     gap: 16px;
   }
 
+  .form-control {
+    height: 44px;
+    font-size: 0.85rem;
+  }
+
+  .amount-input-wrapper {
+    height: 50px;
+  }
+
   .modal-actions {
     flex-direction: column-reverse;
+    align-items: stretch;
     gap: 10px;
+    margin-top: 24px;
   }
 
   .btn-cancel,
   .btn-submit {
     width: 100%;
     justify-content: center;
+    box-sizing: border-box;
   }
 }
 
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+
+  .modal-card {
+    max-height: calc(100dvh - 20px);
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .modal-header {
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+  }
+
+  .modal-title {
+    font-size: 1.1rem;
+  }
+
+  .modal-subtitle {
+    font-size: 0.76rem;
+  }
+
+  .close-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  .form-label {
+    font-size: 0.78rem;
+  }
+
+  .helper-text {
+    font-size: 0.72rem;
+  }
+
+  .balance-options-grid {
+    gap: 7px;
+  }
+
+  .type-card-btn {
+    min-height: 42px;
+    padding: 10px 7px;
+    font-size: 0.72rem;
+    gap: 6px;
+  }
+
+  .form-control {
+    height: 43px;
+    padding-left: 40px;
+    padding-right: 12px;
+  }
+
+  .select-control {
+    padding-left: 40px !important;
+    padding-right: 36px;
+  }
+
+  .select-icon {
+    left: 12px;
+  }
+
+  .calendar-icon-btn {
+    left: 4px;
+  }
+
+  .currency-prefix {
+    padding: 0 14px;
+    font-size: 0.75rem;
+  }
+
+  .amount-input {
+    padding: 0 12px;
+    font-size: 0.9rem;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    padding: 11px 16px;
+    font-size: 0.82rem;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
 @media (max-width: 400px) {
+  .modal-overlay {
+    padding: 8px;
+  }
+
+  .modal-card {
+    max-height: calc(100dvh - 16px);
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    gap: 8px;
+  }
+
+  .modal-title {
+    font-size: 1rem;
+  }
+
+  .modal-subtitle {
+    font-size: 0.72rem;
+  }
+
   .balance-options-grid {
     grid-template-columns: 1fr;
+  }
+
+  .type-card-btn {
+    width: 100%;
+    min-height: 42px;
+  }
+
+  .form-row-2col {
+    gap: 14px;
+  }
+
+  .amount-input-wrapper {
+    height: 48px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL DEVICES
+========================================================= */
+
+@media (max-width: 360px) {
+  .modal-overlay {
+    padding: 6px;
+  }
+
+  .modal-card {
+    max-height: calc(100dvh - 12px);
+    padding: 12px;
+  }
+
+  .modal-header {
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+
+  .modal-title {
+    font-size: 0.95rem;
+  }
+
+  .modal-subtitle {
+    font-size: 0.68rem;
+  }
+
+  .close-btn {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+  }
+
+  .form-label {
+    font-size: 0.75rem;
+  }
+
+  .form-control {
+    height: 41px;
+    font-size: 0.8rem;
+  }
+
+  .amount-input-wrapper {
+    height: 46px;
+  }
+
+  .currency-prefix {
+    padding: 0 11px;
+  }
+
+  .amount-input {
+    padding: 0 10px;
+    font-size: 0.85rem;
+  }
+}
+
+/* =========================================================
+   TOUCH DEVICES
+========================================================= */
+
+@media (hover: none) {
+  .close-btn:hover {
+    background-color: transparent;
+    color: #64748b;
+  }
+
+  .type-card-btn:hover {
+    border-color: #e2e8f0;
+    background-color: #f8fafc;
+  }
+
+  .btn-cancel:hover {
+    background-color: transparent;
+    color: #475569;
+  }
+
+  .btn-submit:hover {
+    background-color: #047857;
+  }
+
+  .calendar-icon-btn:hover {
+    background-color: transparent;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .close-btn,
+  .type-card-btn,
+  .input-icon,
+  .calendar-icon-btn,
+  .form-control,
+  .amount-input-wrapper,
+  .btn-cancel,
+  .btn-submit {
+    transition: none;
   }
 }

@@ -1,28 +1,49 @@
 /* ==========================================
-   Responsive Stats Grid (4 columns default)
+   STATS GRID
+   Large Desktop → 4 columns
 ========================================== */
+
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
   gap: 16px;
+
   width: 100%;
+  max-width: 100%;
+
   box-sizing: border-box;
+
+  min-width: 0;
 }
 
 /* ==========================================
-   Card Container
+   CARD CONTAINER
 ========================================== */
+
 .stat-card {
+  width: 100%;
+  min-width: 0;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
   padding: 16px 18px;
+
   min-height: 120px;
+
   border-radius: 12px;
+
   box-sizing: border-box;
+
   position: relative;
+
   overflow: hidden;
+
   cursor: pointer;
+
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
@@ -30,139 +51,554 @@
 
 .stat-card:hover {
   transform: translateY(-2px);
+
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .stat-card:focus-visible {
   outline: 2px solid #2563eb;
+
   outline-offset: 2px;
 }
 
 /* ==========================================
-   Card Background Variants
+   CARD BACKGROUND VARIANTS
 ========================================== */
+
 .card-green {
   background-color: #bbf7d0;
-  /* Soft lime-green */
 }
 
 .card-teal {
   background-color: #6ee7b7;
-  /* Mint / Teal */
 }
 
 .card-pink {
   background-color: #fca5a5;
-  /* Light reddish pink */
 }
 
 .card-grey {
   background-color: #e5e7eb;
-  /* Soft neutral grey */
 }
 
 /* ==========================================
-   Red Left Accent Border
+   RED LEFT ACCENT BORDER
 ========================================== */
+
 .accent-border-red {
   border-left: 5px solid #ef4444;
-  /* Thick left red border bar */
 }
 
 /* ==========================================
-   Card Header (Label & Icon)
+   CARD HEADER
 ========================================== */
+
 .card-header {
+  width: 100%;
+  min-width: 0;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  gap: 10px;
 }
+
+/* ==========================================
+   CARD LABEL
+========================================== */
 
 .card-label {
+  min-width: 0;
+
   font-size: 11px;
   font-weight: 700;
+
   letter-spacing: 0.5px;
+
   color: #4b5563;
+
   text-transform: uppercase;
+
+  line-height: 1.3;
+
+  overflow-wrap: anywhere;
 }
 
+/* ==========================================
+   CARD ICON
+========================================== */
+
 .card-icon {
+  flex-shrink: 0;
+
   font-size: 16px;
+
   color: #374151;
 }
 
 /* ==========================================
-   Card Main Content Area
+   CARD BODY
 ========================================== */
+
 .card-body {
+  width: 100%;
+
   margin-top: 8px;
+
+  min-width: 0;
 }
+
+/* ==========================================
+   CARD AMOUNT
+========================================== */
 
 .card-amount {
+  max-width: 100%;
+
   font-size: 22px;
+
   font-weight: 800;
+
   color: #111827;
+
   margin: 0;
+
   line-height: 1.2;
+
+  overflow-wrap: anywhere;
+
+  word-break: break-word;
 }
+
+/* ==========================================
+   CARD SUBTEXT
+========================================== */
 
 .card-subtext {
+  max-width: 100%;
+
   font-size: 12px;
+
   color: #4b5563;
+
   margin: 4px 0 0 0;
+
   font-weight: 500;
+
+  line-height: 1.3;
+
+  overflow-wrap: anywhere;
 }
 
-/* Special Variations for Subtexts */
+/* ==========================================
+   SPECIAL SUBTEXT VARIATIONS
+========================================== */
+
 .bold-subtext {
   font-size: 16px;
+
   font-weight: 700;
+
   color: #111827;
+
+  line-height: 1.3;
 }
 
 .large-subtext {
   font-size: 18px;
+
   font-weight: 700;
+
   color: #111827;
+
+  line-height: 1.3;
 }
 
 /* ==========================================
-   Color Variants
+   COLOR VARIANTS
 ========================================== */
+
 .text-red {
   color: #dc2626 !important;
 }
 
-/* ==========================================
-   Responsiveness
-========================================== */
+/* =========================================================
+   LARGE DESKTOP
+   1440px+
+========================================================= */
 
-/* Large Tablets / Laptops */
-@media (max-width: 1200px) {
+@media (min-width: 1440px) {
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-  }
-}
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 
-/* Tablets & Mobile Devices */
-@media (max-width: 640px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 18px;
   }
 
   .stat-card {
+    padding: 18px 20px;
+
+    min-height: 125px;
+
+    border-radius: 13px;
+  }
+
+  .card-label {
+    font-size: 11.5px;
+  }
+
+  .card-icon {
+    font-size: 17px;
+  }
+
+  .card-amount {
+    font-size: 23px;
+  }
+
+  .card-subtext {
+    font-size: 12px;
+  }
+
+  .bold-subtext {
+    font-size: 16px;
+  }
+
+  .large-subtext {
+    font-size: 18px;
+  }
+}
+
+/* =========================================================
+   DESKTOP / LAPTOP
+   1201px - 1439px
+========================================================= */
+
+@media (min-width: 1201px) and (max-width: 1439px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+  }
+
+  .stat-card {
+    padding: 16px 18px;
+
+    min-height: 120px;
+  }
+}
+
+/* =========================================================
+   LAPTOP / SMALL DESKTOP
+   1025px - 1200px
+========================================================= */
+
+@media (min-width: 1025px) and (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 14px;
+  }
+
+  .stat-card {
+    min-height: 115px;
+
+    padding: 15px 17px;
+  }
+
+  .card-amount {
+    font-size: 21px;
+  }
+}
+
+/* =========================================================
+   TABLET
+   769px - 1024px
+========================================================= */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 14px;
+  }
+
+  .stat-card {
+    min-height: 110px;
+
     padding: 14px 16px;
-    min-height: 105px;
+
+    border-radius: 11px;
+  }
+
+  .card-label {
+    font-size: 10.5px;
+
+    letter-spacing: 0.4px;
+  }
+
+  .card-icon {
+    font-size: 15px;
+  }
+
+  .card-body {
+    margin-top: 7px;
   }
 
   .card-amount {
     font-size: 20px;
   }
 
-  .bold-subtext,
+  .card-subtext {
+    font-size: 11.5px;
+  }
+
+  .bold-subtext {
+    font-size: 15px;
+  }
+
+  .large-subtext {
+    font-size: 17px;
+  }
+}
+
+/* =========================================================
+   TABLET / LARGE MOBILE
+   601px - 768px
+========================================================= */
+
+@media (min-width: 601px) and (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+  }
+
+  .stat-card {
+    min-height: 108px;
+
+    padding: 14px 15px;
+
+    border-radius: 10px;
+  }
+
+  .card-header {
+    gap: 8px;
+  }
+
+  .card-label {
+    font-size: 10px;
+
+    letter-spacing: 0.35px;
+  }
+
+  .card-icon {
+    font-size: 15px;
+  }
+
+  .card-body {
+    margin-top: 7px;
+  }
+
+  .card-amount {
+    font-size: 19px;
+  }
+
+  .card-subtext {
+    font-size: 11px;
+  }
+
+  .bold-subtext {
+    font-size: 14.5px;
+  }
+
+  .large-subtext {
+    font-size: 16px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   481px - 600px
+========================================================= */
+
+@media (min-width: 481px) and (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .stat-card {
+    min-height: 105px;
+
+    padding: 13px 14px;
+
+    border-radius: 10px;
+  }
+
+  .card-header {
+    gap: 7px;
+  }
+
+  .card-label {
+    font-size: 9.5px;
+
+    letter-spacing: 0.3px;
+  }
+
+  .card-icon {
+    font-size: 14px;
+  }
+
+  .card-body {
+    margin-top: 6px;
+  }
+
+  .card-amount {
+    font-size: 18px;
+  }
+
+  .card-subtext {
+    font-size: 10.5px;
+  }
+
+  .bold-subtext {
+    font-size: 14px;
+  }
+
   .large-subtext {
     font-size: 15px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   361px - 480px
+========================================================= */
+
+@media (min-width: 361px) and (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+  }
+
+  .stat-card {
+    min-height: 100px;
+
+    padding: 13px 14px;
+
+    border-radius: 10px;
+  }
+
+  .card-header {
+    gap: 8px;
+  }
+
+  .card-label {
+    font-size: 10px;
+
+    letter-spacing: 0.35px;
+  }
+
+  .card-icon {
+    font-size: 15px;
+  }
+
+  .card-body {
+    margin-top: 6px;
+  }
+
+  .card-amount {
+    font-size: 20px;
+  }
+
+  .card-subtext {
+    font-size: 11px;
+  }
+
+  .bold-subtext {
+    font-size: 15px;
+  }
+
+  .large-subtext {
+    font-size: 16px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+   <= 360px
+========================================================= */
+
+@media (max-width: 360px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+
+    gap: 9px;
+  }
+
+  .stat-card {
+    min-height: 96px;
+
+    padding: 12px 13px;
+
+    border-radius: 9px;
+  }
+
+  .card-header {
+    gap: 7px;
+  }
+
+  .card-label {
+    font-size: 9.5px;
+
+    letter-spacing: 0.25px;
+  }
+
+  .card-icon {
+    font-size: 14px;
+  }
+
+  .card-body {
+    margin-top: 6px;
+  }
+
+  .card-amount {
+    font-size: 18px;
+  }
+
+  .card-subtext {
+    font-size: 10.5px;
+  }
+
+  .bold-subtext {
+    font-size: 14px;
+  }
+
+  .large-subtext {
+    font-size: 15px;
+  }
+}
+
+/* =========================================================
+   TOUCH DEVICES
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .stat-card:hover {
+    transform: none;
+
+    box-shadow: none;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .stat-card {
+    transition: none;
   }
 }

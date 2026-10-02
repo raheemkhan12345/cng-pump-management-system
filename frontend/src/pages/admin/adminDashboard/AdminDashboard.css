@@ -18,6 +18,8 @@
     sans-serif;
 
   color: #0f172a;
+
+  overflow-x: hidden;
 }
 
 /* =========================================================
@@ -34,6 +36,8 @@
   gap: 15px;
 
   box-sizing: border-box;
+
+  min-width: 0;
 }
 
 /* =========================================================
@@ -70,6 +74,8 @@
     border-color 0.2s ease,
     background-color 0.2s ease,
     box-shadow 0.2s ease;
+
+  min-width: 0;
 }
 
 .date-filter-pill:hover {
@@ -96,6 +102,8 @@
 
 .date-filter-pill > span:not(.dropdown-arrow-badge) {
   white-space: nowrap;
+
+  min-width: 0;
 }
 
 /* =========================================================
@@ -112,6 +120,8 @@
   max-width: 220px;
 
   flex-shrink: 1;
+
+  box-sizing: border-box;
 }
 
 /* =========================================================
@@ -125,6 +135,7 @@
 
   width: 100%;
   min-width: 145px;
+  max-width: 100%;
 
   border: none;
   outline: none;
@@ -216,6 +227,8 @@
   font-weight: 500;
 
   box-sizing: border-box;
+
+  text-align: center;
 }
 
 /* =========================================================
@@ -252,9 +265,13 @@
 .dashboard-error p {
   margin: 0;
 
+  max-width: 100%;
+
   font-size: 14px;
 
   line-height: 1.5;
+
+  overflow-wrap: anywhere;
 }
 
 .dashboard-error button {
@@ -311,13 +328,24 @@
 
   cursor: pointer;
 
-  transition: all 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+
+  flex-shrink: 0;
+
+  box-sizing: border-box;
 }
 
 .btn-super-admin:hover {
   background-color: #111827;
 
   border-color: #22d3ee;
+}
+
+.btn-super-admin:active {
+  transform: scale(0.98);
 }
 
 /* =========================================================
@@ -349,109 +377,237 @@
   max-width: 100%;
 
   box-sizing: border-box;
+
+  min-width: 0;
 }
 
 /* =========================================================
-   LARGE TABLET / SMALL DESKTOP
-   1024px
+   LARGE DESKTOP
+   1440px+
 ========================================================= */
 
-@media (max-width: 1024px) {
+@media (min-width: 1440px) {
+  .admin-dashboard-wrapper {
+    gap: 22px;
+  }
+
+  .dashboard-action-bar {
+    gap: 18px;
+  }
+
+  .date-filter-pill {
+    min-height: 44px;
+
+    padding: 7px 12px 7px 14px;
+
+    font-size: 13.5px;
+  }
+
+  .month-select-wrapper {
+    min-width: 155px;
+    max-width: 240px;
+  }
+
+  .dashboard-month-select {
+    min-width: 155px;
+
+    font-size: 13.5px;
+
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .btn-super-admin {
+    min-height: 42px;
+
+    font-size: 14px;
+  }
+}
+
+/* =========================================================
+   LAPTOP / SMALL DESKTOP
+   1025px - 1439px
+========================================================= */
+
+@media (min-width: 1025px) and (max-width: 1439px) {
+  .admin-dashboard-wrapper {
+    gap: 20px;
+  }
+
+  .dashboard-action-bar {
+    gap: 15px;
+  }
+
+  .date-filter-pill {
+    min-height: 42px;
+  }
+
+  .month-select-wrapper {
+    min-width: 145px;
+    max-width: 220px;
+  }
+}
+
+/* =========================================================
+   TABLET / LARGE TABLET
+   769px - 1024px
+========================================================= */
+
+@media (min-width: 769px) and (max-width: 1024px) {
   .admin-dashboard-wrapper {
     gap: 18px;
   }
 
   .dashboard-action-bar {
     gap: 12px;
+
+    flex-wrap: wrap;
   }
 
   .date-filter-pill {
     min-height: 40px;
 
     padding: 6px 9px 6px 11px;
+
+    font-size: 12.5px;
   }
 
   .month-select-wrapper {
     min-width: 135px;
+
+    max-width: 200px;
   }
 
   .dashboard-month-select {
     min-width: 135px;
 
     font-size: 12.5px;
+
+    padding-right: 24px;
+  }
+
+  .btn-super-admin {
+    min-height: 40px;
+
+    font-size: 13px;
+  }
+
+  .icon-circle {
+    width: 25px;
+    height: 25px;
   }
 }
 
 /* =========================================================
-   TABLET
-   768px
+   MOBILE LAYOUT
+   <= 768px
 ========================================================= */
 
 @media (max-width: 768px) {
-  .admin-dashboard-wrapper {
-    gap: 16px;
+  .layout-wrapper {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
   }
 
-  .dashboard-action-bar {
-    width: 100%;
+  /* Mobile Sidebar */
+  .sidebar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
 
+    width: 270px;
+    max-width: 85vw;
+
+    height: 100vh;
+    height: 100dvh;
+
+    margin: 0;
+
+    transform: translateX(-100%);
+
+    z-index: 1000;
+
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .sidebar-container.open {
+    transform: translateX(0);
+  }
+
+  /* Main Content */
+  .layout-main {
+    width: 100%;
+    max-width: 100%;
+
+    min-width: 0;
+
+    margin-left: 0;
+
+    display: flex;
     flex-direction: column;
-
-    align-items: stretch;
-
-    gap: 10px;
   }
 
-  .date-filter-pill {
+  /* TOP NAVBAR */
+  .admin-top-navbar {
     width: 100%;
+    max-width: 100%;
 
-    justify-content: flex-start;
+    flex-shrink: 0;
 
-    min-height: 44px;
+    position: sticky;
+    top: 0;
 
-    padding: 7px 10px;
+    z-index: 900;
   }
 
-  .date-filter-pill > span:not(.dropdown-arrow-badge) {
-    font-size: 12px;
+  /* Overlay */
+  .sidebar-overlay {
+    display: block;
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background-color: rgba(15, 23, 42, 0.4);
+
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+
+    z-index: 950;
   }
 
-  .month-select-wrapper {
-    flex: 1;
+  /* Content */
+  .layout-content {
+    width: 100%;
+    max-width: 100%;
 
     min-width: 0;
 
-    max-width: none;
+    padding: 16px;
+
+    box-sizing: border-box;
   }
 
-  .dashboard-month-select {
+  .content-container {
     width: 100%;
+    max-width: 100%;
 
     min-width: 0;
 
-    max-width: none;
+    margin: 0;
 
-    font-size: 13px;
-
-    padding-left: 3px;
-  }
-
-  .dropdown-icon {
-    right: 5px;
-  }
-
-  .btn-super-admin {
-    width: 100%;
-
-    justify-content: center;
-
-    min-height: 42px;
+    box-sizing: border-box;
   }
 }
 
 /* =========================================================
    MOBILE
-   600px
+   <= 600px
 ========================================================= */
 
 @media (max-width: 600px) {
@@ -505,6 +661,17 @@
     height: 12px;
   }
 
+  .btn-super-admin {
+    min-height: 42px;
+
+    font-size: 13px;
+  }
+
+  .icon-circle {
+    width: 25px;
+    height: 25px;
+  }
+
   .dashboard-loading {
     min-height: 160px;
 
@@ -528,12 +695,16 @@
 
 /* =========================================================
    SMALL MOBILE
-   480px
+   <= 480px
 ========================================================= */
 
 @media (max-width: 480px) {
   .admin-dashboard-wrapper {
     gap: 12px;
+  }
+
+  .dashboard-action-bar {
+    gap: 8px;
   }
 
   .date-filter-pill {
@@ -546,12 +717,18 @@
     gap: 6px;
 
     padding: 6px 7px;
+
+    border-radius: 8px;
   }
 
   .date-filter-pill > span:not(.dropdown-arrow-badge) {
     white-space: nowrap;
 
     font-size: 10.5px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
   }
 
   .month-select-wrapper {
@@ -569,7 +746,7 @@
 
     font-size: 11.5px;
 
-    padding-right: 23px;
+    padding: 7px 23px 7px 2px;
   }
 
   .dropdown-icon {
@@ -578,11 +755,56 @@
     width: 11px;
     height: 11px;
   }
+
+  .btn-super-admin {
+    width: 100%;
+
+    min-height: 40px;
+
+    gap: 8px;
+
+    font-size: 12.5px;
+
+    padding: 5px 12px 5px 7px;
+  }
+
+  .icon-circle {
+    width: 24px;
+    height: 24px;
+  }
+
+  .dashboard-loading {
+    min-height: 150px;
+
+    padding: 16px;
+
+    font-size: 12.5px;
+  }
+
+  .dashboard-error {
+    min-height: 150px;
+
+    padding: 18px;
+
+    gap: 12px;
+  }
+
+  .dashboard-error p {
+    font-size: 12.5px;
+  }
+
+  .dashboard-error button {
+    width: 100%;
+
+    max-width: 180px;
+
+    padding: 9px 14px;
+  }
 }
 
 /* =========================================================
    VERY SMALL MOBILE
-   360px
+   <= 360px
 ========================================================= */
 
 @media (max-width: 360px) {
@@ -590,15 +812,25 @@
     gap: 10px;
   }
 
+  .dashboard-action-bar {
+    gap: 7px;
+  }
+
   .date-filter-pill {
     display: flex;
 
+    width: 100%;
+
+    min-height: 42px;
+
     gap: 6px;
+
+    padding: 6px 7px;
   }
 
   /*
      Hide "Viewing reports for" on very small screens.
-     The selected month itself remains visible.
+     Selected month remains visible.
   */
 
   .date-filter-pill > span:not(.dropdown-arrow-badge) {
@@ -620,9 +852,7 @@
 
     font-size: 12px;
 
-    padding-left: 2px;
-
-    padding-right: 23px;
+    padding: 6px 23px 6px 2px;
   }
 
   .dropdown-icon {
@@ -630,6 +860,59 @@
 
     width: 11px;
     height: 11px;
+  }
+
+  .btn-super-admin {
+    min-height: 40px;
+
+    font-size: 12px;
+  }
+
+  .icon-circle {
+    width: 23px;
+    height: 23px;
+  }
+
+  .dashboard-loading {
+    min-height: 140px;
+
+    padding: 14px;
+
+    font-size: 12px;
+  }
+
+  .dashboard-error {
+    min-height: 140px;
+
+    padding: 16px;
+  }
+
+  .dashboard-error p {
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   TOUCH DEVICES
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .date-filter-pill:hover {
+    background: #cacccd;
+
+    border-color: #e2e8f0;
+
+    box-shadow: none;
+  }
+
+  .btn-super-admin:hover {
+    background-color: #1f2937;
+
+    border-color: #06b6d4;
+  }
+
+  .dashboard-error button:hover {
+    background: #0f172a;
   }
 }
 

@@ -1,66 +1,278 @@
 .layout-wrapper {
-    display: flex;
-    min-height: 100vh;
-    background-color: #f8fafc;
-    width: 100%;
+  display: flex;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  background-color: #f8fafc;
+
+  overflow-x: hidden;
 }
+
+/* =========================================================
+   SIDEBAR CONTAINER
+========================================================= */
 
 .sidebar-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    z-index: 50;
-    transition: transform 0.3s ease-in-out;
+  position: fixed;
+
+  top: 0;
+  left: 0;
+  bottom: 0;
+
+  width: 250px;
+  height: 100vh;
+  height: 100dvh;
+
+  z-index: 50;
+
+  transition: transform 0.3s ease-in-out;
+
+  transform: translateX(0);
 }
+
+/* =========================================================
+   MAIN AREA
+========================================================= */
 
 .layout-main {
-    flex: 1;
-    margin-left: 250px;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    transition: margin-left 0.3s ease-in-out;
+  flex: 1;
+
+  width: calc(100% - 250px);
+  min-width: 0;
+
+  margin-left: 250px;
+
+  display: flex;
+  flex-direction: column;
+
+  transition:
+    margin-left 0.3s ease-in-out,
+    width 0.3s ease-in-out;
 }
+
+/* =========================================================
+   CONTENT
+========================================================= */
 
 .layout-content {
-    flex: 1;
-    padding: 24px;
+  flex: 1;
+
+  width: 100%;
+
+  padding: 24px;
+
+  box-sizing: border-box;
 }
+
+/* =========================================================
+   CONTENT CONTAINER
+========================================================= */
 
 .content-container {
-    max-width: 1400px;
-    margin: 0 auto;
+  width: 100%;
+  max-width: 1400px;
+
+  margin: 0 auto;
+
+  box-sizing: border-box;
 }
+
+/* =========================================================
+   SIDEBAR OVERLAY
+========================================================= */
 
 .sidebar-overlay {
-    display: none;
+  display: none;
+
+  position: fixed;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background-color: rgba(15, 23, 42, 0.4);
+
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+
+  z-index: 40;
 }
 
-/* Mobile Responsiveness */
+/* =========================================================
+   LARGE DESKTOP
+   1440px+
+========================================================= */
+
+@media (min-width: 1440px) {
+  .sidebar-container {
+    width: 250px;
+  }
+
+  .layout-main {
+    width: calc(100% - 250px);
+
+    margin-left: 250px;
+  }
+
+  .layout-content {
+    padding: 28px 32px;
+  }
+
+  .content-container {
+    max-width: 1500px;
+  }
+}
+
+/* =========================================================
+   LAPTOP
+   1025px - 1439px
+========================================================= */
+
+@media (max-width: 1439px) {
+  .sidebar-container {
+    width: 250px;
+  }
+
+  .layout-main {
+    width: calc(100% - 250px);
+
+    margin-left: 250px;
+  }
+
+  .layout-content {
+    padding: 24px;
+  }
+
+  .content-container {
+    max-width: 1400px;
+  }
+}
+
+/* =========================================================
+   TABLET
+   769px - 1024px
+========================================================= */
+
+@media (max-width: 1024px) {
+  .sidebar-container {
+    width: 250px;
+  }
+
+  .layout-main {
+    width: calc(100% - 250px);
+
+    margin-left: 250px;
+  }
+
+  .layout-content {
+    padding: 20px;
+  }
+
+  .content-container {
+    max-width: 100%;
+  }
+}
+
+/* =========================================================
+   MOBILE / TABLET
+   0px - 768px
+========================================================= */
+
 @media (max-width: 768px) {
-    .sidebar-container {
-        transform: translateX(-100%);
-    }
+  .sidebar-container {
+    width: 270px;
+    max-width: 85vw;
 
-    .sidebar-container.open {
-        transform: translateX(0);
-    }
+    transform: translateX(-100%);
+  }
 
-    .layout-main {
-        margin-left: 0;
-    }
+  .sidebar-container.open {
+    transform: translateX(0);
+  }
 
-    .sidebar-overlay {
-        display: block;
-        position: fixed;
-        inset: 0;
-        background-color: rgba(15, 23, 42, 0.4);
-        backdrop-filter: blur(2px);
-        z-index: 40;
-    }
+  .layout-main {
+    width: 100%;
+    max-width: 100%;
 
-    .layout-content {
-        padding: 16px;
-    }
+    margin-left: 0;
+  }
+
+  .layout-content {
+    width: 100%;
+
+    padding: 16px;
+  }
+
+  .content-container {
+    width: 100%;
+    max-width: 100%;
+
+    margin: 0;
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   481px - 767px
+========================================================= */
+
+@media (max-width: 767px) {
+  .layout-content {
+    padding: 14px;
+  }
+
+  .sidebar-container {
+    width: 260px;
+    max-width: 88vw;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   0px - 480px
+========================================================= */
+
+@media (max-width: 480px) {
+  .sidebar-container {
+    width: 250px;
+    max-width: 88vw;
+  }
+
+  .layout-content {
+    padding: 12px;
+  }
+}
+
+/* =========================================================
+   EXTRA SMALL MOBILE
+   0px - 360px
+========================================================= */
+
+@media (max-width: 360px) {
+  .sidebar-container {
+    width: 240px;
+    max-width: 90vw;
+  }
+
+  .layout-content {
+    padding: 10px;
+  }
+}
+
+/* =========================================================
+   REDUCE MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-container,
+  .layout-main {
+    transition: none;
+  }
 }

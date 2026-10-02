@@ -5,10 +5,12 @@
 .cb-container {
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: #f8fafc;
   color: #1e293b;
   padding: 20px 30px;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* =========================================================
@@ -18,7 +20,9 @@
 .cb-content-wrapper {
   width: 100%;
   max-width: 1400px;
+  min-width: 0;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 /* =========================================================
@@ -26,19 +30,33 @@
 ========================================================= */
 
 .cb-header-bar {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   margin-bottom: 24px;
+  min-width: 0;
 }
 
 .cb-location-text {
+  min-width: 0;
+  max-width: 100%;
   font-size: 15px;
   font-weight: 600;
   color: #334155;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cb-btn-icon-setting {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border: none;
   font-size: 18px;
@@ -56,7 +74,9 @@
 ========================================================= */
 
 .cb-title-section {
+  width: 100%;
   margin-bottom: 24px;
+  min-width: 0;
 }
 
 .cb-page-title {
@@ -64,6 +84,8 @@
   font-weight: 700;
   color: #0f172a;
   margin: 0 0 6px 0;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .cb-page-subtitle {
@@ -71,6 +93,7 @@
   color: #64748b;
   margin: 0;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 /* =========================================================
@@ -81,10 +104,13 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
+  width: 100%;
   margin-bottom: 24px;
+  min-width: 0;
 }
 
 .cb-stat-card {
+  min-width: 0;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -92,6 +118,8 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 16px;
+  box-sizing: border-box;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
@@ -106,6 +134,7 @@
 
 .cb-stat-info {
   min-width: 0;
+  flex: 1;
 }
 
 .cb-stat-label {
@@ -115,14 +144,17 @@
   color: #64748b;
   letter-spacing: 0.5px;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .cb-stat-value {
+  max-width: 100%;
   font-size: 26px;
   font-weight: 700;
   color: #0f172a;
   margin: 12px 0 0 0;
   line-height: 1.2;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
@@ -133,6 +165,7 @@
 .cb-stat-icon-wrapper {
   width: 44px;
   height: 44px;
+  min-width: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -158,20 +191,23 @@
 }
 
 /* =========================================================
-   CASH & OPENING BALANCE ACTIONS (2-COLUMN GRID)
+   CASH & OPENING BALANCE ACTIONS
 ========================================================= */
 
 .cb-action-buttons-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
+  width: 100%;
   margin-bottom: 24px;
+  min-width: 0;
 }
 
 .cb-btn-action-dark {
   width: 100%;
   min-height: 52px;
   padding: 0 24px;
+  box-sizing: border-box;
   background-color: #1e293b;
   color: #ffffff;
   border: none;
@@ -204,7 +240,10 @@
   outline-offset: 2px;
 }
 
-/* Pill badge around icon inside Transfer Cash button */
+/* =========================================================
+   TRANSFER BUTTON PILL
+========================================================= */
+
 .cb-transfer-btn-pill {
   display: inline-flex;
   align-items: center;
@@ -212,6 +251,7 @@
   padding: 3px 10px;
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 20px;
+  flex-shrink: 0;
 }
 
 .cb-pill-icon {
@@ -224,11 +264,14 @@
 ========================================================= */
 
 .cb-table-card {
+  width: 100%;
+  min-width: 0;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+  box-sizing: border-box;
 }
 
 /* =========================================================
@@ -236,22 +279,33 @@
 ========================================================= */
 
 .cb-table-header {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   padding: 20px 24px;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .cb-table-title {
+  min-width: 0;
+  max-width: 100%;
   font-size: 16px;
   font-weight: 700;
   color: #0f172a;
   margin: 0;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cb-table-btn-icon {
   width: 36px;
   height: 36px;
+  min-width: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -261,6 +315,7 @@
   color: #64748b;
   font-size: 14px;
   cursor: pointer;
+  flex-shrink: 0;
   transition:
     background-color 0.2s ease,
     color 0.2s ease,
@@ -284,8 +339,12 @@
 
 .cb-table-responsive {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  box-sizing: border-box;
 }
 
 /* =========================================================
@@ -445,6 +504,7 @@
 .cb-table-footer {
   display: flex;
   justify-content: center;
+  align-items: center;
   padding: 14px;
   background-color: #ffffff;
   border-top: 1px solid #f1f5f9;
@@ -473,16 +533,21 @@
 
 .cb-loading {
   min-height: 300px;
+  padding: 20px;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #64748b;
   font-size: 14px;
   font-weight: 500;
+  text-align: center;
 }
 
 .cb-error {
   min-height: 300px;
+  padding: 20px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -492,10 +557,12 @@
 }
 
 .cb-error p {
+  max-width: 100%;
   margin: 0;
   color: #dc2626;
   font-size: 14px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .cb-error button {
@@ -531,15 +598,58 @@
   text-align: center !important;
   color: #64748b !important;
   font-size: 14px;
+  white-space: normal !important;
 }
 
 /* =========================================================
-   TABLET
+   LARGE DESKTOP
 ========================================================= */
 
-@media (max-width: 1024px) {
+@media (min-width: 1440px) {
+  .cb-container {
+    padding: 28px 32px;
+  }
+
+  .cb-content-wrapper {
+    max-width: 1500px;
+  }
+
+  .cb-stats-grid,
+  .cb-action-buttons-grid {
+    gap: 22px;
+  }
+
+  .cb-stat-card {
+    padding: 26px;
+  }
+
+  .cb-page-title {
+    font-size: 25px;
+  }
+}
+
+/* =========================================================
+   DESKTOP
+========================================================= */
+
+@media (max-width: 1439px) {
+  .cb-container {
+    padding: 24px;
+  }
+}
+
+/* =========================================================
+   LAPTOP / TABLET LANDSCAPE
+========================================================= */
+
+@media (max-width: 1200px) {
   .cb-container {
     padding: 20px;
+  }
+
+  .cb-stats-grid,
+  .cb-action-buttons-grid {
+    gap: 16px;
   }
 
   .cb-stat-card {
@@ -558,12 +668,59 @@
 }
 
 /* =========================================================
-   MOBILE
+   TABLET
+========================================================= */
+
+@media (max-width: 1024px) {
+  .cb-container {
+    padding: 18px;
+  }
+
+  .cb-header-bar {
+    margin-bottom: 20px;
+  }
+
+  .cb-title-section {
+    margin-bottom: 20px;
+  }
+
+  .cb-page-title {
+    font-size: 23px;
+  }
+
+  .cb-page-subtitle {
+    font-size: 13px;
+  }
+
+  .cb-stat-card {
+    padding: 18px;
+  }
+
+  .cb-stat-value {
+    font-size: 23px;
+  }
+
+  .cb-table-header {
+    padding: 18px;
+  }
+}
+
+/* =========================================================
+   TABLET PORTRAIT / LARGE MOBILE
 ========================================================= */
 
 @media (max-width: 768px) {
   .cb-container {
     padding: 16px;
+  }
+
+  .cb-header-bar {
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .cb-location-text {
+    font-size: 14px;
   }
 
   .cb-title-section {
@@ -578,7 +735,10 @@
     font-size: 13px;
   }
 
-  /* Stats */
+  /* =======================================================
+     STATS
+  ======================================================= */
+
   .cb-stats-grid {
     grid-template-columns: 1fr;
     gap: 14px;
@@ -593,14 +753,25 @@
     font-size: 24px;
   }
 
-  /* Action Buttons Grid Mobile */
+  /* =======================================================
+     ACTION BUTTONS
+  ======================================================= */
+
   .cb-action-buttons-grid {
     grid-template-columns: 1fr;
     gap: 12px;
     margin-bottom: 20px;
   }
 
-  /* Table */
+  .cb-btn-action-dark {
+    min-height: 50px;
+    padding: 0 20px;
+  }
+
+  /* =======================================================
+     TABLE
+  ======================================================= */
+
   .cb-table-card {
     border-radius: 10px;
   }
@@ -619,9 +790,47 @@
     padding-right: 16px;
   }
 
-  /* Footer */
+  /* =======================================================
+     FOOTER
+  ======================================================= */
+
   .cb-table-footer {
     padding: 13px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .cb-container {
+    padding: 14px;
+  }
+
+  .cb-header-bar {
+    align-items: flex-start;
+  }
+
+  .cb-location-text {
+    font-size: 13px;
+  }
+
+  .cb-page-title {
+    font-size: 21px;
+  }
+
+  .cb-stat-card {
+    padding: 18px;
+  }
+
+  .cb-btn-action-dark {
+    font-size: 14px;
+    padding: 0 16px;
+  }
+
+  .cb-table-header {
+    padding: 15px;
   }
 }
 
@@ -644,6 +853,7 @@
 
   .cb-stat-card {
     padding: 18px;
+    gap: 12px;
   }
 
   .cb-stat-label {
@@ -657,11 +867,13 @@
   .cb-stat-icon-wrapper {
     width: 40px;
     height: 40px;
+    min-width: 40px;
     font-size: 16px;
   }
 
   .cb-table-header {
     padding: 14px;
+    gap: 10px;
   }
 
   .cb-table-title {
@@ -671,6 +883,7 @@
   .cb-table-btn-icon {
     width: 34px;
     height: 34px;
+    min-width: 34px;
   }
 
   .cb-table th {
@@ -683,5 +896,104 @@
 
   .cb-actions-cell {
     gap: 12px;
+  }
+
+  .cb-empty-state {
+    padding: 32px 16px !important;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 360px) {
+  .cb-container {
+    padding: 10px;
+  }
+
+  .cb-header-bar {
+    gap: 8px;
+  }
+
+  .cb-location-text {
+    font-size: 12px;
+  }
+
+  .cb-page-title {
+    font-size: 19px;
+  }
+
+  .cb-page-subtitle {
+    font-size: 11px;
+  }
+
+  .cb-stat-card {
+    padding: 15px;
+  }
+
+  .cb-stat-value {
+    font-size: 19px;
+  }
+
+  .cb-stat-icon-wrapper {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+  }
+
+  .cb-btn-action-dark {
+    min-height: 48px;
+    padding: 0 12px;
+    font-size: 13px;
+    gap: 8px;
+  }
+
+  .cb-table-header {
+    padding: 12px;
+  }
+
+  .cb-table-title {
+    font-size: 13px;
+  }
+
+  .cb-table-btn-icon {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+  }
+}
+
+/* =========================================================
+   TOUCH DEVICES
+========================================================= */
+
+@media (hover: none) {
+  .cb-stat-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .cb-btn-action-dark:hover,
+  .cb-error button:hover,
+  .cb-btn-view-all:hover,
+  .cb-delete-btn:hover {
+    transform: none;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-stat-card,
+  .cb-btn-action-dark,
+  .cb-table-btn-icon,
+  .cb-action-btn,
+  .cb-btn-view-all,
+  .cb-error button,
+  .cb-btn-icon-setting {
+    transition: none;
   }
 }

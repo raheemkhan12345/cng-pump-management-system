@@ -1,150 +1,564 @@
-/* --- CNG Sales Page Container --- */
+/* =========================================================
+   CNG SALES PAGE CONTAINER
+========================================================= */
+
 .cng-sales-page-container {
-    padding: 24px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: #0f172a;
+  width: 100%;
+  max-width: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+
+  color: #0f172a;
+  overflow-x: hidden;
 }
 
 .cng-sales-content-wrapper {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+  width: 100%;
+  max-width: 1400px;
+  min-width: 0;
+
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  box-sizing: border-box;
 }
 
-/* --- Action Buttons Bar --- */
+/* =========================================================
+   ACTION BUTTONS BAR
+========================================================= */
+
 .cng-sales-action-bar {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  box-sizing: border-box;
 }
 
-/* Primary "Record New Sale" Button */
+/* =========================================================
+   PRIMARY "RECORD NEW SALE" BUTTON
+========================================================= */
+
 .cng-btn-primary-record {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: #055a36;
-    color: #ffffff;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  min-height: 44px;
+  box-sizing: border-box;
+
+  background-color: #055a36;
+  color: #ffffff;
+
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease-in-out,
+    transform 0.2s ease-in-out;
+
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  white-space: nowrap;
 }
 
 .cng-btn-primary-record:hover {
-    background-color: #04492c;
+  background-color: #04492c;
 }
 
-/* Secondary "View Sales Report" Button */
+/* =========================================================
+   SECONDARY "VIEW SALES REPORT" BUTTON
+========================================================= */
+
 .cng-btn-secondary-reports {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: #f1f3f6;
-    color: #334155;
-    border: 1px solid #e2e8f0;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  min-height: 44px;
+  box-sizing: border-box;
+
+  background-color: #f1f3f6;
+  color: #334155;
+
+  border: 1px solid #e2e8f0;
+  padding: 12px 20px;
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    transform 0.2s ease-in-out;
+
+  white-space: nowrap;
 }
 
 .cng-btn-secondary-reports:hover {
-    background-color: #e2e8f0;
-    border-color: #cbd5e1;
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
 }
 
-/* --- Stats Grid Section --- */
+/* =========================================================
+   STATS GRID SECTION
+========================================================= */
+
 .cng-sales-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+  width: 100%;
+  min-width: 0;
+
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+
+  box-sizing: border-box;
 }
 
-/* Base Card Styling */
+/* =========================================================
+   BASE STAT CARD
+========================================================= */
+
 .cng-stat-card {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 140px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  min-width: 0;
+
+  background-color: #ffffff;
+
+  padding: 20px;
+  box-sizing: border-box;
+
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  min-height: 140px;
+
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  overflow: hidden;
 }
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
 
 .cng-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 12px;
 }
+
+/* =========================================================
+   CARD LABEL
+========================================================= */
 
 .cng-card-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #64748b;
+  min-width: 0;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  color: #64748b;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+/* =========================================================
+   CARD ICON
+========================================================= */
 
 .cng-card-icon {
-    color: #cbd5e1;
+  flex-shrink: 0;
+  color: #cbd5e1;
 }
+
+/* =========================================================
+   CARD BODY
+========================================================= */
 
 .cng-card-body {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
+  width: 100%;
+  min-width: 0;
+
+  flex-grow: 1;
+
+  display: flex;
+  align-items: center;
+
+  margin-top: 10px;
+
+  box-sizing: border-box;
 }
+
+/* =========================================================
+   CARD AMOUNT
+========================================================= */
 
 .cng-card-amount {
-    font-size: 28px;
-    font-weight: 800;
-    color: #0f172a;
-    margin: 0;
+  min-width: 0;
+  max-width: 100%;
+
+  font-size: 28px;
+  font-weight: 800;
+
+  color: #0f172a;
+
+  margin: 0;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
+
+/* =========================================================
+   CARD FOOTER
+========================================================= */
 
 .cng-card-footer {
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    font-weight: 500;
+  min-width: 0;
+
+  margin-top: 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  overflow-wrap: anywhere;
 }
 
-/* Footer Colors */
+/* =========================================================
+   FOOTER COLORS
+========================================================= */
+
 .cng-footer-positive {
-    color: #16a34a;
+  color: #16a34a;
 }
 
 .cng-footer-status-green {
-    color: #16a34a;
+  color: #16a34a;
 }
 
-/* --- Responsiveness --- */
+/* =========================================================
+   LARGE DESKTOP
+   1440px+
+========================================================= */
+
+@media (min-width: 1440px) {
+  .cng-sales-page-container {
+    padding: 28px 32px;
+  }
+
+  .cng-sales-content-wrapper {
+    max-width: 1500px;
+  }
+
+  .cng-sales-stats-grid {
+    gap: 24px;
+  }
+
+  .cng-stat-card {
+    padding: 22px;
+  }
+
+  .cng-card-amount {
+    font-size: 30px;
+  }
+}
+
+/* =========================================================
+   DESKTOP
+   1201px - 1439px
+========================================================= */
+
+@media (max-width: 1439px) {
+  .cng-sales-page-container {
+    padding: 24px;
+  }
+
+  .cng-sales-content-wrapper {
+    max-width: 1400px;
+  }
+}
+
+/* =========================================================
+   LAPTOP
+   1025px - 1200px
+========================================================= */
+
+@media (max-width: 1200px) {
+  .cng-sales-page-container {
+    padding: 22px;
+  }
+
+  .cng-sales-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .cng-stat-card {
+    padding: 20px;
+  }
+
+  .cng-card-amount {
+    font-size: 26px;
+  }
+}
+
+/* =========================================================
+   TABLET LANDSCAPE
+   769px - 1024px
+========================================================= */
+
 @media (max-width: 1024px) {
-    .cng-sales-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+  .cng-sales-page-container {
+    padding: 20px;
+  }
+
+  .cng-sales-content-wrapper {
+    gap: 20px;
+  }
+
+  .cng-sales-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .cng-stat-card {
+    min-height: 135px;
+    padding: 18px;
+  }
+
+  .cng-card-amount {
+    font-size: 25px;
+  }
 }
 
-@media (max-width: 640px) {
-    .cng-sales-stats-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
+/* =========================================================
+   TABLET / LARGE MOBILE
+   601px - 768px
+========================================================= */
 
-    .cng-sales-action-bar {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+@media (max-width: 768px) {
+  .cng-sales-page-container {
+    padding: 16px;
+  }
+
+  .cng-sales-content-wrapper {
+    gap: 18px;
+  }
+
+  .cng-sales-action-bar {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .cng-btn-primary-record,
+  .cng-btn-secondary-reports {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .cng-sales-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .cng-stat-card {
+    min-height: 130px;
+    padding: 18px;
+  }
+
+  .cng-card-label {
+    font-size: 12px;
+  }
+
+  .cng-card-amount {
+    font-size: 24px;
+  }
+
+  .cng-card-footer {
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   481px - 600px
+========================================================= */
+
+@media (max-width: 600px) {
+  .cng-sales-page-container {
+    padding: 14px;
+  }
+
+  .cng-sales-content-wrapper {
+    gap: 16px;
+  }
+
+  .cng-sales-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .cng-stat-card {
+    min-height: 125px;
+    padding: 18px;
+  }
+
+  .cng-card-amount {
+    font-size: 25px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   361px - 480px
+========================================================= */
+
+@media (max-width: 480px) {
+  .cng-sales-page-container {
+    padding: 12px;
+  }
+
+  .cng-sales-content-wrapper {
+    gap: 14px;
+  }
+
+  .cng-sales-action-bar {
+    gap: 10px;
+  }
+
+  .cng-btn-primary-record,
+  .cng-btn-secondary-reports {
+    width: 100%;
+    padding: 11px 16px;
+
+    font-size: 13px;
+  }
+
+  .cng-stat-card {
+    min-height: 120px;
+    padding: 16px;
+    border-radius: 10px;
+  }
+
+  .cng-card-header {
+    gap: 8px;
+  }
+
+  .cng-card-label {
+    font-size: 12px;
+  }
+
+  .cng-card-amount {
+    font-size: 23px;
+  }
+
+  .cng-card-footer {
+    margin-top: 8px;
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+   <=360px
+========================================================= */
+
+@media (max-width: 360px) {
+  .cng-sales-page-container {
+    padding: 10px;
+  }
+
+  .cng-sales-content-wrapper {
+    gap: 12px;
+  }
+
+  .cng-btn-primary-record,
+  .cng-btn-secondary-reports {
+    min-height: 42px;
+    padding: 10px 12px;
+
+    font-size: 12px;
+  }
+
+  .cng-stat-card {
+    min-height: 115px;
+    padding: 14px;
+  }
+
+  .cng-card-label {
+    font-size: 11px;
+  }
+
+  .cng-card-amount {
+    font-size: 21px;
+  }
+
+  .cng-card-footer {
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   TOUCH DEVICES
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  .cng-btn-primary-record:hover,
+  .cng-btn-secondary-reports:hover {
+    transform: none;
+  }
+
+  .cng-btn-primary-record:active,
+  .cng-btn-secondary-reports:active {
+    transform: scale(0.98);
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .cng-btn-primary-record,
+  .cng-btn-secondary-reports {
+    transition: none;
+  }
 }

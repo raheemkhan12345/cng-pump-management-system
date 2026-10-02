@@ -3,422 +3,452 @@
 ========================================================= */
 
 .admin-top-navbar {
-    width: 100%;
-    height: 64px;
+  width: 100%;
+  height: 64px;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-    padding: 0 24px;
-    box-sizing: border-box;
+  padding: 0 24px;
+  box-sizing: border-box;
 
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
 
-    position: sticky;
-    top: 0;
-    z-index: 100;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  overflow: hidden;
 }
-
 
 /* =========================================================
    NAVBAR LEFT
 ========================================================= */
 
 .navbar-left {
-    min-width: 0;
+  min-width: 0;
+  max-width: 100%;
 
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  flex: 1;
 }
-
 
 /* =========================================================
    SIDEBAR TOGGLE
 ========================================================= */
 
 .sidebar-toggle-btn {
-    display: none;
+  display: none;
 
-    width: 38px;
-    height: 38px;
+  width: 38px;
+  height: 38px;
 
-    align-items: center;
-    justify-content: center;
+  align-items: center;
+  justify-content: center;
 
-    padding: 0;
+  flex-shrink: 0;
 
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 9px;
+  padding: 0;
 
-    color: #334155;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
 
-    cursor: pointer;
+  color: #334155;
 
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.2s ease;
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .sidebar-toggle-btn:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-    color: #059669;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #059669;
 }
 
 .sidebar-toggle-btn:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
 }
-
 
 /* =========================================================
    PUMP TITLE
 ========================================================= */
 
 .pump-title-container {
-    min-width: 0;
+  min-width: 0;
+  max-width: 100%;
 
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  flex: 1;
 }
-
 
 /* =========================================================
    PUMP NAME
 ========================================================= */
 
 .pump-name {
-    max-width: 420px;
+  min-width: 0;
+  max-width: 420px;
 
-    margin: 0;
+  margin: 0;
 
-    color: #059669;
+  color: #059669;
 
-    font-size: 18px;
-    font-weight: 800;
-    line-height: 1.2;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.2;
 
-    background: linear-gradient(135deg,
-            #059669,
-            #2563eb);
+  background: linear-gradient(135deg, #059669, #2563eb);
 
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-
 
 /* =========================================================
    PUMP LOCATION
 ========================================================= */
 
 .pump-location {
-    max-width: 360px;
+  min-width: 0;
+  max-width: 360px;
 
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+  display: inline-flex;
+  align-items: center;
 
-    padding: 5px 10px;
+  gap: 5px;
 
-    color: #64748b;
+  padding: 5px 10px;
 
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
+  color: #64748b;
 
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.2;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  box-sizing: border-box;
 }
 
 .location-icon {
-    flex-shrink: 0;
-    color: #059669;
-}
+  flex-shrink: 0;
 
+  color: #059669;
+}
 
 /* =========================================================
    NAVBAR RIGHT
 ========================================================= */
 
 .navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  min-width: 0;
 
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  flex-shrink: 0;
 }
-
 
 /* =========================================================
    LARGE DESKTOP
+   1440px+
 ========================================================= */
 
 @media (min-width: 1440px) {
-    .admin-top-navbar {
-        height: 68px;
-        padding: 0 32px;
-    }
+  .admin-top-navbar {
+    height: 68px;
 
-    .navbar-left {
-        gap: 18px;
-    }
+    padding: 0 32px;
+  }
 
-    .pump-title-container {
-        gap: 14px;
-    }
+  .navbar-left {
+    gap: 18px;
+  }
 
-    .pump-name {
-        font-size: 19px;
-        max-width: 520px;
-    }
+  .pump-title-container {
+    gap: 14px;
+  }
 
-    .pump-location {
-        max-width: 420px;
-        font-size: 12px;
-    }
+  .pump-name {
+    font-size: 19px;
+
+    max-width: 520px;
+  }
+
+  .pump-location {
+    max-width: 420px;
+
+    font-size: 12px;
+  }
 }
-
 
 /* =========================================================
    LAPTOP
+   1025px - 1439px
 ========================================================= */
 
 @media (max-width: 1200px) {
-    .admin-top-navbar {
-        padding: 0 20px;
-    }
+  .admin-top-navbar {
+    padding: 0 20px;
+  }
 
-    .pump-name {
-        max-width: 350px;
-    }
+  .pump-name {
+    max-width: 350px;
+  }
 
-    .pump-location {
-        max-width: 300px;
-    }
+  .pump-location {
+    max-width: 300px;
+  }
 }
-
 
 /* =========================================================
    TABLET
+   769px - 1024px
 ========================================================= */
 
 @media (max-width: 1024px) {
-    .admin-top-navbar {
-        height: 62px;
-        padding: 0 18px;
-    }
+  .admin-top-navbar {
+    height: 62px;
 
-    .navbar-left {
-        gap: 12px;
-    }
+    padding: 0 18px;
+  }
 
-    .pump-title-container {
-        gap: 10px;
-    }
+  .navbar-left {
+    gap: 12px;
+  }
 
-    .pump-name {
-        font-size: 17px;
-        max-width: 280px;
-    }
+  .pump-title-container {
+    gap: 10px;
+  }
 
-    .pump-location {
-        max-width: 240px;
-        padding: 5px 9px;
-        font-size: 11px;
-    }
+  .pump-name {
+    max-width: 260px;
+
+    font-size: 17px;
+  }
+
+  .pump-location {
+    max-width: 220px;
+
+    padding: 5px 9px;
+
+    font-size: 11px;
+  }
 }
-
 
 /* =========================================================
    TABLET / MOBILE
+   0px - 768px
 ========================================================= */
 
 @media (max-width: 768px) {
-    .admin-top-navbar {
-        height: 60px;
+  .admin-top-navbar {
+    height: 60px;
 
-        padding: 0 16px;
-    }
+    padding: 0 16px;
+  }
 
-    /* Show hamburger */
-    .sidebar-toggle-btn {
-        display: flex;
-        flex-shrink: 0;
-    }
+  /* Show hamburger */
+  .sidebar-toggle-btn {
+    display: flex;
+  }
 
-    .navbar-left {
-        width: 100%;
-        gap: 10px;
-    }
+  .navbar-left {
+    width: 100%;
 
-    .pump-title-container {
-        min-width: 0;
-        flex: 1;
+    gap: 10px;
+  }
 
-        gap: 8px;
-    }
+  .pump-title-container {
+    min-width: 0;
 
-    .pump-name {
-        max-width: 220px;
+    gap: 8px;
+  }
 
-        font-size: 16px;
-    }
+  .pump-name {
+    max-width: 220px;
 
-    .pump-location {
-        max-width: 220px;
+    font-size: 16px;
+  }
 
-        padding: 4px 8px;
+  .pump-location {
+    max-width: 180px;
 
-        font-size: 11px;
-    }
+    padding: 4px 8px;
 
-    .navbar-right {
-        gap: 6px;
-    }
+    font-size: 11px;
+  }
+
+  .navbar-right {
+    gap: 6px;
+  }
 }
-
 
 /* =========================================================
    MOBILE
+   481px - 600px
 ========================================================= */
 
 @media (max-width: 600px) {
-    .admin-top-navbar {
-        height: 58px;
+  .admin-top-navbar {
+    height: 58px;
 
-        padding: 0 12px;
-    }
+    padding: 0 12px;
+  }
 
-    .sidebar-toggle-btn {
-        width: 36px;
-        height: 36px;
-    }
+  .sidebar-toggle-btn {
+    width: 36px;
+    height: 36px;
+  }
 
-    .navbar-left {
-        gap: 9px;
-    }
+  .navbar-left {
+    gap: 9px;
+  }
 
-    .pump-title-container {
-        gap: 7px;
-    }
+  .pump-title-container {
+    gap: 7px;
+  }
 
-    .pump-name {
-        max-width: 180px;
+  .pump-name {
+    max-width: 180px;
 
-        font-size: 15px;
-    }
+    font-size: 15px;
+  }
 
-    .pump-location {
-        max-width: 170px;
+  .pump-location {
+    max-width: 150px;
 
-        font-size: 10.5px;
+    font-size: 10.5px;
 
-        padding: 4px 7px;
-    }
+    padding: 4px 7px;
+  }
 
-    .location-icon {
-        width: 11px;
-        height: 11px;
-    }
+  .location-icon {
+    width: 11px;
+    height: 11px;
+  }
 }
-
 
 /* =========================================================
    SMALL MOBILE
+   0px - 480px
 ========================================================= */
 
 @media (max-width: 480px) {
-    .admin-top-navbar {
-        height: 56px;
+  .admin-top-navbar {
+    height: 56px;
 
-        padding: 0 10px;
-    }
+    padding: 0 10px;
+  }
 
-    .sidebar-toggle-btn {
-        width: 34px;
-        height: 34px;
+  .sidebar-toggle-btn {
+    width: 34px;
+    height: 34px;
 
-        border-radius: 8px;
-    }
+    border-radius: 8px;
+  }
 
-    .navbar-left {
-        gap: 8px;
-    }
+  .navbar-left {
+    gap: 8px;
+  }
 
-    .pump-title-container {
-        display: block;
+  .pump-title-container {
+    display: block;
 
-        min-width: 0;
-    }
+    min-width: 0;
+  }
 
-    .pump-name {
-        display: block;
+  .pump-name {
+    display: block;
 
-        max-width: 170px;
+    max-width: 170px;
 
-        font-size: 14px;
-    }
+    font-size: 14px;
+  }
 
-    /*
-    Location stays hidden on very small screens
-    to keep the navbar clean.
-  */
-    .pump-location {
-        display: none;
-    }
+  /* Hide location to keep navbar clean */
+  .pump-location {
+    display: none;
+  }
+
+  .navbar-right {
+    gap: 4px;
+  }
 }
-
 
 /* =========================================================
    EXTRA SMALL DEVICES
+   0px - 360px
 ========================================================= */
 
 @media (max-width: 360px) {
-    .admin-top-navbar {
-        padding: 0 8px;
-    }
+  .admin-top-navbar {
+    height: 54px;
 
-    .sidebar-toggle-btn {
-        width: 32px;
-        height: 32px;
-    }
+    padding: 0 8px;
+  }
 
-    .pump-name {
-        max-width: 145px;
-        font-size: 13.5px;
-    }
+  .sidebar-toggle-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .pump-name {
+    max-width: 145px;
+
+    font-size: 13.5px;
+  }
+
+  .navbar-left {
+    gap: 7px;
+  }
+
+  .navbar-right {
+    gap: 3px;
+  }
 }
-
 
 /* =========================================================
    TOUCH DEVICES
 ========================================================= */
 
 @media (hover: none) and (pointer: coarse) {
-    .sidebar-toggle-btn {
-        min-width: 38px;
-        min-height: 38px;
-    }
+  .sidebar-toggle-btn {
+    min-width: 38px;
+    min-height: 38px;
+  }
 
-    .sidebar-toggle-btn:hover {
-        background: #f8fafc;
-        border-color: #e2e8f0;
-        color: #334155;
-    }
+  .sidebar-toggle-btn:hover {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    color: #334155;
+  }
 }

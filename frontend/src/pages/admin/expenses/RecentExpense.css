@@ -3,120 +3,266 @@
 ========================================== */
 
 .exp-table-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
 }
 
+/* ==========================================
+   TABLE HEADER
+========================================== */
+
 .exp-table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 24px;
-    border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 16px;
+
+  width: 100%;
+  min-width: 0;
+
+  padding: 18px 24px;
+
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .exp-table-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0;
+  min-width: 0;
+  margin: 0;
+
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+
+  color: #0f172a;
+
+  overflow-wrap: anywhere;
 }
 
 .exp-btn-view-all {
-    background: transparent;
-    border: none;
-    font-size: 13px;
-    font-weight: 600;
-    color: #334155;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  gap: 6px;
+
+  min-height: 36px;
+
+  padding: 6px 10px;
+
+  box-sizing: border-box;
+
+  background: transparent;
+
+  border: none;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #334155;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
+
+.exp-btn-view-all:hover {
+  color: #0f172a;
+}
+
+.exp-btn-view-all:focus-visible {
+  outline: 2px solid #94a3b8;
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   TABLE WRAPPER
+========================================== */
 
 .exp-table-wrapper {
-    width: 100%;
-    overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  -webkit-overflow-scrolling: touch;
+
+  box-sizing: border-box;
 }
 
+/* ==========================================
+   TABLE
+========================================== */
+
 .exp-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13.5px;
+  width: 100%;
+
+  /*
+      Keeps table readable on smaller screens.
+      Mobile will scroll horizontally instead
+      of squeezing all columns.
+    */
+  min-width: 850px;
+
+  border-collapse: collapse;
+
+  font-size: 13.5px;
+
+  box-sizing: border-box;
 }
 
 .exp-table thead tr {
-    background-color: #1e293b;
-    color: #ffffff;
+  background-color: #1e293b;
+  color: #ffffff;
 }
 
 .exp-table th {
-    padding: 14px 24px;
-    font-weight: 600;
-    text-align: left;
-    font-size: 12px;
-    letter-spacing: 0.3px;
+  padding: 14px 24px;
+
+  font-weight: 600;
+  font-size: 12px;
+
+  letter-spacing: 0.3px;
+
+  text-align: left;
+
+  white-space: nowrap;
+
+  box-sizing: border-box;
 }
 
 .exp-table td {
-    padding: 16px 24px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #334155;
-    vertical-align: middle;
+  padding: 16px 24px;
+
+  border-bottom: 1px solid #f1f5f9;
+
+  color: #334155;
+
+  vertical-align: middle;
+
+  box-sizing: border-box;
+
+  overflow-wrap: anywhere;
 }
 
+.exp-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ==========================================
+   TEXT HELPERS
+========================================== */
+
 .exp-text-muted {
-    color: #64748b;
+  color: #64748b;
 }
 
 .exp-font-medium {
-    font-weight: 500;
-    color: #0f172a;
+  font-weight: 500;
+  color: #0f172a;
 }
 
 .exp-font-bold {
-    font-weight: 700;
-    color: #0f172a;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .exp-text-center {
-    text-align: center;
+  text-align: center;
 }
 
-/* Category Badge */
+/* ==========================================
+   CATEGORY BADGE
+========================================== */
 
 .exp-category-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background-color: #e2e8f0;
-    color: #334155;
-    padding: 4px 12px;
-    border-radius: 16px;
-    font-size: 12px;
-    font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  max-width: 100%;
+
+  background-color: #e2e8f0;
+  color: #334155;
+
+  padding: 4px 12px;
+
+  border-radius: 16px;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  line-height: 1.3;
+
+  box-sizing: border-box;
+
+  overflow-wrap: anywhere;
 }
 
-/* Payment Method */
+/* ==========================================
+   PAYMENT METHOD
+========================================== */
 
 .exp-payment-method {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  max-width: 100%;
+
+  white-space: nowrap;
 }
 
-/* Status Pill */
+/* ==========================================
+   STATUS PILL
+========================================== */
 
 .exp-status-paid {
-    display: inline-block;
-    background-color: #86efac;
-    color: #14532d;
-    padding: 4px 16px;
-    border-radius: 16px;
-    font-size: 12px;
-    font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 26px;
+
+  background-color: #86efac;
+  color: #14532d;
+
+  padding: 4px 16px;
+
+  border-radius: 16px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  line-height: 1.3;
+
+  box-sizing: border-box;
+
+  white-space: nowrap;
 }
 
 /* ==========================================
@@ -124,54 +270,473 @@
 ========================================== */
 
 .exp-actions-cell {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  min-width: 70px;
+
+  white-space: nowrap;
 }
 
+/* ==========================================
+   ACTION BUTTON
+========================================== */
+
 .exp-action-btn {
-    width: 18px;
-    height: 18px;
-    padding: 0;
-    margin: 0;
-    border: none;
-    outline: none;
-    background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  width: 32px;
+  height: 32px;
 
-    cursor: pointer;
-    transition: all 0.2s ease;
+  min-width: 32px;
+  min-height: 32px;
+
+  padding: 0;
+  margin: 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #374151;
+
+  cursor: pointer;
+
+  border-radius: 6px;
+
+  box-sizing: border-box;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .exp-action-btn svg {
-    width: 11px;
-    height: 11px;
+  width: 14px;
+  height: 14px;
+
+  flex-shrink: 0;
 }
 
 .exp-edit-btn {
-    color: #374151;
+  color: #374151;
 }
 
 .exp-delete-btn {
-    color: #374151;
+  color: #374151;
 }
 
 .exp-edit-btn:hover {
-    color: #2563eb;
-    transform: scale(1.15);
+  color: #2563eb;
+  background-color: #eff6ff;
+  transform: scale(1.05);
 }
 
 .exp-delete-btn:hover {
-    color: #dc2626;
-    transform: scale(1.15);
+  color: #dc2626;
+  background-color: #fef2f2;
+  transform: scale(1.05);
 }
 
 .exp-action-btn:focus-visible {
-    outline: 2px solid #94a3b8;
-    outline-offset: 3px;
+  outline: 2px solid #94a3b8;
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   TABLE SCROLLBAR
+========================================== */
+
+.exp-table-wrapper::-webkit-scrollbar {
+  height: 7px;
+}
+
+.exp-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.exp-table-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.exp-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ==========================================
+   LARGE DESKTOP
+   1440px+
+========================================== */
+
+@media (min-width: 1440px) {
+  .exp-table-header {
+    padding: 20px 28px;
+  }
+
+  .exp-table th {
+    padding: 15px 28px;
+  }
+
+  .exp-table td {
+    padding: 17px 28px;
+  }
+
+  .exp-table {
+    font-size: 14px;
+  }
+}
+
+/* ==========================================
+   DESKTOP
+   1201px - 1439px
+========================================== */
+
+@media (max-width: 1439px) {
+  .exp-table-header {
+    padding: 18px 24px;
+  }
+}
+
+/* ==========================================
+   LAPTOP
+   1025px - 1200px
+========================================== */
+
+@media (max-width: 1200px) {
+  .exp-table-header {
+    padding: 17px 20px;
+  }
+
+  .exp-table th {
+    padding: 13px 20px;
+  }
+
+  .exp-table td {
+    padding: 15px 20px;
+  }
+
+  .exp-table {
+    min-width: 820px;
+  }
+}
+
+/* ==========================================
+   TABLET
+   769px - 1024px
+========================================== */
+
+@media (max-width: 1024px) {
+  .exp-table-header {
+    padding: 16px 18px;
+  }
+
+  .exp-table-title {
+    font-size: 15px;
+  }
+
+  .exp-btn-view-all {
+    font-size: 12px;
+  }
+
+  .exp-table {
+    min-width: 800px;
+  }
+
+  .exp-table th {
+    padding: 13px 18px;
+    font-size: 11px;
+  }
+
+  .exp-table td {
+    padding: 14px 18px;
+    font-size: 13px;
+  }
+}
+
+/* ==========================================
+   TABLET / LARGE MOBILE
+   601px - 768px
+========================================== */
+
+@media (max-width: 768px) {
+  .exp-table-header {
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 15px 16px;
+  }
+
+  .exp-table-title {
+    font-size: 15px;
+  }
+
+  .exp-btn-view-all {
+    min-height: 38px;
+
+    padding: 7px 10px;
+
+    font-size: 12px;
+  }
+
+  .exp-table {
+    min-width: 780px;
+  }
+
+  .exp-table th {
+    padding: 12px 16px;
+  }
+
+  .exp-table td {
+    padding: 14px 16px;
+  }
+
+  .exp-category-badge {
+    padding: 4px 10px;
+  }
+
+  .exp-actions-cell {
+    gap: 10px;
+  }
+
+  .exp-action-btn {
+    width: 34px;
+    height: 34px;
+
+    min-width: 34px;
+    min-height: 34px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+   481px - 600px
+========================================== */
+
+@media (max-width: 600px) {
+  .exp-table-header {
+    padding: 14px;
+  }
+
+  .exp-table-title {
+    font-size: 14px;
+  }
+
+  .exp-btn-view-all {
+    min-height: 38px;
+
+    font-size: 12px;
+  }
+
+  .exp-table {
+    min-width: 760px;
+
+    font-size: 12.5px;
+  }
+
+  .exp-table th {
+    padding: 11px 14px;
+
+    font-size: 10.5px;
+  }
+
+  .exp-table td {
+    padding: 13px 14px;
+
+    font-size: 12px;
+  }
+
+  .exp-category-badge {
+    padding: 4px 9px;
+
+    font-size: 11px;
+  }
+
+  .exp-status-paid {
+    padding: 4px 12px;
+
+    font-size: 11px;
+  }
+
+  .exp-action-btn {
+    width: 36px;
+    height: 36px;
+
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .exp-action-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* ==========================================
+   SMALL MOBILE
+   361px - 480px
+========================================== */
+
+@media (max-width: 480px) {
+  .exp-table-header {
+    padding: 13px 12px;
+
+    gap: 10px;
+  }
+
+  .exp-table-title {
+    font-size: 14px;
+  }
+
+  .exp-btn-view-all {
+    padding: 6px 8px;
+
+    font-size: 11px;
+  }
+
+  .exp-table {
+    min-width: 740px;
+  }
+
+  .exp-table th {
+    padding: 10px 12px;
+
+    font-size: 10px;
+  }
+
+  .exp-table td {
+    padding: 12px;
+
+    font-size: 11.5px;
+  }
+
+  .exp-category-badge {
+    padding: 4px 8px;
+
+    font-size: 10.5px;
+  }
+
+  .exp-payment-method {
+    gap: 5px;
+  }
+
+  .exp-status-paid {
+    min-height: 24px;
+
+    padding: 4px 10px;
+
+    font-size: 10.5px;
+  }
+
+  .exp-actions-cell {
+    gap: 8px;
+  }
+
+  .exp-action-btn {
+    width: 36px;
+    height: 36px;
+
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+
+/* ==========================================
+   VERY SMALL MOBILE
+   <=360px
+========================================== */
+
+@media (max-width: 360px) {
+  .exp-table-header {
+    padding: 12px 10px;
+  }
+
+  .exp-table-title {
+    font-size: 13px;
+  }
+
+  .exp-btn-view-all {
+    min-height: 36px;
+
+    padding: 6px;
+
+    font-size: 10px;
+  }
+
+  .exp-table {
+    min-width: 720px;
+  }
+
+  .exp-table th {
+    padding: 9px 10px;
+
+    font-size: 9.5px;
+  }
+
+  .exp-table td {
+    padding: 11px 10px;
+
+    font-size: 11px;
+  }
+
+  .exp-category-badge {
+    padding: 3px 7px;
+
+    font-size: 10px;
+  }
+
+  .exp-status-paid {
+    padding: 3px 8px;
+
+    font-size: 10px;
+  }
+
+  .exp-action-btn {
+    width: 36px;
+    height: 36px;
+
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .exp-action-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+/* ==========================================
+   TOUCH DEVICES
+========================================== */
+
+@media (hover: none) and (pointer: coarse) {
+  .exp-action-btn,
+  .exp-btn-view-all {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .exp-action-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .exp-action-btn,
+  .exp-btn-view-all {
+    transition: none;
+  }
 }

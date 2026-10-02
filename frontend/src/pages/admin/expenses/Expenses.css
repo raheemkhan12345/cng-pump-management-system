@@ -4,12 +4,19 @@
 
 .exp-page-container {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
   min-height: 100vh;
+  min-height: 100dvh;
+
   padding: 24px 30px;
   box-sizing: border-box;
 
   background: #f8fafc;
   color: #1e293b;
+
+  overflow-x: hidden;
 }
 
 /* =========================================================
@@ -20,9 +27,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 16px;
 
   width: 100%;
+  min-width: 0;
+
   margin-bottom: 20px;
 }
 
@@ -30,9 +40,11 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+
   gap: 10px;
 
   min-width: 0;
+  max-width: 100%;
 
   color: #0f172a;
   font-size: 15px;
@@ -41,14 +53,19 @@
 
 .exp-divider {
   color: #cbd5e1;
+  flex-shrink: 0;
 }
 
 .exp-location-text {
+  min-width: 0;
+  max-width: 100%;
+
   color: #64748b;
   font-weight: 500;
 
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* =========================================================
@@ -59,9 +76,12 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 24px;
 
   width: 100%;
+  min-width: 0;
+
   margin-bottom: 24px;
 }
 
@@ -74,21 +94,31 @@
 }
 
 .exp-page-title {
+  min-width: 0;
+
   margin: 0 0 5px;
 
   color: #0f172a;
+
   font-size: 24px;
   font-weight: 700;
   line-height: 1.25;
+
+  overflow-wrap: anywhere;
 }
 
 .exp-page-subtitle {
+  min-width: 0;
+
   margin: 0;
 
   color: #64748b;
+
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
+
+  overflow-wrap: anywhere;
 }
 
 /* =========================================================
@@ -99,12 +129,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   gap: 8px;
 
   flex-shrink: 0;
 
   min-height: 42px;
+
   padding: 10px 20px;
+
+  box-sizing: border-box;
 
   border: none;
   border-radius: 8px;
@@ -113,6 +147,7 @@
   color: #ffffff;
 
   font-family: inherit;
+
   font-size: 14px;
   font-weight: 600;
 
@@ -145,26 +180,36 @@
 
 .exp-stats-grid {
   display: grid;
+
   grid-template-columns: repeat(3, minmax(0, 1fr));
+
   gap: 20px;
 
   width: 100%;
+  min-width: 0;
+
   margin-bottom: 24px;
+
+  box-sizing: border-box;
 }
 
 .exp-stat-card {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 16px;
 
+  width: 100%;
   min-width: 0;
   min-height: 120px;
+
   padding: 20px;
 
   box-sizing: border-box;
 
   background: #ffffff;
+
   border: 1px solid #e2e8f0;
   border-radius: 12px;
 
@@ -180,32 +225,46 @@
 }
 
 .exp-stat-label {
+  min-width: 0;
+
   margin: 0;
 
   color: #64748b;
+
   font-size: 11px;
   font-weight: 700;
+
   letter-spacing: 0.5px;
   line-height: 1.3;
 
   text-transform: uppercase;
+
+  overflow-wrap: anywhere;
 }
 
 .exp-stat-value {
+  min-width: 0;
+  max-width: 100%;
+
   margin: 9px 0 4px;
 
   color: #0f172a;
+
   font-size: 24px;
   font-weight: 700;
   line-height: 1.2;
 
   overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .exp-stat-sub {
+  min-width: 0;
+
   margin: 0;
 
   color: #94a3b8;
+
   font-size: 12px;
   font-weight: 400;
   line-height: 1.4;
@@ -228,6 +287,8 @@
   height: 36px;
 
   border-radius: 8px;
+
+  box-sizing: border-box;
 }
 
 .exp-icon-red {
@@ -247,30 +308,43 @@
 .exp-actions-container {
   display: flex;
   flex-direction: column;
+
   gap: 16px;
 
   width: 100%;
+  min-width: 0;
+
   margin-bottom: 28px;
 }
 
-/* First row - 3 buttons */
+/* =========================================================
+   FIRST ROW - 3 BUTTONS
+========================================================= */
 
 .exp-action-row-1 {
   display: grid;
+
   grid-template-columns: repeat(3, minmax(0, 1fr));
+
   gap: 16px;
 
   width: 100%;
+  min-width: 0;
 }
 
-/* Second row - 2 buttons */
+/* =========================================================
+   SECOND ROW - 2 BUTTONS
+========================================================= */
 
 .exp-action-row-2 {
   display: grid;
+
   grid-template-columns: repeat(2, minmax(0, 1fr));
+
   gap: 16px;
 
   width: 66.6667%;
+  min-width: 0;
 }
 
 /* =========================================================
@@ -281,11 +355,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   gap: 10px;
 
   width: 100%;
   min-width: 0;
+
   min-height: 48px;
+
   padding: 0 16px;
 
   box-sizing: border-box;
@@ -293,6 +370,7 @@
   border-radius: 8px;
 
   font-family: inherit;
+
   font-size: 14px;
   font-weight: 600;
 
@@ -306,6 +384,9 @@
     color 0.2s ease,
     transform 0.2s ease,
     box-shadow 0.2s ease;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .exp-btn-action:focus-visible {
@@ -323,6 +404,7 @@
 
 .exp-btn-green {
   border: 1px solid #007a3d;
+
   background: #007a3d;
   color: #ffffff;
 }
@@ -338,6 +420,7 @@
 
 .exp-btn-dark {
   border: 1px solid #1e293b;
+
   background: #1e293b;
   color: #ffffff;
 }
@@ -353,6 +436,7 @@
 
 .exp-btn-outline {
   border: 1px solid #e2e8f0;
+
   background: #ffffff;
   color: #1e293b;
 }
@@ -364,44 +448,54 @@
 
 /* =========================================================
    LOADING / ERROR
-   Safe styles if these classes exist in JSX
 ========================================================= */
 
 .exp-loading,
 .exp-error {
   width: 100%;
+  min-width: 0;
+
   padding: 24px;
 
   box-sizing: border-box;
 
   text-align: center;
+
   border-radius: 10px;
+
+  overflow-wrap: anywhere;
 }
 
 .exp-loading {
   color: #64748b;
+
   background: #ffffff;
+
   border: 1px solid #e2e8f0;
 }
 
 .exp-error {
   color: #dc2626;
+
   background: #fef2f2;
+
   border: 1px solid #fecaca;
 }
 
 /* =========================================================
    PAGINATION
-   Safe styles if pagination exists in JSX
 ========================================================= */
 
 .exp-pagination {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 16px;
 
   width: 100%;
+  min-width: 0;
+
   margin-top: 20px;
   padding: 14px 0;
 
@@ -409,8 +503,13 @@
 }
 
 .exp-pagination-info {
+  min-width: 0;
+
   color: #64748b;
+
   font-size: 13px;
+
+  overflow-wrap: anywhere;
 }
 
 .exp-pagination-info strong {
@@ -422,15 +521,20 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+
   gap: 6px;
 
   min-width: 0;
+  max-width: 100%;
 }
 
 .exp-pagination-pages {
   display: flex;
   align-items: center;
+
   gap: 4px;
+
+  min-width: 0;
 }
 
 .exp-pagination-btn,
@@ -441,7 +545,10 @@
 
   min-width: 36px;
   height: 36px;
+
   padding: 0 10px;
+
+  box-sizing: border-box;
 
   border: 1px solid #e2e8f0;
   border-radius: 7px;
@@ -450,6 +557,7 @@
   color: #475569;
 
   font-family: inherit;
+
   font-size: 13px;
   font-weight: 500;
 
@@ -459,6 +567,8 @@
     background-color 0.2s ease,
     border-color 0.2s ease,
     color 0.2s ease;
+
+  flex-shrink: 0;
 }
 
 .exp-pagination-btn:hover:not(:disabled),
@@ -469,6 +579,7 @@
 
 .exp-pagination-page.active {
   border-color: #007a3d;
+
   background: #007a3d;
   color: #ffffff;
 }
@@ -480,17 +591,40 @@
 
 /* =========================================================
    LARGE DESKTOP
-   1201px+
+   1440px+
 ========================================================= */
 
-@media (min-width: 1201px) {
+@media (min-width: 1440px) {
+  .exp-page-container {
+    padding: 28px 32px;
+  }
+
+  .exp-stats-grid {
+    gap: 24px;
+  }
+
+  .exp-stat-card {
+    padding: 22px;
+  }
+
+  .exp-stat-value {
+    font-size: 25px;
+  }
+}
+
+/* =========================================================
+   DESKTOP
+   1201px - 1439px
+========================================================= */
+
+@media (max-width: 1439px) {
   .exp-page-container {
     padding: 24px 30px;
   }
 }
 
 /* =========================================================
-   LAPTOP / SMALL DESKTOP
+   LAPTOP
    1025px - 1200px
 ========================================================= */
 
@@ -518,7 +652,7 @@
 }
 
 /* =========================================================
-   TABLET
+   TABLET LANDSCAPE
    769px - 1024px
 ========================================================= */
 
@@ -526,8 +660,6 @@
   .exp-page-container {
     padding: 20px;
   }
-
-  /* Header */
 
   .exp-header-bar {
     margin-bottom: 18px;
@@ -537,6 +669,7 @@
 
   .exp-stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+
     gap: 16px;
   }
 
@@ -552,13 +685,14 @@
 
   .exp-action-row-2 {
     width: 100%;
+
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 /* =========================================================
-   MOBILE
-   481px - 768px
+   TABLET / LARGE MOBILE
+   601px - 768px
 ========================================================= */
 
 @media (max-width: 768px) {
@@ -570,8 +704,11 @@
 
   .exp-header-bar {
     align-items: flex-start;
+
     flex-direction: column;
+
     gap: 8px;
+
     margin-bottom: 18px;
   }
 
@@ -583,7 +720,9 @@
 
   .exp-title-row {
     flex-direction: column;
+
     align-items: stretch;
+
     gap: 16px;
 
     margin-bottom: 20px;
@@ -605,6 +744,7 @@
 
   .exp-stats-grid {
     grid-template-columns: 1fr;
+
     gap: 14px;
   }
 
@@ -614,6 +754,7 @@
 
   .exp-stat-card {
     min-height: 110px;
+
     padding: 18px;
   }
 
@@ -625,18 +766,22 @@
 
   .exp-actions-container {
     gap: 12px;
+
     margin-bottom: 22px;
   }
 
   .exp-action-row-1,
   .exp-action-row-2 {
     width: 100%;
+
     grid-template-columns: 1fr;
+
     gap: 12px;
   }
 
   .exp-btn-action {
     min-height: 46px;
+
     font-size: 13px;
   }
 
@@ -644,18 +789,79 @@
 
   .exp-pagination {
     align-items: stretch;
+
     flex-direction: column;
+
+    gap: 14px;
   }
 
   .exp-pagination-info {
+    width: 100%;
+
     text-align: center;
   }
 
   .exp-pagination-controls {
-    justify-content: center;
     width: 100%;
+
+    justify-content: center;
+
     overflow-x: auto;
+
     padding-bottom: 2px;
+
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   481px - 600px
+========================================================= */
+
+@media (max-width: 600px) {
+  .exp-page-container {
+    padding: 14px;
+  }
+
+  .exp-header-left {
+    gap: 8px;
+
+    font-size: 13px;
+  }
+
+  .exp-title-row {
+    gap: 14px;
+  }
+
+  .exp-page-title {
+    font-size: 21px;
+  }
+
+  .exp-page-subtitle {
+    font-size: 12px;
+  }
+
+  .exp-stat-card {
+    min-height: 105px;
+
+    padding: 17px;
+  }
+
+  .exp-stat-value {
+    font-size: 21px;
+  }
+
+  .exp-btn-add-owners {
+    min-height: 42px;
+
+    padding: 10px 16px;
+
+    font-size: 13px;
+  }
+
+  .exp-btn-action {
+    min-height: 45px;
   }
 }
 
@@ -669,14 +875,11 @@
     padding: 12px;
   }
 
-  /* Header */
-
   .exp-header-left {
     gap: 7px;
-    font-size: 13px;
-  }
 
-  /* Title */
+    font-size: 12px;
+  }
 
   .exp-page-title {
     font-size: 20px;
@@ -684,12 +887,15 @@
 
   .exp-page-subtitle {
     font-size: 12px;
+
+    line-height: 1.45;
   }
 
-  /* Owner Button */
-
   .exp-btn-add-owners {
+    width: 100%;
+
     min-height: 42px;
+
     padding: 10px 16px;
 
     font-size: 13px;
@@ -699,7 +905,10 @@
 
   .exp-stat-card {
     min-height: 100px;
+
     padding: 16px;
+
+    border-radius: 10px;
   }
 
   .exp-stat-label {
@@ -708,6 +917,7 @@
 
   .exp-stat-value {
     margin-top: 8px;
+
     font-size: 20px;
   }
 
@@ -718,6 +928,7 @@
   .exp-icon-box {
     width: 34px;
     height: 34px;
+
     flex-basis: 34px;
   }
 
@@ -725,13 +936,28 @@
 
   .exp-btn-action {
     min-height: 44px;
+
     padding: 0 12px;
 
     font-size: 12px;
+
     gap: 8px;
   }
 
+  /* Loading/Error */
+
+  .exp-loading,
+  .exp-error {
+    padding: 20px 14px;
+
+    font-size: 13px;
+  }
+
   /* Pagination */
+
+  .exp-pagination {
+    margin-top: 14px;
+  }
 
   .exp-pagination-controls {
     justify-content: flex-start;
@@ -747,8 +973,8 @@
 }
 
 /* =========================================================
-   VERY SMALL DEVICES
-   360px and below
+   VERY SMALL MOBILE
+   <=360px
 ========================================================= */
 
 @media (max-width: 360px) {
@@ -757,7 +983,7 @@
   }
 
   .exp-header-left {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .exp-page-title {
@@ -768,8 +994,17 @@
     font-size: 11px;
   }
 
+  .exp-title-row {
+    gap: 12px;
+  }
+
+  /* Stats */
+
   .exp-stat-card {
     gap: 10px;
+
+    min-height: 95px;
+
     padding: 14px;
   }
 
@@ -788,23 +1023,40 @@
   .exp-icon-box {
     width: 32px;
     height: 32px;
+
     flex-basis: 32px;
   }
 
+  /* Buttons */
+
   .exp-btn-add-owners {
+    min-height: 40px;
+
+    padding: 9px 12px;
+
     font-size: 12px;
   }
 
   .exp-btn-action {
     min-height: 42px;
+
     padding: 0 10px;
 
     font-size: 11px;
+
     gap: 6px;
   }
 
-  .exp-pagination {
-    margin-top: 14px;
+  /* Pagination */
+
+  .exp-pagination-controls {
+    gap: 4px;
+  }
+
+  .exp-pagination-btn,
+  .exp-pagination-page {
+    min-width: 32px;
+    height: 32px;
   }
 }
 
