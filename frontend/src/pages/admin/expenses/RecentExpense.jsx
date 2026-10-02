@@ -137,12 +137,6 @@ const RecentExpenses = ({ expenses = [], onEdit, onDelete }) => {
 
       <div className="exp-table-header">
         <h3 className="exp-table-title">Recent Expenses</h3>
-
-        <button type="button" className="exp-btn-view-all">
-          <span>View All</span>
-
-          <ArrowRight size={16} />
-        </button>
       </div>
 
       {/* ==========================================
