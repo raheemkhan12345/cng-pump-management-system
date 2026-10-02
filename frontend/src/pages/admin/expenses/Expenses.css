@@ -1,3 +1,4 @@
+
 /* =========================================================
    EXPENSES PAGE
 ========================================================= */
@@ -52,8 +53,8 @@
 }
 
 .exp-divider {
-  color: #cbd5e1;
   flex-shrink: 0;
+  color: #cbd5e1;
 }
 
 .exp-location-text {
@@ -91,6 +92,13 @@
 
   min-width: 0;
   flex: 1;
+}
+
+.exp-selected-month {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #64748b;
+
 }
 
 .exp-page-title {
@@ -378,15 +386,15 @@
 
   white-space: nowrap;
 
+  overflow: hidden;
+  text-overflow: ellipsis;
+
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease,
     color 0.2s ease,
     transform 0.2s ease,
     box-shadow 0.2s ease;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .exp-btn-action:focus-visible {
@@ -563,12 +571,12 @@
 
   cursor: pointer;
 
+  flex-shrink: 0;
+
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease,
     color 0.2s ease;
-
-  flex-shrink: 0;
 }
 
 .exp-pagination-btn:hover:not(:disabled),
@@ -649,6 +657,11 @@
   .exp-action-row-2 {
     gap: 14px;
   }
+
+  .exp-btn-action {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 }
 
 /* =========================================================
@@ -704,7 +717,6 @@
 
   .exp-header-bar {
     align-items: flex-start;
-
     flex-direction: column;
 
     gap: 8px;
@@ -713,6 +725,7 @@
   }
 
   .exp-header-left {
+    width: 100%;
     font-size: 14px;
   }
 
@@ -720,7 +733,6 @@
 
   .exp-title-row {
     flex-direction: column;
-
     align-items: stretch;
 
     gap: 16px;
@@ -754,7 +766,6 @@
 
   .exp-stat-card {
     min-height: 110px;
-
     padding: 18px;
   }
 
@@ -766,7 +777,6 @@
 
   .exp-actions-container {
     gap: 12px;
-
     margin-bottom: 22px;
   }
 
@@ -781,7 +791,6 @@
 
   .exp-btn-action {
     min-height: 46px;
-
     font-size: 13px;
   }
 
@@ -789,7 +798,6 @@
 
   .exp-pagination {
     align-items: stretch;
-
     flex-direction: column;
 
     gap: 14px;
@@ -797,7 +805,6 @@
 
   .exp-pagination-info {
     width: 100%;
-
     text-align: center;
   }
 
@@ -811,6 +818,7 @@
     padding-bottom: 2px;
 
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
   }
 }
 
@@ -826,7 +834,6 @@
 
   .exp-header-left {
     gap: 8px;
-
     font-size: 13px;
   }
 
@@ -844,7 +851,6 @@
 
   .exp-stat-card {
     min-height: 105px;
-
     padding: 17px;
   }
 
@@ -853,6 +859,8 @@
   }
 
   .exp-btn-add-owners {
+    width: 100%;
+
     min-height: 42px;
 
     padding: 10px 16px;
@@ -862,6 +870,10 @@
 
   .exp-btn-action {
     min-height: 45px;
+  }
+
+  .exp-pagination-controls {
+    justify-content: flex-start;
   }
 }
 
@@ -877,7 +889,6 @@
 
   .exp-header-left {
     gap: 7px;
-
     font-size: 12px;
   }
 
@@ -887,7 +898,6 @@
 
   .exp-page-subtitle {
     font-size: 12px;
-
     line-height: 1.45;
   }
 
@@ -917,7 +927,6 @@
 
   .exp-stat-value {
     margin-top: 8px;
-
     font-size: 20px;
   }
 
@@ -944,12 +953,11 @@
     gap: 8px;
   }
 
-  /* Loading/Error */
+  /* Loading / Error */
 
   .exp-loading,
   .exp-error {
     padding: 20px 14px;
-
     font-size: 13px;
   }
 
@@ -961,12 +969,15 @@
 
   .exp-pagination-controls {
     justify-content: flex-start;
+    width: 100%;
   }
 
   .exp-pagination-btn,
   .exp-pagination-page {
     min-width: 34px;
     height: 34px;
+
+    padding: 0 8px;
 
     font-size: 12px;
   }
@@ -1057,6 +1068,8 @@
   .exp-pagination-page {
     min-width: 32px;
     height: 32px;
+
+    padding: 0 7px;
   }
 }
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { Calendar } from "lucide-react";
+import { FaChevronDown } from "react-icons/fa6";
 
 import DashboardStats from "./DashboardStats";
 import RecentTransactions from "./RecentTransactions";
@@ -8,17 +9,16 @@ import RecentTransactions from "./RecentTransactions";
 import { getDashboard } from "../../../services/adminApis/dashboardApi";
 
 import "./AdminDashboard.css";
-import { FaChevronDown } from "react-icons/fa6";
+
+// =========================================================
+// STORAGE KEY
+// =========================================================
+
+const DASHBOARD_MONTH_KEY = "cng_dashboard_selected_month";
 
 const AdminDashboard = () => {
-  const [dashboardData, setDashboardData] = useState({});
-  const [recentTransactions, setRecentTransactions] = useState([]);
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-
   // =========================================================
-  // CURRENT MONTH & YEAR
+  // CURRENT DATE
   // =========================================================
 
   const currentDate = new Date();
@@ -28,25 +28,60 @@ const AdminDashboard = () => {
   const currentMonth = currentDate.getMonth() + 1;
 
   // =========================================================
-  // SELECTED MONTH
+  // GET SAVED MONTH
   // =========================================================
 
-  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const getInitialSelectedMonth = () => {
+    try {
+      const savedMonth = sessionStorage.getItem(DASHBOARD_MONTH_KEY);
 
-  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+      if (savedMonth) {
+        const parsed = JSON.parse(savedMonth);
+
+        if (
+          parsed &&
+          Number.isInteger(parsed.year) &&
+          Number.isInteger(parsed.month) &&
+          parsed.month >= 1 &&
+          parsed.month <= 12
+        ) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.error("Failed to read saved dashboard month:", error);
+    }
+
+    return {
+      year: currentYear,
+      month: currentMonth,
+    };
+  };
+
+  const initialSelectedMonth = getInitialSelectedMonth();
+
+  // =========================================================
+  // STATES
+  // =========================================================
+
+  const [selectedYear, setSelectedYear] = useState(
+    initialSelectedMonth.year,
+  );
+
+  const [selectedMonth, setSelectedMonth] = useState(
+    initialSelectedMonth.month,
+  );
+
+  const [dashboardData, setDashboardData] = useState({});
+
+  const [recentTransactions, setRecentTransactions] = useState([]);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [error, setError] = useState("");
 
   // =========================================================
   // GENERATE MONTH LIST
-  // =========================================================
-  // This creates the current month + previous 11 months.
-  //
-  // Example:
-  // October 2026
-  // September 2026
-  // August 2026
-  // July 2026
-  // ...
-  // November 2025
   // =========================================================
 
   const monthOptions = [];
@@ -56,7 +91,9 @@ const AdminDashboard = () => {
 
     monthOptions.push({
       month: date.getMonth() + 1,
+
       year: date.getFullYear(),
+
       label: new Intl.DateTimeFormat("en-US", {
         month: "long",
         year: "numeric",
@@ -65,28 +102,44 @@ const AdminDashboard = () => {
   }
 
   // =========================================================
-  // SELECTED MONTH LABEL
-  // =========================================================
-
-  const selectedMonthYear = new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    year: "numeric",
-  }).format(new Date(selectedYear, selectedMonth - 1, 1));
-
-  // =========================================================
   // GET DASHBOARD DATA
   // =========================================================
 
   const fetchDashboard = useCallback(async (year, month) => {
     try {
       setIsLoading(true);
+
       setError("");
 
       // =====================================================
-      // CALL SAME DASHBOARD API
+      // DEBUG
+      // =====================================================
+
+      console.log("======================================");
+
+      console.log("FETCH DASHBOARD");
+
+      console.log("YEAR:", year);
+
+      console.log("MONTH:", month);
+
+      console.log(
+        "MONTH NAME:",
+        new Intl.DateTimeFormat("en-US", {
+          month: "long",
+          year: "numeric",
+        }).format(new Date(year, month - 1, 1)),
+      );
+
+      console.log("======================================");
+
+      // =====================================================
+      // API CALL
       // =====================================================
 
       const response = await getDashboard(year, month);
+
+      console.log("Dashboard API Response:", response);
 
       // =====================================================
       // EXTRACT DASHBOARD DATA
@@ -121,7 +174,7 @@ const AdminDashboard = () => {
       }
 
       // =====================================================
-      // EXTRACT RECENT TRANSACTIONS
+      // EXTRACT TRANSACTIONS
       // =====================================================
 
       let transactions = [];
@@ -144,6 +197,8 @@ const AdminDashboard = () => {
 
       setRecentTransactions(transactions);
     } catch (error) {
+      console.error("Dashboard Error:", error);
+
       const errorMessage =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
@@ -161,12 +216,12 @@ const AdminDashboard = () => {
   }, []);
 
   // =========================================================
-  // FETCH DASHBOARD ON PAGE LOAD
+  // FETCH SELECTED MONTH
   // =========================================================
 
   useEffect(() => {
-    fetchDashboard(currentYear, currentMonth);
-  }, [fetchDashboard, currentYear, currentMonth]);
+    fetchDashboard(selectedYear, selectedMonth);
+  }, [fetchDashboard, selectedYear, selectedMonth]);
 
   // =========================================================
   // HANDLE MONTH CHANGE
@@ -177,11 +232,45 @@ const AdminDashboard = () => {
 
     const [year, month] = value.split("-").map(Number);
 
+    // =======================================================
+    // UPDATE STATE
+    // =======================================================
+
     setSelectedYear(year);
 
     setSelectedMonth(month);
 
-    fetchDashboard(year, month);
+    // =======================================================
+    // SAVE SELECTED MONTH
+    // =======================================================
+
+    sessionStorage.setItem(
+      DASHBOARD_MONTH_KEY,
+      JSON.stringify({
+        year,
+        month,
+      }),
+    );
+
+    console.log("======================================");
+
+    console.log("MONTH CHANGED");
+
+    console.log("YEAR:", year);
+
+    console.log("MONTH:", month);
+
+    console.log(
+      "MONTH NAME:",
+      new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        year: "numeric",
+      }).format(new Date(year, month - 1, 1)),
+    );
+
+    console.log("SAVED TO SESSION STORAGE");
+
+    console.log("======================================");
   };
 
   // =========================================================
@@ -199,7 +288,9 @@ const AdminDashboard = () => {
   if (isLoading) {
     return (
       <div className="admin-dashboard-wrapper">
-        <div className="dashboard-loading">Loading dashboard...</div>
+        <div className="dashboard-loading">
+          Loading dashboard...
+        </div>
       </div>
     );
   }
@@ -229,65 +320,55 @@ const AdminDashboard = () => {
   return (
     <div className="admin-dashboard-wrapper">
       {/* =====================================================
-          TOP HEADER FILTER & ACTION BAR
+          TOP HEADER FILTER
       ====================================================== */}
 
       <div className="dashboard-action-bar">
-        {/* ===================================================
-            MONTH FILTER
-        ==================================================== */}
-
         <div className="date-filter-pill">
-          {" "}
-          <Calendar size={15} /> <span>Viewing reports for</span>{" "}
+          <Calendar size={15} />
+
+          <span>Viewing reports for</span>
+
           <div className="month-select-wrapper">
-            {" "}
             <select
               value={`${selectedYear}-${selectedMonth}`}
               onChange={handleMonthChange}
               className="dashboard-month-select"
+              aria-label="Select dashboard month"
             >
-              {" "}
               {monthOptions.map((option) => (
                 <option
                   key={`${option.year}-${option.month}`}
                   value={`${option.year}-${option.month}`}
                 >
-                  {" "}
-                  {option.label}{" "}
+                  {option.label}
                 </option>
-              ))}{" "}
-            </select>{" "}
-            <FaChevronDown className="dropdown-icon" size={11} />{" "}
-          </div>{" "}
-        </div>
+              ))}
+            </select>
 
-        {/* ===================================================
-            SUPER DASHBOARD
-        ==================================================== */}
-
-        {/* 
-        <button type="button" className="btn-super-admin">
-          <div className="icon-circle">
-            <Undo2 size={14} />
+            <FaChevronDown
+              className="dropdown-icon"
+              size={11}
+            />
           </div>
-
-          <span>Super Dashboard</span>
-        </button>
-        */}
+        </div>
       </div>
 
       {/* =====================================================
           DASHBOARD STATS
       ====================================================== */}
 
-      <DashboardStats dashboardData={dashboardData} />
+      <DashboardStats
+        dashboardData={dashboardData}
+      />
 
       {/* =====================================================
           RECENT TRANSACTIONS
       ====================================================== */}
 
-      <RecentTransactions transactions={recentTransactions} />
+      <RecentTransactions
+        transactions={recentTransactions}
+      />
     </div>
   );
 };

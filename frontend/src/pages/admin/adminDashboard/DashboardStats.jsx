@@ -28,7 +28,7 @@ const DashboardStats = ({ dashboardData = {} }) => {
       subtext: "Current balance in counter",
       icon: FaMoneyBillWave,
       variant: "card-green",
-      path: "/admin/sales",
+      path: "/admin/sales-report",
     },
 
     {
@@ -38,18 +38,7 @@ const DashboardStats = ({ dashboardData = {} }) => {
       subtext: "Total volume dispensed",
       icon: FaScaleBalanced,
       variant: "card-teal",
-      path: "/admin/sales",
-    },
-
-    {
-      id: 3,
-      label: "DAILY SALE",
-      value: `Rs. ${formatCurrency(dashboardData.dailySale?.amount)}`,
-      subtext: `KG. ${formatCurrency(dashboardData.dailySale?.kg)}`,
-      icon: FaMoneyBillWave,
-      variant: "card-green",
-      subtextBold: true,
-      path: "/admin/sales",
+      path: "/admin/sales-report",
     },
 
     {

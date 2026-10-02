@@ -30,6 +30,8 @@ import "./Loans.css";
 
 const ITEMS_PER_PAGE = 5;
 
+const DASHBOARD_MONTH_KEY = "cng_dashboard_selected_month";
+
 const EMPTY_LOAN_STATS = {
   thisMonthLoan: 0,
   totalLoansGiven: 0,
@@ -38,10 +40,123 @@ const EMPTY_LOAN_STATS = {
 };
 
 // =========================================================
+// GET SELECTED DASHBOARD MONTH
+// =========================================================
+
+const getSelectedDashboardMonth = () => {
+  try {
+    const savedMonth = sessionStorage.getItem(DASHBOARD_MONTH_KEY);
+
+    if (savedMonth) {
+      const parsed = JSON.parse(savedMonth);
+
+      if (
+        parsed &&
+        Number.isInteger(parsed.year) &&
+        Number.isInteger(parsed.month) &&
+        parsed.month >= 1 &&
+        parsed.month <= 12
+      ) {
+        return parsed;
+      }
+    }
+  } catch (error) {
+    console.error(
+      "Failed to read selected dashboard month:",
+      error,
+    );
+  }
+
+  // =======================================================
+  // FALLBACK TO CURRENT MONTH
+  // =======================================================
+
+  const currentDate = new Date();
+
+  return {
+    year: currentDate.getFullYear(),
+    month: currentDate.getMonth() + 1,
+  };
+};
+
+// =========================================================
+// CHECK WHETHER DATE BELONGS TO SELECTED MONTH
+// =========================================================
+
+const isDateInSelectedMonth = (date, selectedYear, selectedMonth) => {
+  if (!date) {
+    return false;
+  }
+
+  // =======================================================
+  // HANDLE YYYY-MM-DD FORMAT DIRECTLY
+  // =======================================================
+
+  const dateString = String(date).split("T")[0];
+
+  const dateParts = dateString.split("-");
+
+  if (dateParts.length === 3) {
+    const year = Number(dateParts[0]);
+    const month = Number(dateParts[1]);
+
+    if (
+      Number.isInteger(year) &&
+      Number.isInteger(month)
+    ) {
+      return (
+        year === selectedYear &&
+        month === selectedMonth
+      );
+    }
+  }
+
+  // =======================================================
+  // FALLBACK DATE PARSING
+  // =======================================================
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return false;
+  }
+
+  return (
+    parsedDate.getFullYear() === selectedYear &&
+    parsedDate.getMonth() + 1 === selectedMonth
+  );
+};
+
+// =========================================================
+// GET SELECTED MONTH LABEL
+// =========================================================
+
+const getSelectedMonthLabel = (year, month) => {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+  }).format(new Date(year, month - 1, 1));
+};
+
+// =========================================================
 // COMPONENT
 // =========================================================
 
 const Loans = () => {
+  // =========================================================
+  // SELECTED DASHBOARD MONTH
+  // =========================================================
+
+  const initialSelectedMonth = getSelectedDashboardMonth();
+
+  const [selectedYear, setSelectedYear] = useState(
+    initialSelectedMonth.year,
+  );
+
+  const [selectedMonth, setSelectedMonth] = useState(
+    initialSelectedMonth.month,
+  );
+
   // =========================================================
   // STATE
   // =========================================================
@@ -121,7 +236,47 @@ const Loans = () => {
     try {
       setIsLoading(true);
 
+      // =====================================================
+      // READ LATEST SELECTED MONTH FROM SESSION STORAGE
+      // =====================================================
+
+      const savedMonth = getSelectedDashboardMonth();
+
+      const currentSelectedYear = savedMonth.year;
+      const currentSelectedMonth = savedMonth.month;
+
+      // =====================================================
+      // KEEP LOCAL STATE IN SYNC
+      // =====================================================
+
+      setSelectedYear(currentSelectedYear);
+      setSelectedMonth(currentSelectedMonth);
+
+      console.log("======================================");
+
+      console.log("FETCH LOANS");
+
+      console.log("SELECTED YEAR:", currentSelectedYear);
+
+      console.log("SELECTED MONTH:", currentSelectedMonth);
+
+      console.log(
+        "SELECTED MONTH NAME:",
+        getSelectedMonthLabel(
+          currentSelectedYear,
+          currentSelectedMonth,
+        ),
+      );
+
+      console.log("======================================");
+
+      // =====================================================
+      // API CALL
+      // =====================================================
+
       const response = await getAllLoans();
+
+      console.log("Loans API Response:", response);
 
       // =====================================================
       // FIND API DATA
@@ -141,126 +296,238 @@ const Loans = () => {
             ? apiData.data
             : [];
 
+      console.log("TOTAL LOANS FROM API:", loansArray.length);
+
       // =====================================================
-      // BACKEND SUMMARY
+      // FILTER LOANS BY SELECTED MONTH
+      // =====================================================
+
+      const selectedMonthLoans = loansArray.filter((loan) => {
+        return isDateInSelectedMonth(
+          loan?.date,
+          currentSelectedYear,
+          currentSelectedMonth,
+        );
+      });
+
+      console.log(
+        "SELECTED MONTH LOANS:",
+        selectedMonthLoans.length,
+      );
+
+      // =====================================================
+      // CALCULATE SELECTED MONTH STATISTICS
+      // =====================================================
+
+      let selectedMonthLoanGiven = 0;
+
+      let selectedMonthLoanReceived = 0;
+
+      selectedMonthLoans.forEach((loan) => {
+        const amount = Number(loan?.amount) || 0;
+
+        if (loan?.loanType === "loan_given") {
+          selectedMonthLoanGiven += amount;
+        }
+
+        if (loan?.loanType === "loan_received") {
+          selectedMonthLoanReceived += amount;
+        }
+      });
+
+      // =====================================================
+      // GET BACKEND SUMMARY
       // =====================================================
 
       const summary = apiData?.summary || {};
 
-      setLoanStats({
-        thisMonthLoan: Number(summary?.thisMonthLoan) || 0,
-
-        totalLoansGiven: Number(summary?.totalLoanGiven) || 0,
-
-        thisMonthRecovery: Number(summary?.thisMonthLoanReceived) || 0,
-
-        activeLoanStaff: Number(summary?.activeLoanStaff) || 0,
-      });
-
       // =====================================================
-      // FORMAT LOANS
+      // ACTIVE STAFF
+      //
+      // Calculate from selected-month records first.
+      // Each unique person with a remaining balance > 0
+      // is counted.
       // =====================================================
 
-      const formattedLoans = loansArray.map((loan, index) => {
-        // ---------------------------------------------------
-        // ID
-        // ---------------------------------------------------
+      const activeStaffNames = new Set();
 
-        const loanId = loan?._id || loan?.id || `loan-${index}-${Date.now()}`;
-
-        // ---------------------------------------------------
-        // DATE
-        // ---------------------------------------------------
-
-        const formattedDate = formatDateForTable(loan?.date);
-
-        // ---------------------------------------------------
-        // LOAN TYPE
-        // ---------------------------------------------------
-
-        let formattedLoanType = "-";
-
-        if (loan?.loanType === "loan_given") {
-          formattedLoanType = "Loan Given";
-        } else if (loan?.loanType === "loan_received") {
-          formattedLoanType = "Loan Received";
-        } else if (loan?.loanType) {
-          formattedLoanType = loan.loanType;
-        }
-
-        // ---------------------------------------------------
-        // NAME
-        // ---------------------------------------------------
-
-        const personName =
-          loan?.name || loan?.personName || loan?.staffName || "-";
-
-        // ---------------------------------------------------
-        // ORIGINAL LOAN AMOUNT
-        // ---------------------------------------------------
-
-        const amount = Number(loan?.amount) || 0;
-
-        // ---------------------------------------------------
-        // REMAINING BALANCE
-        //
-        // IMPORTANT:
-        // Backend sends remainingBalance.
-        // ---------------------------------------------------
-
+      selectedMonthLoans.forEach((loan) => {
         const remainingBalance = Number(
           loan?.remainingBalance ??
             loan?.remainingBal ??
             loan?.balance ??
-            amount,
+            loan?.amount ??
+            0,
         );
 
-        // ---------------------------------------------------
-        // STATUS
-        //
-        // Prefer backend status.
-        // Otherwise calculate from remaining balance.
-        // ---------------------------------------------------
+        const personName =
+          loan?.name ||
+          loan?.personName ||
+          loan?.staffName ||
+          "";
 
-        const status =
-          loan?.status || (remainingBalance <= 0 ? "paid" : "active");
-
-        // ---------------------------------------------------
-        // PAYMENT TYPE
-        // ---------------------------------------------------
-
-        const paymentMode = convertPaymentTypeToFrontend(loan?.paymentType);
-
-        // ---------------------------------------------------
-        // RETURN FORMATTED OBJECT
-        // ---------------------------------------------------
-
-        return {
-          // Table data
-          id: loanId,
-          date: formattedDate,
-          staffName: personName,
-          type: formattedLoanType,
-          amount,
-          remainingBal: remainingBalance,
-
-          // Backend status
-          status,
-
-          // Edit form data
-          loanType:
-            loan?.loanType === "loan_received" ? "loan_received" : "loan_given",
-
-          personName,
-
-          paymentMode,
-
-          // Keep original transactions if needed later
-          transactions: Array.isArray(loan?.transactions)
-            ? loan.transactions
-            : [],
-        };
+        if (
+          remainingBalance > 0 &&
+          String(personName).trim()
+        ) {
+          activeStaffNames.add(
+            String(personName).trim().toLowerCase(),
+          );
+        }
       });
+
+      // =====================================================
+      // TOTAL LOANS GIVEN
+      //
+      // Preserve backend value if available because this
+      // represents the current outstanding total.
+      // =====================================================
+
+      const backendTotalLoansGiven = Number(
+        summary?.totalLoanGiven,
+      ) || 0;
+
+      const totalLoansGiven =
+        backendTotalLoansGiven > 0
+          ? backendTotalLoansGiven
+          : selectedMonthLoanGiven;
+
+      // =====================================================
+      // SET LOAN STATS
+      // =====================================================
+
+      setLoanStats({
+        thisMonthLoan: selectedMonthLoanGiven,
+
+        totalLoansGiven,
+
+        thisMonthRecovery: selectedMonthLoanReceived,
+
+        activeLoanStaff:
+          activeStaffNames.size ||
+          Number(summary?.activeLoanStaff) ||
+          0,
+      });
+
+      // =====================================================
+      // FORMAT SELECTED MONTH LOANS
+      // =====================================================
+
+      const formattedLoans = selectedMonthLoans.map(
+        (loan, index) => {
+          // -------------------------------------------------
+          // ID
+          // -------------------------------------------------
+
+          const loanId =
+            loan?._id ||
+            loan?.id ||
+            `loan-${index}-${Date.now()}`;
+
+          // -------------------------------------------------
+          // DATE
+          // -------------------------------------------------
+
+          const formattedDate = formatDateForTable(
+            loan?.date,
+          );
+
+          // -------------------------------------------------
+          // LOAN TYPE
+          // -------------------------------------------------
+
+          let formattedLoanType = "-";
+
+          if (loan?.loanType === "loan_given") {
+            formattedLoanType = "Loan Given";
+          } else if (
+            loan?.loanType === "loan_received"
+          ) {
+            formattedLoanType = "Loan Received";
+          } else if (loan?.loanType) {
+            formattedLoanType = loan.loanType;
+          }
+
+          // -------------------------------------------------
+          // NAME
+          // -------------------------------------------------
+
+          const personName =
+            loan?.name ||
+            loan?.personName ||
+            loan?.staffName ||
+            "-";
+
+          // -------------------------------------------------
+          // ORIGINAL LOAN AMOUNT
+          // -------------------------------------------------
+
+          const amount = Number(loan?.amount) || 0;
+
+          // -------------------------------------------------
+          // REMAINING BALANCE
+          // -------------------------------------------------
+
+          const remainingBalance = Number(
+            loan?.remainingBalance ??
+              loan?.remainingBal ??
+              loan?.balance ??
+              amount,
+          );
+
+          // -------------------------------------------------
+          // STATUS
+          // -------------------------------------------------
+
+          const status =
+            loan?.status ||
+            (remainingBalance <= 0 ? "paid" : "active");
+
+          // -------------------------------------------------
+          // PAYMENT TYPE
+          // -------------------------------------------------
+
+          const paymentMode =
+            convertPaymentTypeToFrontend(
+              loan?.paymentType,
+            );
+
+          // -------------------------------------------------
+          // RETURN FORMATTED OBJECT
+          // -------------------------------------------------
+
+          return {
+            id: loanId,
+
+            date: formattedDate,
+
+            staffName: personName,
+
+            type: formattedLoanType,
+
+            amount,
+
+            remainingBal: remainingBalance,
+
+            status,
+
+            loanType:
+              loan?.loanType === "loan_received"
+                ? "loan_received"
+                : "loan_given",
+
+            personName,
+
+            paymentMode,
+
+            transactions: Array.isArray(
+              loan?.transactions,
+            )
+              ? loan.transactions
+              : [],
+          };
+        },
+      );
 
       setLoanTransactions(formattedLoans);
 
@@ -289,6 +556,75 @@ const Loans = () => {
   }, [fetchLoans]);
 
   // =========================================================
+  // SYNC WHEN DASHBOARD MONTH CHANGES
+  //
+  // sessionStorage itself does not trigger React updates.
+  // This checks when the page becomes visible/focused again.
+  // =========================================================
+
+  useEffect(() => {
+    const handleWindowFocus = () => {
+      const savedMonth = getSelectedDashboardMonth();
+
+      if (
+        savedMonth.year !== selectedYear ||
+        savedMonth.month !== selectedMonth
+      ) {
+        setSelectedYear(savedMonth.year);
+
+        setSelectedMonth(savedMonth.month);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        handleWindowFocus();
+      }
+    };
+
+    window.addEventListener(
+      "focus",
+      handleWindowFocus,
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "focus",
+        handleWindowFocus,
+      );
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange,
+      );
+    };
+  }, [selectedYear, selectedMonth]);
+
+  // =========================================================
+  // REFETCH WHEN SELECTED MONTH CHANGES
+  // =========================================================
+
+  useEffect(() => {
+    const savedMonth = getSelectedDashboardMonth();
+
+    if (
+      savedMonth.year === selectedYear &&
+      savedMonth.month === selectedMonth
+    ) {
+      fetchLoans();
+    }
+  }, [
+    selectedYear,
+    selectedMonth,
+    fetchLoans,
+  ]);
+
+  // =========================================================
   // LOAN STATUS
   // =========================================================
 
@@ -303,7 +639,9 @@ const Loans = () => {
     }
 
     // Fallback
-    return Number(loan?.remainingBal) <= 0 ? "Paid" : "Active";
+    return Number(loan?.remainingBal) <= 0
+      ? "Paid"
+      : "Active";
   };
 
   // =========================================================
@@ -323,7 +661,10 @@ const Loans = () => {
         !newLoanData?.personName?.trim() ||
         !newLoanData?.amount
       ) {
-        console.error("Invalid loan form data:", newLoanData);
+        console.error(
+          "Invalid loan form data:",
+          newLoanData,
+        );
 
         return;
       }
@@ -344,7 +685,9 @@ const Loans = () => {
 
         amount: Number(newLoanData.amount),
 
-        paymentType: convertPaymentModeToApi(newLoanData.paymentMode),
+        paymentType: convertPaymentModeToApi(
+          newLoanData.paymentMode,
+        ),
       };
 
       // =====================================================
@@ -353,7 +696,10 @@ const Loans = () => {
 
       const response = await createLoan(payload);
 
-      console.log("Create Loan API Response:", response);
+      console.log(
+        "Create Loan API Response:",
+        response,
+      );
 
       // =====================================================
       // REFRESH LOANS
@@ -373,11 +719,20 @@ const Loans = () => {
 
       console.error("Axios Error:", error);
 
-      console.error("Status:", error?.response?.status);
+      console.error(
+        "Status:",
+        error?.response?.status,
+      );
 
-      console.error("API Error Response:", error?.response?.data);
+      console.error(
+        "API Error Response:",
+        error?.response?.data,
+      );
 
-      console.error("API Error Message:", error?.response?.data?.message);
+      console.error(
+        "API Error Message:",
+        error?.response?.data?.message,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -396,8 +751,13 @@ const Loans = () => {
     // PREVENT EDITING PAID LOAN
     // =====================================================
 
-    if (loan?.status === "paid" || Number(loan?.remainingBal) <= 0) {
-      window.alert("This loan is already fully paid and cannot be updated.");
+    if (
+      loan?.status === "paid" ||
+      Number(loan?.remainingBal) <= 0
+    ) {
+      window.alert(
+        "This loan is already fully paid and cannot be updated.",
+      );
 
       return;
     }
@@ -406,7 +766,9 @@ const Loans = () => {
     // CONVERT TABLE DATE
     // =====================================================
 
-    let editDate = new Date().toISOString().split("T")[0];
+    let editDate = new Date()
+      .toISOString()
+      .split("T")[0];
 
     if (loan?.date && loan.date !== "-") {
       const dateParts = loan.date.split("-");
@@ -427,9 +789,14 @@ const Loans = () => {
 
       loanType:
         loan.loanType ||
-        (loan.type === "Loan Received" ? "loan_received" : "loan_given"),
+        (loan.type === "Loan Received"
+          ? "loan_received"
+          : "loan_given"),
 
-      personName: loan.personName || loan.staffName || "",
+      personName:
+        loan.personName ||
+        loan.staffName ||
+        "",
 
       amount: loan.amount ?? "",
 
@@ -441,7 +808,10 @@ const Loans = () => {
           : "cash",
     };
 
-    console.log("Selected Loan For Edit:", selectedLoanData);
+    console.log(
+      "Selected Loan For Edit:",
+      selectedLoanData,
+    );
 
     setSelectedLoan(selectedLoanData);
 
@@ -465,7 +835,9 @@ const Loans = () => {
       // =====================================================
 
       if (!selectedLoan?.id) {
-        console.error("Update Loan Error: Loan ID is missing.");
+        console.error(
+          "Update Loan Error: Loan ID is missing.",
+        );
 
         return;
       }
@@ -481,7 +853,10 @@ const Loans = () => {
         !updatedLoanData?.loanType ||
         !updatedLoanData?.paymentMode
       ) {
-        console.error("Invalid update loan form data:", updatedLoanData);
+        console.error(
+          "Invalid update loan form data:",
+          updatedLoanData,
+        );
 
         return;
       }
@@ -502,14 +877,19 @@ const Loans = () => {
 
         amount: Number(updatedLoanData.amount),
 
-        paymentType: convertPaymentModeToApi(updatedLoanData.paymentMode),
+        paymentType: convertPaymentModeToApi(
+          updatedLoanData.paymentMode,
+        ),
       };
 
       // =====================================================
       // UPDATE API
       // =====================================================
 
-      const response = await updateLoan(selectedLoan.id, payload);
+      const response = await updateLoan(
+        selectedLoan.id,
+        payload,
+      );
 
       // =====================================================
       // REFRESH LOANS
@@ -525,15 +905,24 @@ const Loans = () => {
 
       setSelectedLoan(null);
 
-      window.alert("Loan updated successfully.", response);
+      window.alert(
+        "Loan updated successfully.",
+        response,
+      );
     } catch (error) {
       console.error("UPDATE LOAN FAILED");
 
       console.error("Axios Error:", error);
 
-      console.error("Update Loan Status:", error?.response?.status);
+      console.error(
+        "Update Loan Status:",
+        error?.response?.status,
+      );
 
-      console.error("Update Loan API Error Response:", error?.response?.data);
+      console.error(
+        "Update Loan API Error Response:",
+        error?.response?.data,
+      );
 
       const errorMessage =
         error?.response?.data?.message ||
@@ -542,7 +931,10 @@ const Loans = () => {
         error?.message ||
         "Failed to update loan. Please try again.";
 
-      console.error("Update Loan API Error Message:", errorMessage);
+      console.error(
+        "Update Loan API Error Message:",
+        errorMessage,
+      );
 
       alert(errorMessage);
     } finally {
@@ -582,7 +974,9 @@ const Loans = () => {
     // =====================================================
 
     if (!loan?.id) {
-      console.error("Delete Loan Error: Loan ID is missing.");
+      console.error(
+        "Delete Loan Error: Loan ID is missing.",
+      );
 
       return;
     }
@@ -614,15 +1008,24 @@ const Loans = () => {
 
       await fetchLoans();
 
-      window.alert("Loan deleted successfully.", response);
+      window.alert(
+        "Loan deleted successfully.",
+        response,
+      );
     } catch (error) {
       console.error("DELETE LOAN FAILED");
 
       console.error("Axios Error:", error);
 
-      console.error("Delete Loan Status:", error?.response?.status);
+      console.error(
+        "Delete Loan Status:",
+        error?.response?.status,
+      );
 
-      console.error("Delete Loan API Error Response:", error?.response?.data);
+      console.error(
+        "Delete Loan API Error Response:",
+        error?.response?.data,
+      );
 
       console.error(
         "Delete Loan API Error Message:",
@@ -638,7 +1041,9 @@ const Loans = () => {
   // =========================================================
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-PK").format(Number(amount) || 0);
+    return new Intl.NumberFormat("en-PK").format(
+      Number(amount) || 0,
+    );
   };
 
   // =========================================================
@@ -647,13 +1052,22 @@ const Loans = () => {
 
   const totalResults = loanTransactions.length;
 
-  const totalPages = Math.ceil(totalResults / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(
+    totalResults / ITEMS_PER_PAGE,
+  );
 
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const startIndex =
+    (currentPage - 1) * ITEMS_PER_PAGE;
 
-  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalResults);
+  const endIndex = Math.min(
+    startIndex + ITEMS_PER_PAGE,
+    totalResults,
+  );
 
-  const currentTransactions = loanTransactions.slice(startIndex, endIndex);
+  const currentTransactions = loanTransactions.slice(
+    startIndex,
+    endIndex,
+  );
 
   // =========================================================
   // PAGE NUMBERS
@@ -670,7 +1084,9 @@ const Loans = () => {
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage((previousPage) => previousPage - 1);
+      setCurrentPage(
+        (previousPage) => previousPage - 1,
+      );
     }
   };
 
@@ -680,7 +1096,9 @@ const Loans = () => {
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage((previousPage) => previousPage + 1);
+      setCurrentPage(
+        (previousPage) => previousPage + 1,
+      );
     }
   };
 
@@ -717,6 +1135,15 @@ const Loans = () => {
   };
 
   // =========================================================
+  // SELECTED MONTH LABEL
+  // =========================================================
+
+  const selectedMonthLabel = getSelectedMonthLabel(
+    selectedYear,
+    selectedMonth,
+  );
+
+  // =========================================================
   // RENDER
   // =========================================================
 
@@ -724,14 +1151,22 @@ const Loans = () => {
     <div className="loan-page-container">
       {/* =====================================================
           HEADER
-      ===================================================== */}
+      ====================================================== */}
 
       <div className="loan-header-section">
         <div>
           <h1 className="loan-page-title">Loans</h1>
 
           <p className="loan-page-subtitle">
-            Manage staff loans, recoveries, and outstanding balances.
+            Manage staff loans, recoveries, and outstanding
+            balances.
+          </p>
+
+          {/* SELECTED MONTH */}
+
+          <p className="loan-selected-month">
+            Showing data for{" "}
+            <strong>{selectedMonthLabel}</strong>
           </p>
         </div>
 
@@ -751,20 +1186,28 @@ const Loans = () => {
 
       {/* =====================================================
           STATISTICS
-      ===================================================== */}
+      ====================================================== */}
 
       <div className="loan-stats-grid">
         {/* THIS MONTH LOAN */}
 
         <div className="loan-stat-card">
           <div className="loan-icon-box loan-icon-bg-gray">
-            <Landmark size={18} className="loan-icon-gray" />
+            <Landmark
+              size={18}
+              className="loan-icon-gray"
+            />
           </div>
 
-          <span className="loan-stat-label">This Month Loan</span>
+          <span className="loan-stat-label">
+            {selectedMonthLabel} Loan
+          </span>
 
           <h2 className="loan-stat-value">
-            Rs. {formatCurrency(loanStats.thisMonthLoan)}
+            Rs.{" "}
+            {formatCurrency(
+              loanStats.thisMonthLoan,
+            )}
           </h2>
         </div>
 
@@ -772,29 +1215,47 @@ const Loans = () => {
 
         <div className="loan-stat-card">
           <div className="loan-icon-box loan-icon-bg-gray">
-            <Landmark size={18} className="loan-icon-gray" />
+            <Landmark
+              size={18}
+              className="loan-icon-gray"
+            />
           </div>
 
-          <span className="loan-stat-label">Total Loans Given</span>
+          <span className="loan-stat-label">
+            Total Loans Given
+          </span>
 
           <h2 className="loan-stat-value">
-            Rs. {formatCurrency(loanStats.totalLoansGiven)}
+            Rs.{" "}
+            {formatCurrency(
+              loanStats.totalLoansGiven,
+            )}
           </h2>
 
-          <span className="loan-stat-sub">Current outstanding</span>
+          <span className="loan-stat-sub">
+            Current outstanding
+          </span>
         </div>
 
-        {/* THIS MONTH LOAN RECEIVED */}
+        {/* SELECTED MONTH LOAN RECEIVED */}
 
         <div className="loan-stat-card">
           <div className="loan-icon-box loan-icon-bg-gray">
-            <TrendingUp size={18} className="loan-icon-gray" />
+            <TrendingUp
+              size={18}
+              className="loan-icon-gray"
+            />
           </div>
 
-          <span className="loan-stat-label">This Month's Loan Received</span>
+          <span className="loan-stat-label">
+            {selectedMonthLabel} Loan Received
+          </span>
 
           <h2 className="loan-stat-value loan-text-green">
-            Rs. {formatCurrency(loanStats.thisMonthRecovery)}
+            Rs.{" "}
+            {formatCurrency(
+              loanStats.thisMonthRecovery,
+            )}
           </h2>
         </div>
 
@@ -802,27 +1263,36 @@ const Loans = () => {
 
         <div className="loan-stat-card">
           <div className="loan-icon-box loan-icon-bg-gray">
-            <Users size={18} className="loan-icon-gray" />
+            <Users
+              size={18}
+              className="loan-icon-gray"
+            />
           </div>
 
-          <span className="loan-stat-label">Active Loan Staff</span>
+          <span className="loan-stat-label">
+            Active Loan Staff
+          </span>
 
           <h2 className="loan-stat-value">
             {loanStats.activeLoanStaff}{" "}
-            <span className="loan-unit-text">members</span>
+            <span className="loan-unit-text">
+              members
+            </span>
           </h2>
         </div>
       </div>
 
       {/* =====================================================
           TRANSACTIONS
-      ===================================================== */}
+      ====================================================== */}
 
       <div className="loan-table-card">
         {/* TABLE HEADER */}
 
         <div className="loan-table-header">
-          <h3 className="loan-table-title">Recent Loan Transactions</h3>
+          <h3 className="loan-table-title">
+            {selectedMonthLabel} Loan Transactions
+          </h3>
 
           <button
             type="button"
@@ -852,7 +1322,10 @@ const Loans = () => {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan="7" className="loan-empty-state">
+                  <td
+                    colSpan="7"
+                    className="loan-empty-state"
+                  >
                     Loading loans...
                   </td>
                 </tr>
@@ -864,32 +1337,45 @@ const Loans = () => {
                     <tr key={item.id}>
                       {/* DATE */}
 
-                      <td className="loan-text-muted">{item.date}</td>
+                      <td className="loan-text-muted">
+                        {item.date}
+                      </td>
 
                       {/* NAME */}
 
-                      <td className="loan-font-bold">{item.staffName}</td>
+                      <td className="loan-font-bold">
+                        {item.staffName}
+                      </td>
 
                       {/* TYPE */}
 
-                      <td className="loan-text-muted">{item.type}</td>
+                      <td className="loan-text-muted">
+                        {item.type}
+                      </td>
 
                       {/* AMOUNT */}
 
                       <td
                         className={
-                          item.type === "Loan Received"
+                          item.type ===
+                          "Loan Received"
                             ? "loan-text-green loan-font-bold"
                             : "loan-font-bold"
                         }
                       >
-                        Rs. {formatCurrency(item.amount)}
+                        Rs.{" "}
+                        {formatCurrency(
+                          item.amount,
+                        )}
                       </td>
 
                       {/* REMAINING BALANCE */}
 
                       <td className="loan-text-muted">
-                        Rs. {formatCurrency(item.remainingBal)}
+                        Rs.{" "}
+                        {formatCurrency(
+                          item.remainingBal,
+                        )}
                       </td>
 
                       {/* STATUS */}
@@ -916,11 +1402,16 @@ const Loans = () => {
                           className="loan-action-btn loan-edit-btn"
                           title="Edit"
                           aria-label={`Edit loan for ${item.staffName}`}
-                          onClick={() => handleEdit(item)}
+                          onClick={() =>
+                            handleEdit(item)
+                          }
                           disabled={
                             isSubmitting ||
-                            item.status === "paid" ||
-                            Number(item.remainingBal) <= 0
+                            item.status ===
+                              "paid" ||
+                            Number(
+                              item.remainingBal,
+                            ) <= 0
                           }
                         >
                           <Pencil size={11} />
@@ -933,7 +1424,9 @@ const Loans = () => {
                           className="loan-action-btn loan-delete-btn"
                           title="Delete"
                           aria-label={`Delete loan for ${item.staffName}`}
-                          onClick={() => handleDelete(item)}
+                          onClick={() =>
+                            handleDelete(item)
+                          }
                           disabled={isSubmitting}
                         >
                           <Trash2 size={11} />
@@ -944,8 +1437,12 @@ const Loans = () => {
                 })
               ) : (
                 <tr>
-                  <td colSpan="7" className="loan-empty-state">
-                    No loan transactions found.
+                  <td
+                    colSpan="7"
+                    className="loan-empty-state"
+                  >
+                    No loan transactions found for{" "}
+                    {selectedMonthLabel}.
                   </td>
                 </tr>
               )}
@@ -960,7 +1457,8 @@ const Loans = () => {
         {totalResults > 0 && (
           <div className="loan-table-footer">
             <span className="loan-pagination-info">
-              Showing <b>{startIndex + 1}</b> to <b>{endIndex}</b> of{" "}
+              Showing <b>{startIndex + 1}</b> to{" "}
+              <b>{endIndex}</b> of{" "}
               <b>{totalResults}</b> entries
             </span>
 
@@ -984,9 +1482,13 @@ const Loans = () => {
                   type="button"
                   key={page}
                   className={`loan-page-btn ${
-                    currentPage === page ? "loan-page-active" : ""
+                    currentPage === page
+                      ? "loan-page-active"
+                      : ""
                   }`}
-                  onClick={() => handlePageChange(page)}
+                  onClick={() =>
+                    handlePageChange(page)
+                  }
                 >
                   {page}
                 </button>
@@ -997,7 +1499,9 @@ const Loans = () => {
               <button
                 type="button"
                 className="loan-page-btn loan-page-arrow"
-                disabled={currentPage === totalPages}
+                disabled={
+                  currentPage === totalPages
+                }
                 onClick={handleNextPage}
                 aria-label="Next page"
               >
@@ -1010,7 +1514,7 @@ const Loans = () => {
 
       {/* =====================================================
           CREATE LOAN MODAL
-      ===================================================== */}
+      ====================================================== */}
 
       <RecordLoanModal
         isOpen={isModalOpen}
@@ -1021,7 +1525,7 @@ const Loans = () => {
 
       {/* =====================================================
           EDIT LOAN MODAL
-      ===================================================== */}
+      ====================================================== */}
 
       <EditLoanModal
         key={selectedLoan?.id || "new"}

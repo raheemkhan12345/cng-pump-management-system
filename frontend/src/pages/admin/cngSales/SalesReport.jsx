@@ -32,6 +32,54 @@ const SalesReport = () => {
 
   const ITEMS_PER_PAGE = 5;
 
+  const DASHBOARD_MONTH_KEY = "cng_dashboard_selected_month";
+
+  // =========================================================
+  // GET SELECTED DASHBOARD MONTH
+  // =========================================================
+
+  const getSelectedDashboardMonth = () => {
+    const currentDate = new Date();
+
+    const currentYear = currentDate.getFullYear();
+
+    const currentMonth = currentDate.getMonth() + 1;
+
+    const defaultMonth = {
+      year: currentYear,
+      month: currentMonth,
+    };
+
+    try {
+      const savedMonth = sessionStorage.getItem(DASHBOARD_MONTH_KEY);
+
+      if (!savedMonth) {
+        return defaultMonth;
+      }
+
+      const parsedMonth = JSON.parse(savedMonth);
+
+      if (
+        parsedMonth &&
+        Number.isInteger(Number(parsedMonth.year)) &&
+        Number.isInteger(Number(parsedMonth.month)) &&
+        Number(parsedMonth.month) >= 1 &&
+        Number(parsedMonth.month) <= 12
+      ) {
+        return {
+          year: Number(parsedMonth.year),
+          month: Number(parsedMonth.month),
+        };
+      }
+
+      return defaultMonth;
+    } catch (error) {
+      console.error("Failed to read selected dashboard month:", error);
+
+      return defaultMonth;
+    }
+  };
+
   // =========================================================
   // STATES
   // =========================================================
@@ -45,6 +93,14 @@ const SalesReport = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const [error, setError] = useState("");
+
+  // =========================================================
+  // SELECTED DASHBOARD MONTH
+  // =========================================================
+
+  const [selectedMonthData, setSelectedMonthData] = useState(
+    getSelectedDashboardMonth(),
+  );
 
   // =========================================================
   // EDIT STATES
@@ -61,6 +117,41 @@ const SalesReport = () => {
   // =========================================================
 
   const [deletingSaleId, setDeletingSaleId] = useState(null);
+
+  // =========================================================
+  // SELECTED MONTH VALUES
+  // =========================================================
+
+  const selectedYear = selectedMonthData.year;
+
+  const selectedMonth = selectedMonthData.month;
+
+  // =========================================================
+  // SELECTED MONTH NAME
+  // =========================================================
+
+  const selectedMonthLabel = useMemo(() => {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      year: "numeric",
+    }).format(new Date(selectedYear, selectedMonth - 1, 1));
+  }, [selectedYear, selectedMonth]);
+
+  // =========================================================
+  // SYNC SELECTED MONTH FROM SESSION STORAGE
+  // =========================================================
+
+  useEffect(() => {
+    const syncSelectedMonth = () => {
+      setSelectedMonthData(getSelectedDashboardMonth());
+    };
+
+    window.addEventListener("storage", syncSelectedMonth);
+
+    return () => {
+      window.removeEventListener("storage", syncSelectedMonth);
+    };
+  }, []);
 
   // =========================================================
   // FETCH SALES
@@ -90,7 +181,6 @@ const SalesReport = () => {
       } else if (Array.isArray(response?.data?.data)) {
         sales = response.data.data;
       }
-
 
       // =====================================================
       // NORMALIZE DATA
@@ -273,14 +363,14 @@ const SalesReport = () => {
 
       if (activeTab === "Monthly") {
         return (
-          transactionDate.getMonth() === today.getMonth() &&
-          transactionDate.getFullYear() === today.getFullYear()
+          transactionDate.getMonth() === selectedMonth - 1 &&
+          transactionDate.getFullYear() === selectedYear
         );
       }
 
       return true;
     });
-  }, [transactions, activeTab]);
+  }, [transactions, activeTab, selectedYear, selectedMonth]);
 
   // =========================================================
   // REPORT STATS
@@ -338,6 +428,7 @@ const SalesReport = () => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
+
     setCurrentPage(1);
   };
 
@@ -374,7 +465,6 @@ const SalesReport = () => {
   // =========================================================
 
   const handleEdit = (item) => {
-
     setSelectedTransaction(item);
 
     setIsEditModalOpen(true);
@@ -432,8 +522,7 @@ const SalesReport = () => {
       // PUT API
       // =====================================================
 
-      const response = await updateSale(updatedData.id, saleData);
-
+      await updateSale(updatedData.id, saleData);
 
       // =====================================================
       // CLOSE MODAL
@@ -475,7 +564,6 @@ const SalesReport = () => {
 
   const handleDelete = async (item) => {
     if (!item?.id) {
-
       alert("Sale ID is missing.");
 
       return;
@@ -505,8 +593,7 @@ const SalesReport = () => {
       // DELETE API
       // =====================================================
 
-      const response = await deleteSale(item.id);
-
+      await deleteSale(item.id);
 
       // =====================================================
       // REMOVE FROM LOCAL STATE
@@ -527,7 +614,6 @@ const SalesReport = () => {
       if (newTotalPages > 0 && currentPage > newTotalPages) {
         setCurrentPage(newTotalPages);
       }
-
     } catch (error) {
       console.error("Delete Sale Error:", error);
 
@@ -542,6 +628,14 @@ const SalesReport = () => {
       setDeletingSaleId(null);
     }
   };
+
+  // =========================================================
+  // RESET PAGE WHEN SELECTED MONTH CHANGES
+  // =========================================================
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedYear, selectedMonth]);
 
   // =========================================================
   // LOADING
@@ -599,6 +693,18 @@ const SalesReport = () => {
 
           <p className="sr-page-subtitle">
             Comprehensive overview of CNG sales and revenue.
+          </p>
+
+          {/* SELECTED DASHBOARD MONTH */}
+
+          <p
+            style={{
+              marginTop: "6px",
+              fontSize: "13px",
+              color: "#64748b",
+            }}
+          >
+            Monthly report for <strong>{selectedMonthLabel}</strong>
           </p>
         </div>
       </div>

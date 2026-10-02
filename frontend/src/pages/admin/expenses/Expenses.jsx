@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { PlusCircle, Layers, TrendingDown, Calendar } from "lucide-react";
+import { PlusCircle, TrendingDown, Calendar } from "lucide-react";
 
 import AddNewExpenses from "../../../components/adminDashboardForms/addNewExpenseForm/AddNewExpenses";
 import RecentExpenses from "./RecentExpense";
@@ -22,7 +22,63 @@ import {
 
 import "./Expenses.css";
 
+// =========================================================
+// DASHBOARD MONTH STORAGE KEY
+// =========================================================
+
+const DASHBOARD_MONTH_KEY = "cng_dashboard_selected_month";
+
+// =========================================================
+// GET SELECTED DASHBOARD MONTH
+// =========================================================
+
+const getSelectedDashboardMonth = () => {
+  const currentDate = new Date();
+
+  const defaultMonth = {
+    year: currentDate.getFullYear(),
+    month: currentDate.getMonth() + 1,
+  };
+
+  try {
+    const savedMonth = sessionStorage.getItem(DASHBOARD_MONTH_KEY);
+
+    if (!savedMonth) {
+      return defaultMonth;
+    }
+
+    const parsedMonth = JSON.parse(savedMonth);
+
+    if (
+      Number.isInteger(parsedMonth?.year) &&
+      Number.isInteger(parsedMonth?.month) &&
+      parsedMonth.month >= 1 &&
+      parsedMonth.month <= 12
+    ) {
+      return {
+        year: parsedMonth.year,
+        month: parsedMonth.month,
+      };
+    }
+
+    return defaultMonth;
+  } catch (error) {
+    console.error("Failed to read dashboard selected month:", error);
+
+    return defaultMonth;
+  }
+};
+
 const Expenses = () => {
+  // =========================================================
+  // SELECTED DASHBOARD MONTH
+  // =========================================================
+
+  const initialSelectedMonth = getSelectedDashboardMonth();
+
+  const [selectedYear] = useState(initialSelectedMonth.year);
+  const [selectedMonth] = useState(initialSelectedMonth.month);
+
   // =========================================================
   // MODAL STATES
   // =========================================================
@@ -90,6 +146,17 @@ const Expenses = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const pageSize = 5;
+
+  // =========================================================
+  // SELECTED MONTH LABEL
+  // =========================================================
+
+  const selectedMonthLabel = useMemo(() => {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      year: "numeric",
+    }).format(new Date(selectedYear, selectedMonth - 1, 1));
+  }, [selectedYear, selectedMonth]);
 
   // =========================================================
   // GET ALL NORMAL EXPENSES
@@ -250,7 +317,7 @@ const Expenses = () => {
   }, [allExpenses, currentPage]);
 
   // =========================================================
-  // GET NORMAL EXPENSE AMOUNT
+  // GET EXPENSE AMOUNT
   // =========================================================
 
   const getAmount = (expense) => {
@@ -309,8 +376,21 @@ const Expenses = () => {
     String(today.getDate()).padStart(2, "0"),
   ].join("-");
 
-  const currentYear = today.getFullYear();
-  const currentMonthNumber = today.getMonth() + 1;
+  // =========================================================
+  // CHECK SELECTED MONTH
+  // =========================================================
+
+  const isInSelectedMonth = (dateValue) => {
+    const dateOnly = getDateOnly(dateValue);
+
+    if (!dateOnly) {
+      return false;
+    }
+
+    const [year, month] = dateOnly.split("-").map(Number);
+
+    return year === selectedYear && month === selectedMonth;
+  };
 
   // =========================================================
   // TODAY'S EXPENSES
@@ -325,49 +405,86 @@ const Expenses = () => {
     }, 0);
 
   // =========================================================
-  // CURRENT MONTH EXPENSES
+  // SELECTED MONTH EXPENSES
   // =========================================================
 
   const monthExpenses = allExpenses
     .filter((expense) => {
-      const expenseDate = getDateOnly(getDate(expense));
-
-      if (!expenseDate) {
-        return false;
-      }
-
-      const [year, month] = expenseDate.split("-").map(Number);
-
-      return year === currentYear && month === currentMonthNumber;
+      return isInSelectedMonth(getDate(expense));
     })
     .reduce((total, expense) => {
       return total + getAmount(expense);
     }, 0);
 
   // =========================================================
+  // FILTER NORMAL EXPENSES BY SELECTED MONTH
+  // =========================================================
+
+  const selectedMonthExpenses = useMemo(() => {
+    return allExpenses
+      .filter((expense) => {
+        return isInSelectedMonth(getDate(expense));
+      })
+      .sort((a, b) => {
+        const dateA = new Date(getDate(a) || 0);
+        const dateB = new Date(getDate(b) || 0);
+
+        return dateB - dateA;
+      });
+  }, [allExpenses, selectedYear, selectedMonth]);
+
+  // =========================================================
+  // PAGINATED SELECTED MONTH EXPENSES
+  // =========================================================
+
+  const filteredTotalExpenses = selectedMonthExpenses.length;
+
+  const filteredTotalPages = Math.max(
+    Math.ceil(filteredTotalExpenses / pageSize),
+    1,
+  );
+
+  const selectedMonthCurrentExpenses = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+
+    return selectedMonthExpenses.slice(startIndex, endIndex);
+  }, [selectedMonthExpenses, currentPage]);
+
+  // =========================================================
+  // KEEP CURRENT PAGE VALID
+  // =========================================================
+
+  useEffect(() => {
+    setCurrentPage((previousPage) =>
+      Math.min(previousPage, filteredTotalPages),
+    );
+  }, [filteredTotalPages]);
+
+  // =========================================================
   // RECOVERY EXPENSE TOTAL
+  // SELECTED MONTH ONLY
   // =========================================================
 
-  const recoveryExpenses = recoveryExpensesData.reduce((total, recovery) => {
-    const amount =
-      Number(
-        recovery?.recoveryAmount ??
-          recovery?.amount ??
-          recovery?.totalAmount ??
-          0,
-      ) || 0;
+  const selectedMonthRecoveryExpenses = useMemo(() => {
+    return recoveryExpensesData
+      .filter((recovery) => {
+        return isInSelectedMonth(
+          recovery?.date || recovery?.recoveryDate || recovery?.createdAt || "",
+        );
+      })
+      .reduce((total, recovery) => {
+        const amount =
+          Number(
+            recovery?.recoveryAmount ??
+              recovery?.amount ??
+              recovery?.totalAmount ??
+              0,
+          ) || 0;
 
-    return total + amount;
-  }, 0);
-
-  // =========================================================
-  // CURRENT MONTH LABEL
-  // =========================================================
-
-  const currentMonth = new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    year: "numeric",
-  }).format(today);
+        return total + amount;
+      }, 0);
+  }, [recoveryExpensesData, selectedYear, selectedMonth]);
 
   // =========================================================
   // CURRENCY FORMAT
@@ -388,13 +505,13 @@ const Expenses = () => {
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
+    if (currentPage < filteredTotalPages) {
       setCurrentPage((previousPage) => previousPage + 1);
     }
   };
 
   const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages && page !== currentPage) {
+    if (page >= 1 && page <= filteredTotalPages && page !== currentPage) {
       setCurrentPage(page);
     }
   };
@@ -700,6 +817,18 @@ const Expenses = () => {
         </div>
 
         {/* ===================================================
+            SELECTED MONTH INFO
+        ==================================================== */}
+
+        <div className="exp-selected-month">
+          <Calendar size={16} />
+
+          <span>
+            Viewing expense records for <strong>{selectedMonthLabel}</strong>
+          </span>
+        </div>
+
+        {/* ===================================================
             EXPENSE STATS
         ==================================================== */}
 
@@ -726,12 +855,12 @@ const Expenses = () => {
             </div>
           </div>
 
-          {/* THIS MONTH'S EXPENSES */}
+          {/* SELECTED MONTH EXPENSES */}
 
           <div className="exp-stat-card">
             <div className="exp-stat-info">
               <span className="exp-stat-label">
-                THIS MONTH'S
+                {selectedMonthLabel.toUpperCase()}
                 <br />
                 EXPENSES
               </span>
@@ -740,7 +869,9 @@ const Expenses = () => {
                 Rs. {formatCurrency(monthExpenses)}
               </h2>
 
-              <span className="exp-stat-sub">Total for {currentMonth}</span>
+              <span className="exp-stat-sub">
+                Total for {selectedMonthLabel}
+              </span>
             </div>
 
             <div className="exp-icon-box exp-icon-blue">
@@ -755,8 +886,12 @@ const Expenses = () => {
               <span className="exp-stat-label">RECOVERY EXPENSES</span>
 
               <h2 className="exp-stat-value">
-                Rs. {formatCurrency(recoveryExpenses)}
+                Rs. {formatCurrency(selectedMonthRecoveryExpenses)}
               </h2>
+
+              <span className="exp-stat-sub">
+                Total for {selectedMonthLabel}
+              </span>
             </div>
 
             <div className="exp-icon-box exp-icon-red">
@@ -824,7 +959,7 @@ const Expenses = () => {
         ==================================================== */}
 
         <RecentExpenses
-          expenses={expenses}
+          expenses={selectedMonthCurrentExpenses}
           onEdit={handleEdit}
           onDelete={handleDelete}
           deletingExpenseId={deletingExpenseId}
@@ -834,11 +969,11 @@ const Expenses = () => {
             PAGINATION
         ==================================================== */}
 
-        {totalExpenses > 0 && (
+        {filteredTotalExpenses > 0 && (
           <div className="exp-pagination">
             <div className="exp-pagination-info">
-              Showing <strong>{expenses.length}</strong> of{" "}
-              <strong>{totalExpenses}</strong> expenses
+              Showing <strong>{selectedMonthCurrentExpenses.length}</strong> of{" "}
+              <strong>{filteredTotalExpenses}</strong> expenses
             </div>
 
             <div className="exp-pagination-controls">
@@ -858,7 +993,7 @@ const Expenses = () => {
               <div className="exp-pagination-pages">
                 {Array.from(
                   {
-                    length: totalPages,
+                    length: filteredTotalPages,
                   },
                   (_, index) => index + 1,
                 ).map((page) => (
@@ -881,7 +1016,7 @@ const Expenses = () => {
                 type="button"
                 className="exp-pagination-btn"
                 onClick={handleNextPage}
-                disabled={currentPage === totalPages}
+                disabled={currentPage === filteredTotalPages}
               >
                 Next
               </button>
