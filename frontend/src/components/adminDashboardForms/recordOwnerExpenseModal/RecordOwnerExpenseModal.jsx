@@ -381,7 +381,7 @@ const RecordOwnerExpenseModal = ({
 
             <textarea
               name="detailRemarks"
-              placeholder="Enter any additional details about this expense..."
+              placeholder="Text here..."
               value={formData.detailRemarks}
               onChange={handleChange}
               rows={3}

@@ -6,7 +6,7 @@ const AddInventoryModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
   const getDefaultFormData = () => ({
     itemName: "",
     price: "",
-    quantity: "1",
+    quantity: "",
     remarks: "",
   });
 
@@ -70,7 +70,7 @@ const AddInventoryModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
               <input
                 type="text"
                 name="itemName"
-                placeholder="Dispenser Nozzle"
+                placeholder="Item name..."
                 value={formData.itemName}
                 onChange={handleChange}
                 required
@@ -86,7 +86,7 @@ const AddInventoryModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
                 <input
                   type="number"
                   name="price"
-                  placeholder="15000"
+                  placeholder="0"
                   value={formData.price}
                   onChange={handleChange}
                   min="0"
@@ -102,7 +102,7 @@ const AddInventoryModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
               <input
                 type="number"
                 name="quantity"
-                placeholder="4"
+                placeholder="0"
                 value={formData.quantity}
                 onChange={handleChange}
                 min="1"
@@ -116,7 +116,7 @@ const AddInventoryModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
               <label>Remarks</label>
               <textarea
                 name="remarks"
-                placeholder="Spare for bay 2"
+                placeholder="Text here..."
                 rows="4"
                 value={formData.remarks}
                 onChange={handleChange}

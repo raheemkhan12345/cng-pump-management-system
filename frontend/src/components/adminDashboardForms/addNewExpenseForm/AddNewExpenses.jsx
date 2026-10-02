@@ -817,7 +817,7 @@ const AddNewExpenses = ({
                 rows="3"
                 value={remarks}
                 onChange={(event) => setRemarks(event.target.value)}
-                placeholder="Enter any additional details about this expense..."
+                placeholder="Text here..."
                 className="ane-textarea"
                 disabled={isSubmitting}
               />

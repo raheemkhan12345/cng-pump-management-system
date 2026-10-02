@@ -249,7 +249,7 @@ const AddDieselExpenseModal = ({
 
             <textarea
               name="remarks"
-              placeholder="Add any operational notes or invoice details here..."
+              placeholder="Text here..."
               value={formData.remarks}
               onChange={handleChange}
               rows={3}

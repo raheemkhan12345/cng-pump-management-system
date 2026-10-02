@@ -166,7 +166,7 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
 
             <textarea
               name="remarks"
-              placeholder="Add any relevant notes..."
+              placeholder="Text here..."
               value={formData.remarks}
               onChange={handleChange}
               rows={3}
