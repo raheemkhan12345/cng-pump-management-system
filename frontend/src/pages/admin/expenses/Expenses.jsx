@@ -1,8 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { PlusCircle, TrendingDown, Calendar } from "lucide-react";
+import {
+  PlusCircle,
+  TrendingDown,
+  Calendar,
+  Tags,
+  X,
+  ArrowLeft,
+} from "lucide-react";
 
 import AddNewExpenses from "../../../components/adminDashboardForms/addNewExpenseForm/AddNewExpenses";
 import RecentExpenses from "./RecentExpense";
+import ExpenseCategoryCards from "./ExpenseCategoryCards";
 
 import ExpenseRecoveryModal from "../../../components/adminDashboardForms/expenseRecoveryModal/ExpenseRecoveryModal";
 import AddDieselExpenseModal from "../../../components/adminDashboardForms/addDieselExpenseModal/AddDieselExpenseModal";
@@ -64,7 +72,6 @@ const getSelectedDashboardMonth = () => {
     return defaultMonth;
   } catch (error) {
     console.error("Failed to read dashboard selected month:", error);
-
     return defaultMonth;
   }
 };
@@ -74,10 +81,16 @@ const Expenses = () => {
   // SELECTED DASHBOARD MONTH
   // =========================================================
 
-  const initialSelectedMonth = getSelectedDashboardMonth();
+  const [initialSelectedMonth] = useState(getSelectedDashboardMonth);
 
   const [selectedYear] = useState(initialSelectedMonth.year);
   const [selectedMonth] = useState(initialSelectedMonth.month);
+
+  // =========================================================
+  // VIEW CATEGORIES TOGGLE STATE
+  // =========================================================
+
+  const [showCategories, setShowCategories] = useState(false);
 
   // =========================================================
   // MODAL STATES
@@ -242,7 +255,6 @@ const Expenses = () => {
 
   // =========================================================
   // GET ALL OWNERS
-  // GET /ownerexpense/getOwner
   // =========================================================
 
   const fetchOwners = useCallback(async () => {
@@ -554,7 +566,6 @@ const Expenses = () => {
 
     if (!expenseId) {
       window.alert("Expense ID is missing. Cannot delete this expense.");
-
       return;
     }
 
@@ -646,7 +657,6 @@ const Expenses = () => {
 
   // =========================================================
   // CREATE DIESEL EXPENSE
-  // UPDATE / DELETE IS HANDLED IN DieselExpenseHistory
   // =========================================================
 
   const handleDieselExpense = async (data) => {
@@ -715,7 +725,6 @@ const Expenses = () => {
 
   // =========================================================
   // CREATE OWNER EXPENSE
-  // POST /ownerexpense/create
   // =========================================================
 
   const handleOwnerExpense = async (data) => {
@@ -792,243 +801,247 @@ const Expenses = () => {
   return (
     <div className="exp-page-container">
       <div className="exp-content-wrapper">
-        {/* ===================================================
-            TITLE
-        ==================================================== */}
-
-        <div className="exp-title-row">
-          <div className="exp-title-section">
-            <h1 className="exp-page-title">Expenses</h1>
-
-            <p className="exp-page-subtitle">
-              Manage and track station operational costs.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            className="exp-btn-add-owners"
-            onClick={() => setIsAddOwnerModalOpen(true)}
-          >
-            <PlusCircle size={18} />
-
-            <span>Add Owners</span>
-          </button>
-        </div>
-
-        {/* ===================================================
-            SELECTED MONTH INFO
-        ==================================================== */}
-
-        <div className="exp-selected-month">
-          <Calendar size={16} />
-
-          <span>
-            Viewing expense records for <strong>{selectedMonthLabel}</strong>
-          </span>
-        </div>
-
-        {/* ===================================================
-            EXPENSE STATS
-        ==================================================== */}
-
-        <div className="exp-stats-grid">
-          {/* TODAY'S EXPENSES */}
-
-          <div className="exp-stat-card">
-            <div className="exp-stat-info">
-              <span className="exp-stat-label">
-                TODAY'S
-                <br />
-                EXPENSES
-              </span>
-
-              <h2 className="exp-stat-value">
-                Rs. {formatCurrency(todayExpenses)}
-              </h2>
-
-              <span className="exp-stat-sub">Total outgoings today</span>
-            </div>
-
-            <div className="exp-icon-box exp-icon-red">
-              <TrendingDown size={18} />
-            </div>
-          </div>
-
-          {/* SELECTED MONTH EXPENSES */}
-
-          <div className="exp-stat-card">
-            <div className="exp-stat-info">
-              <span className="exp-stat-label">
-                {selectedMonthLabel.toUpperCase()}
-                <br />
-                EXPENSES
-              </span>
-
-              <h2 className="exp-stat-value">
-                Rs. {formatCurrency(monthExpenses)}
-              </h2>
-
-              <span className="exp-stat-sub">
-                Total for {selectedMonthLabel}
-              </span>
-            </div>
-
-            <div className="exp-icon-box exp-icon-blue">
-              <Calendar size={18} />
-            </div>
-          </div>
-
-          {/* RECOVERY EXPENSES */}
-
-          <div className="exp-stat-card">
-            <div className="exp-stat-info">
-              <span className="exp-stat-label">RECOVERY EXPENSES</span>
-
-              <h2 className="exp-stat-value">
-                Rs. {formatCurrency(selectedMonthRecoveryExpenses)}
-              </h2>
-
-              <span className="exp-stat-sub">
-                Total for {selectedMonthLabel}
-              </span>
-            </div>
-
-            <div className="exp-icon-box exp-icon-red">
-              <TrendingDown size={18} />
-            </div>
-          </div>
-        </div>
-
-        {/* ===================================================
-            ACTION BUTTONS
-        ==================================================== */}
-
-        <div className="exp-actions-container">
-          {/* ROW 1 */}
-
-          <div className="exp-action-row-1">
-            <button
-              type="button"
-              className="exp-btn-action exp-btn-green"
-              onClick={handleAddExpense}
-            >
-              <PlusCircle size={18} />
-
-              <span>Add New Expense</span>
-            </button>
-
-            <button
-              type="button"
-              className="exp-btn-action exp-btn-dark"
-              onClick={() => setIsRecoveryModalOpen(true)}
-            >
-              <PlusCircle size={18} />
-
-              <span>Add Recovery Expense</span>
-            </button>
-          </div>
-
-          {/* ROW 2 */}
-
-          <div className="exp-action-row-2">
-            <button
-              type="button"
-              className="exp-btn-action exp-btn-dark"
-              onClick={handleAddDieselExpense}
-            >
-              <PlusCircle size={18} />
-
-              <span>Diesel Expense</span>
-            </button>
-
-            <button
-              type="button"
-              className="exp-btn-action exp-btn-dark"
-              onClick={() => setIsOwnerExpenseModalOpen(true)}
-            >
-              <PlusCircle size={18} />
-
-              <span>Add Owner Expense</span>
-            </button>
-          </div>
-        </div>
-
-        {/* ===================================================
-            RECENT NORMAL EXPENSES
-        ==================================================== */}
-
-        <RecentExpenses
-          expenses={selectedMonthCurrentExpenses}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          deletingExpenseId={deletingExpenseId}
-        />
-
-        {/* ===================================================
-            PAGINATION
-        ==================================================== */}
-
-        {filteredTotalExpenses > 0 && (
-          <div className="exp-pagination">
-            <div className="exp-pagination-info">
-              Showing <strong>{selectedMonthCurrentExpenses.length}</strong> of{" "}
-              <strong>{filteredTotalExpenses}</strong> expenses
-            </div>
-
-            <div className="exp-pagination-controls">
-              {/* PREVIOUS */}
-
-              <button
-                type="button"
-                className="exp-pagination-btn"
-                onClick={handlePreviousPage}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-
-              {/* PAGE NUMBERS */}
-
-              <div className="exp-pagination-pages">
-                {Array.from(
-                  {
-                    length: filteredTotalPages,
-                  },
-                  (_, index) => index + 1,
-                ).map((page) => (
-                  <button
-                    type="button"
-                    key={page}
-                    className={`exp-pagination-page ${
-                      currentPage === page ? "active" : ""
-                    }`}
-                    onClick={() => handlePageChange(page)}
-                  >
-                    {page}
-                  </button>
-                ))}
+        {showCategories ? (
+          <div>
+            {/* CATEGORY VIEW TITLE */}
+            <div className="exp-title-row">
+              <div className="exp-title-section">
+                <h1 className="exp-page-title">Expense Categories</h1>
+                <p className="exp-page-subtitle">
+                  View your expenses grouped by category.
+                </p>
               </div>
 
-              {/* NEXT */}
-
               <button
                 type="button"
-                className="exp-pagination-btn"
-                onClick={handleNextPage}
-                disabled={currentPage === filteredTotalPages}
+                className="exp-btn-view-categories"
+                onClick={() => setShowCategories(false)}
               >
-                Next
+                <ArrowLeft size={18} />
+                <span>Back to Expenses</span>
               </button>
             </div>
+
+            {/* SELECTED MONTH INFO */}
+            <div className="exp-selected-month">
+              <Calendar size={16} />
+              <span>
+                Viewing categories for <strong>{selectedMonthLabel}</strong>
+              </span>
+            </div>
+
+            {/* EXPENSE CATEGORY CARDS COMPONENT */}
+            <ExpenseCategoryCards expenses={selectedMonthExpenses} />
           </div>
+        ) : (
+          <>
+            {/* TITLE */}
+            <div className="exp-title-row">
+              <div className="exp-title-section">
+                <h1 className="exp-page-title">Expenses</h1>
+
+                <p className="exp-page-subtitle">
+                  Manage and track station operational costs.
+                </p>
+              </div>
+
+              <div className="exp-title-actions">
+                <button
+                  type="button"
+                  className="exp-btn-add-owners"
+                  onClick={() => setIsAddOwnerModalOpen(true)}
+                >
+                  <PlusCircle size={18} />
+                  <span>Add Owners</span>
+                </button>
+              </div>
+            </div>
+
+            {/* SELECTED MONTH INFO */}
+            <div className="exp-selected-month">
+              <Calendar size={16} />
+
+              <span>
+                Viewing expense records for{" "}
+                <strong>{selectedMonthLabel}</strong>
+              </span>
+            </div>
+
+            {/* EXPENSE STATS */}
+            <div className="exp-stats-grid">
+              <div className="exp-stat-card">
+                <div className="exp-stat-info">
+                  <span className="exp-stat-label">
+                    TODAY'S
+                    <br />
+                    EXPENSES
+                  </span>
+
+                  <h2 className="exp-stat-value">
+                    Rs. {formatCurrency(todayExpenses)}
+                  </h2>
+
+                  <span className="exp-stat-sub">Total outgoings today</span>
+                </div>
+
+                <div className="exp-icon-box exp-icon-red">
+                  <TrendingDown size={18} />
+                </div>
+              </div>
+
+              <div className="exp-stat-card">
+                <div className="exp-stat-info">
+                  <span className="exp-stat-label">
+                    {selectedMonthLabel.toUpperCase()}
+                    <br />
+                    EXPENSES
+                  </span>
+
+                  <h2 className="exp-stat-value">
+                    Rs. {formatCurrency(monthExpenses)}
+                  </h2>
+
+                  <span className="exp-stat-sub">
+                    Total for {selectedMonthLabel}
+                  </span>
+                </div>
+
+                <div className="exp-icon-box exp-icon-blue">
+                  <Calendar size={18} />
+                </div>
+              </div>
+
+              <div className="exp-stat-card">
+                <div className="exp-stat-info">
+                  <span className="exp-stat-label">RECOVERY EXPENSES</span>
+
+                  <h2 className="exp-stat-value">
+                    Rs. {formatCurrency(selectedMonthRecoveryExpenses)}
+                  </h2>
+
+                  <span className="exp-stat-sub">
+                    Total for {selectedMonthLabel}
+                  </span>
+                </div>
+
+                <div className="exp-icon-box exp-icon-red">
+                  <TrendingDown size={18} />
+                </div>
+              </div>
+            </div>
+
+            {/* ACTION BUTTONS */}
+            <div className="exp-actions-container">
+              <div className="exp-action-row-1">
+                <button
+                  type="button"
+                  className="exp-btn-action exp-btn-green"
+                  onClick={handleAddExpense}
+                >
+                  <PlusCircle size={18} />
+                  <span>Add New Expense</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="exp-btn-action exp-btn-dark"
+                  onClick={() => setIsRecoveryModalOpen(true)}
+                >
+                  <PlusCircle size={18} />
+                  <span>Add Recovery Expense</span>
+                </button>
+              </div>
+
+              <div className="exp-action-row-2">
+                <button
+                  type="button"
+                  className="exp-btn-action exp-btn-dark"
+                  onClick={handleAddDieselExpense}
+                >
+                  <PlusCircle size={18} />
+                  <span>Diesel Expense</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="exp-btn-action exp-btn-dark"
+                  onClick={() => setIsOwnerExpenseModalOpen(true)}
+                >
+                  <PlusCircle size={18} />
+                  <span>Add Owner Expense</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="exp-btn-view-categories"
+                  onClick={() => setShowCategories(true)}
+                >
+                  <Tags size={18} />
+                  <span>View Categories</span>
+                </button>
+              </div>
+            </div>
+
+            {/* RECENT NORMAL EXPENSES */}
+            <RecentExpenses
+              expenses={selectedMonthCurrentExpenses}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              deletingExpenseId={deletingExpenseId}
+            />
+
+            {/* PAGINATION */}
+            {filteredTotalExpenses > 0 && (
+              <div className="exp-pagination">
+                <div className="exp-pagination-info">
+                  Showing <strong>{selectedMonthCurrentExpenses.length}</strong>{" "}
+                  of <strong>{filteredTotalExpenses}</strong> expenses
+                </div>
+
+                <div className="exp-pagination-controls">
+                  <button
+                    type="button"
+                    className="exp-pagination-btn"
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+
+                  <div className="exp-pagination-pages">
+                    {Array.from(
+                      { length: filteredTotalPages },
+                      (_, index) => index + 1,
+                    ).map((page) => (
+                      <button
+                        type="button"
+                        key={page}
+                        className={`exp-pagination-page ${
+                          currentPage === page ? "active" : ""
+                        }`}
+                        onClick={() => handlePageChange(page)}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="exp-pagination-btn"
+                    onClick={handleNextPage}
+                    disabled={currentPage === filteredTotalPages}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      {/* =====================================================
-          ADD / EDIT NORMAL EXPENSE MODAL
-      ====================================================== */}
-
+      {/* ADD / EDIT NORMAL EXPENSE MODAL */}
       <AddNewExpenses
         isOpen={isModalOpen}
         onClose={handleCloseExpenseModal}
@@ -1036,20 +1049,14 @@ const Expenses = () => {
         editingExpense={editingExpense}
       />
 
-      {/* =====================================================
-          RECOVERY EXPENSE MODAL
-      ====================================================== */}
-
+      {/* RECOVERY EXPENSE MODAL */}
       <ExpenseRecoveryModal
         isOpen={isRecoveryModalOpen}
         onClose={() => setIsRecoveryModalOpen(false)}
         onSubmit={handleRecoveryExpense}
       />
 
-      {/* =====================================================
-          ADD DIESEL EXPENSE MODAL
-      ====================================================== */}
-
+      {/* ADD DIESEL EXPENSE MODAL */}
       <AddDieselExpenseModal
         isOpen={isDieselModalOpen}
         onClose={handleCloseDieselModal}
@@ -1058,10 +1065,7 @@ const Expenses = () => {
         isSubmitting={isDieselSubmitting}
       />
 
-      {/* =====================================================
-          OWNER EXPENSE MODAL
-      ====================================================== */}
-
+      {/* OWNER EXPENSE MODAL */}
       <RecordOwnerExpenseModal
         isOpen={isOwnerExpenseModalOpen}
         onClose={() => setIsOwnerExpenseModalOpen(false)}
@@ -1072,10 +1076,7 @@ const Expenses = () => {
         isSubmitting={isOwnerExpenseSubmitting}
       />
 
-      {/* =====================================================
-          ADD OWNER MODAL
-      ====================================================== */}
-
+      {/* ADD OWNER MODAL */}
       <AddNewOwnerModal
         isOpen={isAddOwnerModalOpen}
         onClose={() => setIsAddOwnerModalOpen(false)}
