@@ -313,13 +313,8 @@ const CngPumps = () => {
 
       setError("");
 
-      console.log("========================================");
-      console.log("FETCHING CNG PUMPS");
-      console.log("========================================");
-
       const response = await getAllAdmins();
 
-      console.log("Get All Admins API Response:", response);
 
       // =================================================
       // EXTRACT
@@ -327,7 +322,6 @@ const CngPumps = () => {
 
       const apiData = extractApiData(response);
 
-      console.log("Extracted Pump/Admin Data:", apiData);
 
       // =================================================
       // NORMALIZE
@@ -335,44 +329,19 @@ const CngPumps = () => {
 
       const formattedPumps = apiData.map(normalizePump);
 
-      console.log("Formatted Pumps:", formattedPumps);
-
-      // =================================================
-      // CHECK IDS + ADMIN DATA
-      // =================================================
-
-      formattedPumps.forEach((pump) => {
-        console.log(
-          "Pump:",
-          pump.pumpName,
-          "| MongoDB ID:",
-          pump._id,
-          "| Admin ID:",
-          pump?.admin?._id,
-          "| Admin Name:",
-          pump?.admin?.name,
-          "| Admin Email:",
-          pump?.admin?.email,
-        );
-      });
 
       setPumps(formattedPumps);
 
       setCurrentPage(1);
     } catch (error) {
-      console.error("========================================");
 
-      console.error("GET ALL ADMINS / PUMPS ERROR");
 
-      console.error("========================================");
 
-      console.error("Full Error:", error);
 
-      console.error("Response:", error?.response);
 
-      console.error("Response Data:", error?.response?.data);
 
-      console.error("Status:", error?.response?.status);
+
+      console.error("Failed to load CNG pumps:", error);
 
       const message =
         error?.response?.data?.message ||
@@ -406,7 +375,7 @@ const CngPumps = () => {
   // ===================================================
 
   const handleAddPump = async () => {
-    console.log("Pump added successfully.");
+    window.alert("Pump added successfully.");
 
     setIsModalOpen(false);
 
@@ -418,21 +387,13 @@ const CngPumps = () => {
   // ===================================================
 
   const handleEditPump = (pump) => {
-    console.log("========================================");
 
-    console.log("EDIT PUMP CLICKED");
 
-    console.log("========================================");
 
-    console.log("Selected Pump:", pump);
 
-    console.log("MongoDB _id:", pump?._id);
 
-    console.log("Admin _id:", pump?.admin?._id);
 
-    console.log("Admin Name:", pump?.admin?.name);
 
-    console.log("Admin Email:", pump?.admin?.email);
 
     // =================================================
     // CHECK ID
@@ -446,8 +407,6 @@ const CngPumps = () => {
       pump?.id;
 
     if (!adminId) {
-      console.error("Admin/Pump MongoDB ID is missing!");
-
       setError("Unable to edit this pump because Admin ID is missing.");
 
       return;
@@ -465,7 +424,6 @@ const CngPumps = () => {
   // ===================================================
 
   const handleCloseEditModal = () => {
-    console.log("Edit Pump Modal Closed");
 
     setIsEditModalOpen(false);
 
@@ -476,16 +434,11 @@ const CngPumps = () => {
   // EDIT SUCCESS
   // ===================================================
 
-  const handlePumpUpdated = async (updatedPump, changedFields) => {
-    console.log("========================================");
+  const handlePumpUpdated = async () => {
 
-    console.log("PUMP / ADMIN UPDATED SUCCESSFULLY");
 
-    console.log("========================================");
 
-    console.log("Updated Pump:", updatedPump);
 
-    console.log("Changed Fields:", changedFields);
 
     // =================================================
     // CLOSE MODAL
@@ -499,11 +452,10 @@ const CngPumps = () => {
     // REFRESH FROM BACKEND
     // =================================================
 
-    console.log("Refreshing CNG pump list...");
 
     await fetchPumps();
 
-    console.log("CNG pump list refreshed successfully.");
+    window.alert("Pump updated successfully.");
   };
 
   // ===================================================
@@ -512,7 +464,6 @@ const CngPumps = () => {
 
   const handleDelete = async (id) => {
   if (!id) {
-    console.error("Delete failed: MongoDB ID missing.");
     setError("Unable to delete this pump because Admin ID is missing.");
     return;
   }
@@ -529,22 +480,19 @@ const CngPumps = () => {
     setIsDeleting(true);
     setError("");
 
-    console.log("========================================");
-    console.log("DELETE PUMP / ADMIN");
-    console.log("========================================");
 
-    console.log("Admin ID:", id);
 
     const response = await deleteAdmin(id);
 
-    console.log("Delete Admin Response:", response);
 
     if (response?.success === false) {
       throw new Error(response?.message || "Failed to delete admin.");
     }
 
-    // Backend se fresh data
+    // Refresh the pump list after successful deletion.
     await fetchPumps();
+
+    window.alert("Pump deleted successfully.");
   } catch (error) {
     console.error("Delete Admin Error:", error);
 

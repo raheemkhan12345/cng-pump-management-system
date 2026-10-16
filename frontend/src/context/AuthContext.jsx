@@ -26,12 +26,10 @@ export const AuthProvider = ({ children }) => {
   // =========================================================
 
   const login = async (email, password) => {
-    const normalizedEmail = email.trim().toLowerCase();
+    const trimmedEmail = email.trim();
+    const normalizedEmail = trimmedEmail.toLowerCase();
 
-    // =======================================================
-    // SUPER ADMIN LOGIN
-    // =======================================================
-
+    // Identify Super Admin
     const isSuperAdmin = normalizedEmail === "superadmin@gmail.com";
 
     try {
@@ -42,16 +40,10 @@ export const AuthProvider = ({ children }) => {
       // =====================================================
 
       if (isSuperAdmin) {
-        console.log("Calling Super Admin Login API...");
-
-        response = await superAdminLogin(email.trim(), password);
+        response = await superAdminLogin(trimmedEmail, password);
       } else {
-        console.log("Calling Admin Login API...");
-
-        response = await adminLogin(email.trim(), password);
+        response = await adminLogin(trimmedEmail, password);
       }
-
-      console.log("Login API Response:", response);
 
       // =====================================================
       // CHECK API SUCCESS
@@ -85,18 +77,13 @@ export const AuthProvider = ({ children }) => {
       // GET USER DATA
       // =====================================================
 
-      /*
-        Backend response different structures ko handle
-        karne ke liye multiple possibilities check kar rahe hain.
-      */
-
       const apiUser =
         response?.user ||
         response?.admin ||
         response?.data?.user ||
         response?.data?.admin ||
         response?.data?.data ||
-        null;
+        response;
 
       // =====================================================
       // SUPER ADMIN USER
@@ -105,47 +92,26 @@ export const AuthProvider = ({ children }) => {
       if (isSuperAdmin) {
         const userData = {
           id: apiUser?._id || apiUser?.id || "super_1",
-
-          email: apiUser?.email || email.trim(),
-
+          email: apiUser?.email || trimmedEmail,
           name: apiUser?.name || apiUser?.fullName || "Super Admin",
-
-          role: apiUser?.role || "SUPER_ADMIN",
-
+          role: (apiUser?.role || "SUPER_ADMIN").toUpperCase(),
           pumpName: apiUser?.pumpName || "",
-
           pumpAddress: apiUser?.pumpAddress || "",
-
-
         };
 
-        // ===================================================
-        // VALIDATE ROLE
-        // ===================================================
-
+        // Validate Super Admin Role
         if (userData.role !== "SUPER_ADMIN") {
           throw new Error("This account is not authorized as Super Admin.");
         }
 
-        // ===================================================
-        // SAVE TOKEN
-        // ===================================================
-
+        // Save Token
         localStorage.setItem("cng_token", token);
 
-        // ===================================================
-        // SAVE USER
-        // ===================================================
-
+        // Save User
         localStorage.setItem("cng_user", JSON.stringify(userData));
 
-        // ===================================================
-        // UPDATE STATE
-        // ===================================================
-
+        // Update State
         setUser(userData);
-
-        console.log("Super Admin Logged In:", userData);
 
         return userData;
       }
@@ -155,20 +121,22 @@ export const AuthProvider = ({ children }) => {
       // =====================================================
 
       const userData = {
-        id: response?.id,
-
-        email: response?.email || email.trim(),
-
-        name: response?.name || "Admin",
-
-        role: response?.role?.toUpperCase() || "ADMIN",
-
+        id: apiUser?._id || apiUser?.id || response?.id || "",
+        email: apiUser?.email || response?.email || trimmedEmail,
+        name: apiUser?.name || apiUser?.fullName || response?.name || "Admin",
+        role: (apiUser?.role || response?.role || "ADMIN").toUpperCase(),
         pump: {
-          id: response?.pump?.id || "",
-          name: response?.pump?.name || "",
-          address: response?.pump?.address || "",
+          id:
+            apiUser?.pump?.id ||
+            apiUser?.pump?._id ||
+            response?.pump?.id ||
+            response?.pump?._id ||
+            "",
+          name: apiUser?.pump?.name || response?.pump?.name || "",
+          address: apiUser?.pump?.address || response?.pump?.address || "",
         },
       };
+
       // =====================================================
       // VALIDATE ADMIN ROLE
       // =====================================================
@@ -195,14 +163,9 @@ export const AuthProvider = ({ children }) => {
 
       setUser(userData);
 
-      console.log("Admin Logged In:", userData);
-
       return userData;
     } catch (error) {
-      // =====================================================
-      // API ERROR HANDLING
-      // =====================================================
-
+      // Log actual errors only
       console.error("Login Error:", error);
 
       const message =

@@ -698,12 +698,7 @@ const SalesReport = () => {
           {/* SELECTED DASHBOARD MONTH */}
 
           <p
-            style={{
-              marginTop: "6px",
-              fontSize: "13px",
-              color: "#64748b",
-            }}
-          >
+            className="sr-selected-month">
             Monthly report for <strong>{selectedMonthLabel}</strong>
           </p>
         </div>

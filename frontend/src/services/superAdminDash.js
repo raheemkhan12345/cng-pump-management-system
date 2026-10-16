@@ -1,3 +1,4 @@
+
 import axiosInstance from "./axiosInstance";
 
 /* ==========================================
@@ -6,27 +7,14 @@ import axiosInstance from "./axiosInstance";
 
 export const createAdmin = async (adminData) => {
   try {
-    console.log("========================================");
-    console.log("CREATE ADMIN API");
-    console.log("========================================");
-
-    console.log("Create Admin Data:", adminData);
-
-    const response = await axiosInstance.post("/admins/createAdmin", adminData);
-
-    console.log("Create Admin API Response:", response.data);
+    const response = await axiosInstance.post(
+      "/admins/createAdmin",
+      adminData
+    );
 
     return response.data;
   } catch (error) {
-    console.error("========================================");
-    console.error("CREATE ADMIN API ERROR");
-    console.error("========================================");
-
-    console.error("Full Error:", error);
-    console.error("Response:", error?.response);
-    console.error("Response Data:", error?.response?.data);
-    console.error("Status:", error?.response?.status);
-
+    console.error("Create Admin API Error:", error);
     throw error;
   }
 };
@@ -37,25 +25,13 @@ export const createAdmin = async (adminData) => {
 
 export const getAllAdmins = async () => {
   try {
-    console.log("========================================");
-    console.log("GET ALL ADMINS API");
-    console.log("========================================");
-
-    const response = await axiosInstance.get("/admins/getAllAdmins");
-
-    console.log("Get All Admins API Response:", response.data);
+    const response = await axiosInstance.get(
+      "/admins/getAllAdmins"
+    );
 
     return response.data;
   } catch (error) {
-    console.error("========================================");
-    console.error("GET ALL ADMINS API ERROR");
-    console.error("========================================");
-
-    console.error("Full Error:", error);
-    console.error("Response:", error?.response);
-    console.error("Response Data:", error?.response?.data);
-    console.error("Status:", error?.response?.status);
-
+    console.error("Get All Admins API Error:", error);
     throw error;
   }
 };
@@ -64,54 +40,20 @@ export const getAllAdmins = async () => {
    UPDATE ADMIN / PUMP
 ========================================== */
 
-
 export const updateAdmin = async (adminId, updateData) => {
   try {
     if (!adminId) {
       throw new Error("Admin ID is required.");
     }
 
-    console.log("========================================");
-    console.log("UPDATE ADMIN API");
-    console.log("========================================");
-
-    console.log("Admin ID:", adminId);
-
-    console.log("Update Data:", {
-      ...updateData,
-
-      ...(updateData?.password
-        ? {
-            password: "[HIDDEN]",
-          }
-        : {}),
-    });
-
     const response = await axiosInstance.put(
       `/admins/updateAdmin/${adminId}`,
-      updateData,
+      updateData
     );
-
-    console.log("========================================");
-    console.log("UPDATE ADMIN API RESPONSE");
-    console.log("========================================");
-
-    console.log("Response:", response.data);
 
     return response.data;
   } catch (error) {
-    console.error("========================================");
-    console.error("UPDATE ADMIN API ERROR");
-    console.error("========================================");
-
-    console.error("Full Error:", error);
-    console.error("Response:", error?.response);
-    console.error("Response Data:", error?.response?.data);
-    console.error("Status:", error?.response?.status);
-    console.error("Status Text:", error?.response?.statusText);
-    console.error("Request URL:", error?.config?.url);
-    console.error("Request Method:", error?.config?.method);
-
+    console.error("Update Admin API Error:", error);
     throw error;
   }
 };
@@ -126,36 +68,13 @@ export const deleteAdmin = async (adminId) => {
       throw new Error("Admin ID is required.");
     }
 
-    console.log("========================================");
-    console.log("DELETE ADMIN API");
-    console.log("========================================");
-
-    console.log("Admin ID:", adminId);
-
     const response = await axiosInstance.delete(
-      `/admins/deleteAdmin/${adminId}`,
+      `/admins/deleteAdmin/${adminId}`
     );
-
-    console.log("========================================");
-    console.log("DELETE ADMIN API RESPONSE");
-    console.log("========================================");
-
-    console.log("Response:", response.data);
 
     return response.data;
   } catch (error) {
-    console.error("========================================");
-    console.error("DELETE ADMIN API ERROR");
-    console.error("========================================");
-
-    console.error("Full Error:", error);
-    console.error("Response:", error?.response);
-    console.error("Response Data:", error?.response?.data);
-    console.error("Status:", error?.response?.status);
-    console.error("Status Text:", error?.response?.statusText);
-    console.error("Request URL:", error?.config?.url);
-    console.error("Request Method:", error?.config?.method);
-
+    console.error("Delete Admin API Error:", error);
     throw error;
   }
 };

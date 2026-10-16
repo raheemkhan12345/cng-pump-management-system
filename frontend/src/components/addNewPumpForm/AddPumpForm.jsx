@@ -5,12 +5,7 @@ import "./AddPumpForm.css";
 
 const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
   const [showPassword, setShowPassword] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
-
-  const [error, setError] = useState("");
-
-  const [success, setSuccess] = useState("");
 
   const [formData, setFormData] = useState({
     pumpName: "",
@@ -24,10 +19,7 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
     return null;
   }
 
-  // ==========================================
   // Handle Input Change
-  // ==========================================
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -35,16 +27,9 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
       ...prev,
       [name]: value,
     }));
-
-    // Clear old messages
-    setError("");
-    setSuccess("");
   };
 
-  // ==========================================
   // Reset Form
-  // ==========================================
-
   const resetForm = () => {
     setFormData({
       pumpName: "",
@@ -55,37 +40,21 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
     });
 
     setShowPassword(false);
-    setError("");
-    setSuccess("");
   };
 
-  // ==========================================
   // Close Modal
-  // ==========================================
-
   const handleClose = () => {
-    if (isLoading) {
-      return;
-    }
+    if (isLoading) return;
 
     resetForm();
     onClose();
   };
 
-  // ==========================================
   // Submit Form
-  // ==========================================
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setError("");
-    setSuccess("");
-
-    // ==========================================
     // Basic Validation
-    // ==========================================
-
     if (
       !formData.pumpName.trim() ||
       !formData.pumpAddress.trim() ||
@@ -93,61 +62,30 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
       !formData.email.trim() ||
       !formData.password.trim()
     ) {
-      setError("Please fill in all fields.");
-
+      window.alert("Please fill in all fields.");
       return;
     }
 
     try {
       setIsLoading(true);
 
-      // ==========================================
-      // Create Admin / Pump API
-      // ==========================================
-
-      console.log("Creating Pump/Admin:", formData);
-
       const response = await createAdmin(formData);
 
-      console.log("Create Pump API Response:", response);
-
-      // ==========================================
-      // Check API Response
-      // ==========================================
-
+      // Handle unsuccessful API response
       if (response?.success === false) {
         throw new Error(response?.message || "Failed to create pump.");
       }
 
-      // ==========================================
-      // Success
-      // ==========================================
-
-      setSuccess(response?.message || "Pump created successfully.");
-
-      // ==========================================
-      // Send Created Data to Parent
-      // ==========================================
-
+      // Send created data to parent
       if (onAddPump) {
         onAddPump(formData, response);
       }
 
-      // ==========================================
-      // Reset After Successful Request
-      // ==========================================
-
-      setTimeout(() => {
-        resetForm();
-
-        onClose();
-      }, 800);
+      // Reset and close modal after success
+      resetForm();
+      onClose();
     } catch (error) {
       console.error("Create Pump Error:", error);
-
-      // ==========================================
-      // Backend Error
-      // ==========================================
 
       const errorMessage =
         error.response?.data?.message ||
@@ -156,7 +94,8 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
         error.message ||
         "Failed to create pump. Please try again.";
 
-      setError(errorMessage);
+      // Show backend error in browser alert
+      window.alert(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -165,10 +104,7 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
   return (
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-        {/* ==========================================
-                    Header
-                ========================================== */}
-
+        {/* Header */}
         <div className="modal-header">
           <h2 className="modal-title">Add New Pump</h2>
 
@@ -182,13 +118,9 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
           </button>
         </div>
 
-        {/* ==========================================
-                    Form
-                ========================================== */}
-
+        {/* Form */}
         <form onSubmit={handleSubmit} className="modal-form">
           {/* Pump Name */}
-
           <div className="form-group">
             <label>Pump Name</label>
 
@@ -204,7 +136,6 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
           </div>
 
           {/* Pump Address */}
-
           <div className="form-group">
             <label>Pump Address</label>
 
@@ -220,7 +151,6 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
           </div>
 
           {/* Admin Name + Email */}
-
           <div className="form-row-2col">
             <div className="form-group">
               <label>Admin Name</label>
@@ -252,7 +182,6 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
           </div>
 
           {/* Password */}
-
           <div className="form-group">
             <label>Password</label>
 
@@ -270,7 +199,7 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
               <button
                 type="button"
                 className="toggle-password-btn"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword((prev) => !prev)}
                 disabled={isLoading}
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
@@ -279,22 +208,7 @@ const AddPumpModal = ({ isOpen, onClose, onAddPump }) => {
             </div>
           </div>
 
-          {/* ==========================================
-                        Error
-                    ========================================== */}
-
-          {error && <div className="form-error">{error}</div>}
-
-          {/* ==========================================
-                        Success
-                    ========================================== */}
-
-          {success && <div className="form-success">{success}</div>}
-
-          {/* ==========================================
-                        Actions
-                    ========================================== */}
-
+          {/* Actions */}
           <div className="modal-actions">
             <button
               type="button"

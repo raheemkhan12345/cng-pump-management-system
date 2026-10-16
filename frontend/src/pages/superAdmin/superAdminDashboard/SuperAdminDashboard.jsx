@@ -16,15 +16,10 @@ const SuperAdminDashboard = () => {
   // =====================================================
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [isCreating, setIsCreating] = useState(false);
-
   const [isLoading, setIsLoading] = useState(true);
-
   const [adminSearch, setAdminSearch] = useState("");
-
   const [pumps, setPumps] = useState([]);
-
   const [error, setError] = useState("");
 
   // =====================================================
@@ -32,7 +27,6 @@ const SuperAdminDashboard = () => {
   // =====================================================
 
   const [adminCurrentPage, setAdminCurrentPage] = useState(1);
-
   const [pumpCurrentPage, setPumpCurrentPage] = useState(1);
 
   // =====================================================
@@ -44,16 +38,9 @@ const SuperAdminDashboard = () => {
       setIsLoading(true);
       setError("");
 
-      console.log("Fetching All Admins...");
-
       const response = await getAllAdmins();
 
-      console.log("Get All Admins API Response:", response);
-
-      // =================================================
-      // EXTRACT API DATA
-      // =================================================
-
+      // Extract API data
       let adminData = [];
 
       if (Array.isArray(response)) {
@@ -68,11 +55,9 @@ const SuperAdminDashboard = () => {
         adminData = response.data.data;
       }
 
-      console.log("Normalized Admin Data:", adminData);
-
       setPumps(adminData);
 
-      // Fresh data ke baad pagination reset
+      // Reset pagination after refreshing data
       setAdminCurrentPage(1);
       setPumpCurrentPage(1);
     } catch (error) {
@@ -85,9 +70,7 @@ const SuperAdminDashboard = () => {
         "Failed to load admins and pumps.";
 
       setError(message);
-
       setPumps([]);
-
       setAdminCurrentPage(1);
       setPumpCurrentPage(1);
     } finally {
@@ -100,10 +83,7 @@ const SuperAdminDashboard = () => {
   // =====================================================
 
   useEffect(() => {
-    const loadAdmins = async () => {
-      await fetchAdmins();
-    };
-    loadAdmins();
+    fetchAdmins();
   }, [fetchAdmins]);
 
   // =====================================================
@@ -115,15 +95,16 @@ const SuperAdminDashboard = () => {
       setIsCreating(true);
       setError("");
 
-      console.log("Pump/Admin successfully created:", response);
-
       if (response?.success) {
-        console.log("Admin created successfully.");
-
         // Close modal
         setIsModalOpen(false);
 
-        // Fresh data from backend
+        // Show success message
+        window.alert(
+          response?.message || "Pump and admin created successfully.",
+        );
+
+        // Refresh data from backend
         await fetchAdmins();
       } else {
         throw new Error(response?.message || "Failed to create pump.");
@@ -150,10 +131,6 @@ const SuperAdminDashboard = () => {
   const normalizedPumps = pumps.map((pump, index) => {
     const admin = pump?.admin || pump?.user || pump?.adminDetails || {};
 
-    // -------------------------------------------------
-    // PUMP NAME
-    // -------------------------------------------------
-
     const pumpName =
       pump?.pumpName ||
       pump?.name ||
@@ -161,20 +138,12 @@ const SuperAdminDashboard = () => {
       pump?.pump?.name ||
       "Unnamed Pump";
 
-    // -------------------------------------------------
-    // PUMP ADDRESS
-    // -------------------------------------------------
-
     const pumpAddress =
       pump?.pumpAddress ||
       pump?.location ||
       pump?.address ||
       pump?.pump?.address ||
       "N/A";
-
-    // -------------------------------------------------
-    // ADMIN NAME
-    // -------------------------------------------------
 
     const adminName =
       pump?.adminName ||
@@ -184,28 +153,12 @@ const SuperAdminDashboard = () => {
       pump?.name ||
       "Unassigned";
 
-    // -------------------------------------------------
-    // ADMIN EMAIL
-    // -------------------------------------------------
-
     const adminEmail = pump?.email || admin?.email || "";
-
-    // -------------------------------------------------
-    // STATUS
-    // -------------------------------------------------
 
     const status = pump?.status || admin?.status || "Active";
 
-    // -------------------------------------------------
-    // ID
-    // -------------------------------------------------
-
     const id =
       pump?._id || pump?.id || admin?._id || admin?.id || `row-${index}`;
-
-    // -------------------------------------------------
-    // ADMIN INITIALS
-    // -------------------------------------------------
 
     const initials =
       admin?.initials ||
@@ -220,30 +173,18 @@ const SuperAdminDashboard = () => {
 
     return {
       ...pump,
-
       id,
-
       name: pumpName,
-
       pumpName,
-
       location: pumpAddress,
-
       pumpAddress,
-
       status,
-
       admin: {
         ...admin,
-
         name: adminName,
-
         email: adminEmail,
-
         initials,
-
         assigned: Boolean(adminName && adminName !== "Unassigned"),
-
         lastLogin: admin?.lastLogin || pump?.lastLogin || "Never",
       },
     };
@@ -257,17 +198,11 @@ const SuperAdminDashboard = () => {
     .filter((pump) => pump.admin && (pump.admin.assigned || pump.admin.name))
     .map((pump) => ({
       id: pump.id || pump._id,
-
       name: pump.admin?.name || pump.adminName || "Unassigned",
-
       email: pump.admin?.email || "",
-
       lastLogin: pump.admin?.lastLogin || "Never",
-
       pump: pump.name || pump.pumpName || "Unknown Pump",
-
       status: pump.status || "Active",
-
       avatar:
         pump.admin?.initials ||
         pump.admin?.name?.charAt(0)?.toUpperCase() ||
@@ -342,9 +277,7 @@ const SuperAdminDashboard = () => {
 
   return (
     <div className="dashboard-page">
-      {/* =================================================
-          HEADER
-      ================================================= */}
+      {/* HEADER */}
 
       <div className="page-header">
         <h1 className="page-title">Super Admin Dashboard</h1>
@@ -354,23 +287,16 @@ const SuperAdminDashboard = () => {
         </p>
       </div>
 
-      {/* =================================================
-          ERROR
-      ================================================= */}
+      {/* ERROR */}
 
       {error && <div className="dashboard-error">{error}</div>}
 
-      {/* =================================================
-          STATS
-      ================================================= */}
+      {/* STATS */}
 
       <div className="stats-grid">
-        {/* TOTAL PUMPS */}
-
         <div className="stat-card">
           <div className="stat-header">
             <span>Total CNG Pumps</span>
-
             <Fuel size={18} className="stat-icon" />
           </div>
 
@@ -378,8 +304,6 @@ const SuperAdminDashboard = () => {
             {isLoading ? "..." : normalizedPumps.length}
           </div>
         </div>
-
-        {/* ADD PUMP */}
 
         <div className="action-card">
           <button
@@ -389,20 +313,15 @@ const SuperAdminDashboard = () => {
             disabled={isCreating || isLoading}
           >
             <Plus size={18} />
-
             <span>Add CNG Pump</span>
           </button>
         </div>
       </div>
 
-      {/* =================================================
-          TABLES
-      ================================================= */}
+      {/* TABLES */}
 
       <div className="dashboard-tables-grid">
-        {/* =================================================
-            ADMIN OVERVIEW
-        ================================================= */}
+        {/* ADMIN OVERVIEW */}
 
         <div className="table-card">
           <div className="table-card-header">
@@ -417,7 +336,6 @@ const SuperAdminDashboard = () => {
                 value={adminSearch}
                 onChange={(e) => {
                   setAdminSearch(e.target.value);
-
                   setAdminCurrentPage(1);
                 }}
               />
@@ -429,9 +347,7 @@ const SuperAdminDashboard = () => {
               <thead>
                 <tr>
                   <th>NAME</th>
-
                   <th>ASSIGNED PUMP</th>
-
                   <th>STATUS</th>
                 </tr>
               </thead>
@@ -453,8 +369,6 @@ const SuperAdminDashboard = () => {
                 ) : filteredAdmins.length > 0 ? (
                   paginatedAdmins.map((admin) => (
                     <tr key={admin.id}>
-                      {/* ADMIN */}
-
                       <td>
                         <div className="user-cell">
                           <div className="avatar-circle">{admin.avatar}</div>
@@ -471,11 +385,7 @@ const SuperAdminDashboard = () => {
                         </div>
                       </td>
 
-                      {/* PUMP */}
-
                       <td className="cell-text">{admin.pump}</td>
-
-                      {/* STATUS */}
 
                       <td>
                         <span
@@ -506,9 +416,7 @@ const SuperAdminDashboard = () => {
             </table>
           </div>
 
-          {/* =================================================
-              ADMIN PAGINATION
-          ================================================= */}
+          {/* ADMIN PAGINATION */}
 
           {!isLoading && filteredAdmins.length > 0 && adminTotalPages > 1 && (
             <div className="pagination">
@@ -523,9 +431,7 @@ const SuperAdminDashboard = () => {
 
               <div className="pagination-pages">
                 {Array.from(
-                  {
-                    length: adminTotalPages,
-                  },
+                  { length: adminTotalPages },
                   (_, index) => index + 1,
                 ).map((page) => (
                   <button
@@ -553,9 +459,7 @@ const SuperAdminDashboard = () => {
           )}
         </div>
 
-        {/* =================================================
-            PUMP OVERVIEW
-        ================================================= */}
+        {/* PUMP OVERVIEW */}
 
         <div className="table-card">
           <div className="table-card-header">
@@ -572,9 +476,7 @@ const SuperAdminDashboard = () => {
               <thead>
                 <tr>
                   <th>PUMP DETAILS</th>
-
                   <th>LOCATION</th>
-
                   <th>STATUS</th>
                 </tr>
               </thead>
@@ -596,8 +498,6 @@ const SuperAdminDashboard = () => {
                 ) : normalizedPumps.length > 0 ? (
                   paginatedPumps.map((pump) => (
                     <tr key={pump.id}>
-                      {/* PUMP DETAILS */}
-
                       <td>
                         <div className="cell-title">{pump.name}</div>
 
@@ -611,11 +511,7 @@ const SuperAdminDashboard = () => {
                         </div>
                       </td>
 
-                      {/* LOCATION */}
-
                       <td className="cell-text">{pump.location}</td>
-
-                      {/* STATUS */}
 
                       <td>
                         <span
@@ -646,9 +542,7 @@ const SuperAdminDashboard = () => {
             </table>
           </div>
 
-          {/* =================================================
-              PUMP PAGINATION
-          ================================================= */}
+          {/* PUMP PAGINATION */}
 
           {!isLoading && normalizedPumps.length > 0 && pumpTotalPages > 1 && (
             <div className="pagination">
@@ -663,9 +557,7 @@ const SuperAdminDashboard = () => {
 
               <div className="pagination-pages">
                 {Array.from(
-                  {
-                    length: pumpTotalPages,
-                  },
+                  { length: pumpTotalPages },
                   (_, index) => index + 1,
                 ).map((page) => (
                   <button
@@ -694,9 +586,7 @@ const SuperAdminDashboard = () => {
         </div>
       </div>
 
-      {/* =================================================
-          ADD PUMP MODAL
-      ================================================= */}
+      {/* ADD PUMP MODAL */}
 
       <AddPumpModal
         isOpen={isModalOpen}
