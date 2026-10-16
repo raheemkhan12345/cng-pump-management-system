@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PumpProvider } from './context/PumpContext';
-import AppRoutes from './routes/AppRoutes'; // Ya jahan bhi aapka AppRoutes component hai
+import AppRoutes from './routes/AppRoutes'; 
 
 function App() {
   return (
