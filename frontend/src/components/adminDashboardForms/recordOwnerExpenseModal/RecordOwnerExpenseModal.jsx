@@ -23,16 +23,12 @@ const RecordOwnerExpenseModal = ({
     amount: "",
     paymentMode: "Cash Account",
     selectedOwner: "",
-    status: "Paid",
     detailRemarks: "",
   });
 
   if (!isOpen) return null;
 
-  // =========================================================
   // GET OWNER NAME
-  // =========================================================
-
   const getOwnerName = (owner) => {
     if (typeof owner === "string") {
       return owner;
@@ -48,11 +44,7 @@ const RecordOwnerExpenseModal = ({
     );
   };
 
-  // =========================================================
   // GET OWNER ID
-  // Backend expects owner ID
-  // =========================================================
-
   const getOwnerValue = (owner) => {
     if (typeof owner === "string") {
       return owner;
@@ -61,10 +53,7 @@ const RecordOwnerExpenseModal = ({
     return owner?._id || owner?.id || owner?.ownerId || "";
   };
 
-  // =========================================================
   // HANDLE INPUT CHANGE
-  // =========================================================
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -74,10 +63,7 @@ const RecordOwnerExpenseModal = ({
     }));
   };
 
-  // =========================================================
   // HANDLE PAYMENT MODE
-  // =========================================================
-
   const handlePaymentModeSelect = (mode) => {
     setFormData((prev) => ({
       ...prev,
@@ -85,10 +71,7 @@ const RecordOwnerExpenseModal = ({
     }));
   };
 
-  // =========================================================
   // HANDLE FORM SUBMIT
-  // =========================================================
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -107,26 +90,14 @@ const RecordOwnerExpenseModal = ({
       return;
     }
 
-    // =======================================================
-    // EXACT BACKEND PAYLOAD
-    // =======================================================
-
+    // BACKEND PAYLOAD WITHOUT STATUS
     const ownerExpenseData = {
       date: formData.date,
       amount: Number(formData.amount),
       paymentMode: formData.paymentMode,
       owner: formData.selectedOwner,
-      status: formData.status,
       remarks: formData.detailRemarks.trim(),
     };
-
-    console.log("========================================");
-    console.log("OWNER EXPENSE FORM SUBMIT");
-    console.log(
-      "OWNER EXPENSE PAYLOAD:",
-      JSON.stringify(ownerExpenseData, null, 2),
-    );
-    console.log("========================================");
 
     if (onSubmit) {
       onSubmit(ownerExpenseData);
@@ -136,10 +107,7 @@ const RecordOwnerExpenseModal = ({
   return (
     <div className="roem-overlay">
       <div className="roem-modal-container">
-        {/* =====================================================
-            HEADER
-        ====================================================== */}
-
+        {/* HEADER */}
         <div className="roem-header">
           <div className="roem-title-group">
             <div className="roem-header-icon-box">
@@ -160,18 +128,10 @@ const RecordOwnerExpenseModal = ({
           </button>
         </div>
 
-        {/* =====================================================
-            FORM
-        ====================================================== */}
-
+        {/* FORM */}
         <form onSubmit={handleSubmit} className="roem-form">
-          {/* ===================================================
-              DATE & AMOUNT
-          ==================================================== */}
-
+          {/* DATE & AMOUNT */}
           <div className="roem-grid-2">
-            {/* DATE */}
-
             <div className="roem-field">
               <label className="roem-label">Date</label>
 
@@ -189,8 +149,6 @@ const RecordOwnerExpenseModal = ({
                 <Calendar size={18} className="roem-input-icon" />
               </div>
             </div>
-
-            {/* AMOUNT */}
 
             <div className="roem-field">
               <label className="roem-label">Amount (PKR)</label>
@@ -214,16 +172,12 @@ const RecordOwnerExpenseModal = ({
             </div>
           </div>
 
-          {/* ===================================================
-              PAYMENT MODE
-          ==================================================== */}
-
+          {/* PAYMENT MODE */}
           <div className="roem-field">
             <label className="roem-label">Payment Mode / Pool</label>
 
             <div className="roem-payment-grid">
               {/* CASH */}
-
               <div
                 className={`roem-payment-card ${
                   formData.paymentMode === "Cash Account" ? "active" : ""
@@ -241,7 +195,6 @@ const RecordOwnerExpenseModal = ({
 
                   <div className="roem-pm-info">
                     <span className="roem-pm-title">Cash Account</span>
-
                     <span className="roem-pm-sub">Hand Pool</span>
                   </div>
                 </div>
@@ -252,7 +205,6 @@ const RecordOwnerExpenseModal = ({
               </div>
 
               {/* BANK */}
-
               <div
                 className={`roem-payment-card ${
                   formData.paymentMode === "Bank Account" ? "active" : ""
@@ -270,7 +222,6 @@ const RecordOwnerExpenseModal = ({
 
                   <div className="roem-pm-info">
                     <span className="roem-pm-title">Bank Account</span>
-
                     <span className="roem-pm-sub">Reserve Pool</span>
                   </div>
                 </div>
@@ -282,10 +233,7 @@ const RecordOwnerExpenseModal = ({
             </div>
           </div>
 
-          {/* ===================================================
-              OWNER
-          ==================================================== */}
-
+          {/* OWNER */}
           <div className="roem-field">
             <label className="roem-label">Owner</label>
 
@@ -305,7 +253,6 @@ const RecordOwnerExpenseModal = ({
                 owners.length > 0 &&
                 owners.map((owner, index) => {
                   const ownerName = getOwnerName(owner);
-
                   const ownerValue = getOwnerValue(owner);
 
                   return (
@@ -322,8 +269,6 @@ const RecordOwnerExpenseModal = ({
               )}
             </select>
 
-            {/* API ERROR */}
-
             {ownersError && (
               <small
                 style={{
@@ -335,8 +280,6 @@ const RecordOwnerExpenseModal = ({
                 {ownersError}
               </small>
             )}
-
-            {/* NO OWNERS */}
 
             {!ownersLoading && !ownersError && owners.length === 0 && (
               <small
@@ -351,31 +294,7 @@ const RecordOwnerExpenseModal = ({
             )}
           </div>
 
-          {/* ===================================================
-              STATUS
-          ==================================================== */}
-
-          <div className="roem-field">
-            <label className="roem-label">Status</label>
-
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="roem-select"
-              required
-              disabled={isSubmitting}
-            >
-              <option value="Paid">Paid</option>
-
-              <option value="Pending">Pending</option>
-            </select>
-          </div>
-
-          {/* ===================================================
-              REMARKS
-          ==================================================== */}
-
+          {/* REMARKS */}
           <div className="roem-field">
             <label className="roem-label">Detail / Remarks</label>
 
@@ -390,10 +309,7 @@ const RecordOwnerExpenseModal = ({
             />
           </div>
 
-          {/* ===================================================
-              FOOTER
-          ==================================================== */}
-
+          {/* FOOTER */}
           <div className="roem-footer">
             <button
               type="button"

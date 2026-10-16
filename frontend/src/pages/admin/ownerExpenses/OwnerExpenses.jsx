@@ -123,10 +123,6 @@ const OwnerExpenses = () => {
 
       const response = await getOwnerExpenses();
 
-      // -------------------------------------------------------
-      // Extract API array safely
-      // -------------------------------------------------------
-
       let expenses = [];
 
       if (Array.isArray(response)) {
@@ -149,16 +145,7 @@ const OwnerExpenses = () => {
 
       setOwnerExpenses(expenses);
     } catch (error) {
-      // Keep error logging for debugging
-      console.error("========================================");
-      console.error("FAILED TO GET OWNER EXPENSES");
-      console.error("ERROR:", error);
-      console.error("STATUS:", error?.response?.status);
-      console.error(
-        "SERVER RESPONSE:",
-        JSON.stringify(error?.response?.data, null, 2),
-      );
-      console.error("========================================");
+      console.error("Failed to get owner expenses:", error);
 
       const errorMessage =
         error?.response?.data?.message ||
@@ -243,10 +230,6 @@ const OwnerExpenses = () => {
       return;
     }
 
-    // -------------------------------------------------------
-    // Create Owner
-    // -------------------------------------------------------
-
     if (!ownersMap[ownerId]) {
       const ownerName = getOwnerName(owner);
 
@@ -258,10 +241,6 @@ const OwnerExpenses = () => {
         transactions: [],
       };
     }
-
-    // -------------------------------------------------------
-    // Add Transaction
-    // -------------------------------------------------------
 
     ownersMap[ownerId].transactions.push({
       id:
@@ -289,12 +268,8 @@ const OwnerExpenses = () => {
         expense?.detailRemarks ||
         "-",
 
-      // -----------------------------------------------------
-      // Payment Status
-      // Cash Account / Bank Account
-      // -----------------------------------------------------
-
-      account: getPaymentMode(expense),
+      // Payment mode only; no Paid/Pending status.
+      paymentMode: getPaymentMode(expense),
 
       amount: formatCurrency(expense?.amount),
     });
@@ -318,17 +293,9 @@ const OwnerExpenses = () => {
       return getOwnerId(expenseOwner) === owner.id;
     });
 
-    // -------------------------------------------------------
-    // Total Expenses
-    // -------------------------------------------------------
-
     const totalExpenses = ownerRawExpenses.reduce((total, expense) => {
       return total + (Number(expense?.amount) || 0);
     }, 0);
-
-    // -------------------------------------------------------
-    // Current Month Expenses
-    // -------------------------------------------------------
 
     const currentDate = new Date();
 
@@ -382,10 +349,7 @@ const OwnerExpenses = () => {
 
   return (
     <div className="owner-expenses-container">
-      {/* =====================================================
-          PAGE HEADER
-      ====================================================== */}
-
+      {/* PAGE HEADER */}
       <div className="section-header">
         <h1 className="section-title">Owner Expenses</h1>
 
@@ -394,17 +358,11 @@ const OwnerExpenses = () => {
         </p>
       </div>
 
-      {/* =====================================================
-          OWNER CARDS GRID
-      ====================================================== */}
-
+      {/* OWNER CARDS GRID */}
       <div className="owners-grid">
         {ownersWithMetrics.map((owner) => (
           <div key={owner.id} className="owner-card">
-            {/* =================================================
-                OWNER HEADER / PROFILE
-            ================================================== */}
-
+            {/* OWNER HEADER */}
             <div className="owner-header">
               <div className="owner-profile-info">
                 <div className="owner-avatar">{owner.initial}</div>
@@ -419,10 +377,7 @@ const OwnerExpenses = () => {
               </div>
             </div>
 
-            {/* =================================================
-                METRICS
-            ================================================== */}
-
+            {/* METRICS */}
             <div className="metrics-row">
               <div className="metric-box">
                 <span className="metric-label">Total Expenses to Date</span>
@@ -441,17 +396,11 @@ const OwnerExpenses = () => {
               </div>
             </div>
 
-            {/* =================================================
-                TRANSACTIONS
-            ================================================== */}
-
+            {/* TRANSACTIONS */}
             <div className="transactions-section">
               <h4 className="transactions-title">RECENT TRANSACTIONS</h4>
 
-              {/* =================================================
-                  DESKTOP / TABLET
-              ================================================== */}
-
+              {/* DESKTOP / TABLET */}
               <div className="table-responsive desktop-table-view">
                 <table className="transactions-table">
                   <thead>
@@ -459,7 +408,7 @@ const OwnerExpenses = () => {
                       <th>Date</th>
                       <th>Category</th>
                       <th>Description</th>
-                      <th>Status</th>
+                      <th>Payment Mode</th>
                       <th className="text-right">Amount (Rs.)</th>
                     </tr>
                   </thead>
@@ -468,11 +417,7 @@ const OwnerExpenses = () => {
                     {owner.transactions.length > 0 ? (
                       owner.transactions.map((tx) => (
                         <tr key={tx.id}>
-                          {/* Date */}
-
                           <td className="tx-date">{tx.date}</td>
-
-                          {/* Category */}
 
                           <td>
                             <span
@@ -482,27 +427,23 @@ const OwnerExpenses = () => {
                             </span>
                           </td>
 
-                          {/* Description */}
-
                           <td>
                             <div className="tx-description">
                               <span>{tx.description}</span>
                             </div>
                           </td>
 
-                          {/* Status */}
-
                           <td>
-                            {tx.account ? (
-                              <span className="account-tag">{tx.account}</span>
+                            {tx.paymentMode ? (
+                              <span className="account-tag">
+                                {tx.paymentMode}
+                              </span>
                             ) : (
                               <span className="account-tag account-empty">
                                 -
                               </span>
                             )}
                           </td>
-
-                          {/* Amount */}
 
                           <td className="tx-amount">{tx.amount}</td>
                         </tr>
@@ -516,36 +457,27 @@ const OwnerExpenses = () => {
                 </table>
               </div>
 
-              {/* =================================================
-                  MOBILE
-              ================================================== */}
-
+              {/* MOBILE */}
               <div className="mobile-cards-view">
                 {owner.transactions.length > 0 ? (
                   owner.transactions.map((tx) => (
                     <div key={tx.id} className="mobile-tx-card">
-                      {/* Top Row */}
-
                       <div className="mobile-tx-row top-row">
                         <span className="tx-date">{tx.date}</span>
 
                         <span className="tx-amount">Rs. {tx.amount}</span>
                       </div>
 
-                      {/* Bottom Row */}
-
                       <div className="mobile-tx-row bottom-row">
                         <div className="tx-description">
                           <span className="tx-desc-text">{tx.description}</span>
 
-                          {/* Payment Status */}
-
-                          {tx.account && (
-                            <span className="account-tag">{tx.account}</span>
+                          {tx.paymentMode && (
+                            <span className="account-tag">
+                              {tx.paymentMode}
+                            </span>
                           )}
                         </div>
-
-                        {/* Category */}
 
                         <span className={`category-tag ${tx.categoryClass}`}>
                           {tx.category}

@@ -244,7 +244,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* CLOSED MONTH BUTTON */}
-        <button
+        {/* <button
           type="button"
           className="btn-closed-month"
           onClick={handleClosedMonthClick}
@@ -253,7 +253,7 @@ const AdminDashboard = () => {
             <Lock size={13} />
           </div>
           <span>Closed Month</span>
-        </button>
+        </button> */}
       </div>
 
       {/* DASHBOARD STATS */}
