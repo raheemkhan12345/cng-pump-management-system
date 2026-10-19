@@ -693,7 +693,7 @@ const Loans = () => {
             <Users size={18} className="loan-icon-gray" />
           </div>
 
-          <span className="loan-stat-label">Active Loan Staff</span>
+          <span className="loan-stat-label">Active Loan</span>
 
           <h2 className="loan-stat-value">
             {loanStats.activeLoanStaff}{" "}

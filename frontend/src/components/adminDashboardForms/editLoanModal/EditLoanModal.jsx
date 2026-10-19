@@ -188,6 +188,8 @@ const EditLoanModal = ({
                 <option value="loan_given">Loan Given</option>
 
                 <option value="loan_received">Loan Received</option>
+                <option value="loan_return">Loan Return</option>
+                <option value="loan_recover">Loan Recovery</option>
               </select>
             </div>
 

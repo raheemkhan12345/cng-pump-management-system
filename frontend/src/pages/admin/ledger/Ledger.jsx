@@ -31,9 +31,7 @@ const Ledger = () => {
       setLoading(true);
       setError("");
 
-      // =====================================================
       // First request
-      // =====================================================
       const firstResponse = await getLedger(1, pageSize);
 
       const firstTransactions = Array.isArray(firstResponse?.transaction)
@@ -42,17 +40,13 @@ const Ledger = () => {
 
       const totalPages = Number(firstResponse?.pagination?.totalPages) || 1;
 
-      // =====================================================
       // If only one page exists
-      // =====================================================
       if (totalPages === 1) {
         setTransactions(firstTransactions);
         return;
       }
 
-      // =====================================================
       // Fetch remaining pages
-      // =====================================================
       const pageRequests = [];
 
       for (let page = 2; page <= totalPages; page++) {
@@ -61,19 +55,11 @@ const Ledger = () => {
 
       const remainingResponses = await Promise.all(pageRequests);
 
-      // =====================================================
-      // Extract transactions from remaining pages
-      // =====================================================
       const remainingTransactions = remainingResponses.flatMap((response) =>
         Array.isArray(response?.transaction) ? response.transaction : [],
       );
 
-      // =====================================================
-      // Combine ALL transactions
-      // =====================================================
-      const allTransactions = [...firstTransactions, ...remainingTransactions];
-
-      setTransactions(allTransactions);
+      setTransactions([...firstTransactions, ...remainingTransactions]);
     } catch (err) {
       console.error("Ledger API Error:", err);
 
@@ -94,6 +80,7 @@ const Ledger = () => {
   // =========================================================
   useEffect(() => {
     fetchLedger();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // =========================================================
@@ -113,24 +100,14 @@ const Ledger = () => {
 
     const dateString = String(dateValue).trim();
 
-    // ---------------------------------------------------------
-    // API ISO format:
-    // 2026-09-09T00:00:00.000Z
-    // ---------------------------------------------------------
     if (dateString.includes("T")) {
       return dateString.split("T")[0];
     }
 
-    // ---------------------------------------------------------
-    // Already YYYY-MM-DD
-    // ---------------------------------------------------------
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
       return dateString;
     }
 
-    // ---------------------------------------------------------
-    // Fallback
-    // ---------------------------------------------------------
     const date = new Date(dateValue);
 
     if (Number.isNaN(date.getTime())) {
@@ -155,50 +132,80 @@ const Ledger = () => {
     }
 
     const day = String(date.getDate()).padStart(2, "0");
-
     const month = String(date.getMonth() + 1).padStart(2, "0");
-
     const year = date.getFullYear();
 
     return `${day}-${month}-${year}`;
   };
 
   // =========================================================
+  // Get first non-empty value
+  // =========================================================
+  const getFirstValue = (...values) => {
+    return values.find(
+      (value) =>
+        value !== undefined && value !== null && String(value).trim() !== "",
+    );
+  };
+
+  // =========================================================
   // Normalize Transaction
   // =========================================================
   const normalizeTransaction = (item, index) => {
-    const rawDate = item?.date || "";
+    const rawDate =
+      getFirstValue(item?.date, item?.transactionDate, item?.createdAt) || "";
+
+    const detail = getFirstValue(
+      item?.detail,
+      item?.remarks,
+      item?.remark,
+      item?.description,
+      item?.details,
+      item?.notes,
+      item?.narration,
+      item?.comment,
+      item?.comments,
+      item?.reason,
+      item?.purpose,
+      item?.reference,
+    );
+
+    const type = getFirstValue(
+      item?.type,
+      item?.transactionType,
+      item?.transaction_type,
+    );
+
+    const specificHead = getFirstValue(
+      item?.specificHead,
+      item?.specific_head,
+      item?.head,
+    );
+
+    const paymentPool = getFirstValue(
+      item?.paymentPool,
+      item?.payment_pool,
+      item?.paymentMethod,
+      item?.payment_method,
+    );
+
+    const volume = getFirstValue(
+      item?.volume,
+      item?.volKg,
+      item?.vol_kg,
+      item?.cngVolume,
+    );
 
     return {
       id: item?.id || item?._id || `ledger-${index}`,
-
-      // Used ONLY for filtering
       rawDate: getDateOnly(rawDate),
-
-      // Used ONLY for displaying
       date: formatDate(rawDate),
-
-      type: item?.type || item?.transactionType || "—",
-
-      specificHead: item?.specificHead || item?.specific_head || "—",
-
-      detail:
-        item?.detail ||
-        item?.remarks ||
-        item?.remark ||
-        item?.description ||
-        item?.details ||
-        "—",
-
+      type: type || "—",
+      specificHead: specificHead || "—",
+      detail: detail === undefined ? "—" : String(detail),
       amount: item?.amount ?? item?.totalAmount ?? item?.total_amount ?? 0,
-
-      paymentPool:
-        item?.paymentPool ||
-        "—",
-
-      volKg:
-        item?.volume ??
-        "—",
+      paymentPool: paymentPool || "—",
+      volKg: volume ?? "—",
     };
   };
 
@@ -206,7 +213,7 @@ const Ledger = () => {
   // Normalize ALL Transactions
   // =========================================================
   const normalizedTransactions = useMemo(() => {
-    return transactions.map(normalizeTransaction);
+    return transactions.map((item, index) => normalizeTransaction(item, index));
   }, [transactions]);
 
   // =========================================================
@@ -216,35 +223,28 @@ const Ledger = () => {
     const search = searchTerm.toLowerCase().trim();
 
     return normalizedTransactions.filter((item) => {
-      // =================================================
-      // Search Filter
-      // =================================================
+      const searchableFields = [
+        item.type,
+        item.specificHead,
+        item.detail,
+        item.paymentPool,
+        item.amount,
+        item.volKg,
+      ];
+
       const matchesSearch =
         !search ||
-        String(item.detail).toLowerCase().includes(search) ||
-        String(item.specificHead).toLowerCase().includes(search) ||
-        String(item.type).toLowerCase().includes(search) ||
-        String(item.paymentPool).toLowerCase().includes(search);
+        searchableFields.some((field) =>
+          String(field ?? "")
+            .toLowerCase()
+            .includes(search),
+        );
 
-      // =================================================
-      // Date Filter
-      // =================================================
       const matchesDate = !filterDate || item.rawDate === filterDate;
 
       return matchesSearch && matchesDate;
     });
   }, [normalizedTransactions, searchTerm, filterDate]);
-
-  // =========================================================
-  // Debug Date Filter
-  // =========================================================
-  useEffect(() => {
-    if (filterDate) {
-      console.log("Selected Date:", filterDate);
-
-      console.log("Matching Transactions:", filteredTransactions);
-    }
-  }, [filterDate, filteredTransactions]);
 
   // =========================================================
   // Frontend Pagination
@@ -254,19 +254,23 @@ const Ledger = () => {
   const totalPages =
     totalRecords === 0 ? 1 : Math.ceil(totalRecords / pageSize);
 
-  // =========================================================
-  // Reset Page When Filter Changes
-  // =========================================================
+  // Reset page when filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterDate]);
+
+  // Keep page valid if result count changes
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   // =========================================================
   // Get Current Page Transactions
   // =========================================================
   const paginatedTransactions = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
-
     const endIndex = startIndex + pageSize;
 
     return filteredTransactions.slice(startIndex, endIndex);
@@ -277,7 +281,6 @@ const Ledger = () => {
   // =========================================================
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-
     setCurrentPage(1);
   };
 
@@ -286,6 +289,7 @@ const Ledger = () => {
   // =========================================================
   const handleReset = () => {
     setSearchTerm("");
+    setFilterDate("");
     setCurrentPage(1);
   };
 
@@ -345,25 +349,19 @@ const Ledger = () => {
   // =========================================================
   return (
     <div className="ledger-container">
-      {/* =================================================
-                Header
-            ================================================== */}
+      {/* Header */}
       <div className="ledger-header">
         <div>
           <h1 className="ledger-title">Ledger</h1>
-
           <p className="ledger-subtitle">
             Complete transaction record of your CNG station
           </p>
         </div>
       </div>
 
-      {/* =================================================
-                Filters
-            ================================================== */}
+      {/* Filters */}
       <div className="ledger-filter-card">
         <div className="ledger-filter-grid">
-          {/* Search */}
           <div className="ledger-filter-group search-group">
             <label>Search</label>
 
@@ -372,50 +370,43 @@ const Ledger = () => {
 
               <input
                 type="text"
-                placeholder="Search remarks..."
+                placeholder="Search type, remarks, specific head..."
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
             </div>
           </div>
 
-          {/* Reset */}
           <div className="ledger-filter-action">
-            <button className="ledger-reset-btn" onClick={handleReset}>
+            <button
+              type="button"
+              className="ledger-reset-btn"
+              onClick={handleReset}
+            >
               <RotateCcw size={14} />
-
               <span>Reset</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* =================================================
-                Table
-            ================================================== */}
+      {/* Table */}
       <div className="ledger-table-card">
         <div className="ledger-table-wrapper">
           <table className="ledger-table">
             <thead>
               <tr>
                 <th>DATE</th>
-
                 <th>TYPE</th>
-
                 <th>SPECIFIC HEAD</th>
-
                 <th>DETAIL / REMARKS</th>
-
                 <th>AMOUNT (PKR)</th>
-
                 <th>PAYMENT POOL</th>
-
                 <th>VOL (KG)</th>
               </tr>
             </thead>
 
             <tbody>
-              {/* Loading */}
               {loading ? (
                 <tr>
                   <td colSpan="7" className="ledger-empty-state">
@@ -423,20 +414,22 @@ const Ledger = () => {
                   </td>
                 </tr>
               ) : error ? (
-                /* Error */
                 <tr>
                   <td colSpan="7" className="ledger-empty-state">
                     {error}
                   </td>
                 </tr>
               ) : paginatedTransactions.length > 0 ? (
-                /* Data */
                 paginatedTransactions.map((item) => (
                   <tr key={item.id}>
                     <td className="ledger-td-date">{item.date}</td>
 
                     <td>
-                      <span className="ledger-badge">{item.type}</span>
+                      <span
+                        className={`ledger-badge ${getTypeBadgeClass(item.type)}`}
+                      >
+                        {item.type}
+                      </span>
                     </td>
 
                     <td className="ledger-td-head">{item.specificHead}</td>
@@ -453,7 +446,6 @@ const Ledger = () => {
                   </tr>
                 ))
               ) : (
-                /* Empty */
                 <tr>
                   <td colSpan="7" className="ledger-empty-state">
                     No transactions found.
@@ -464,9 +456,7 @@ const Ledger = () => {
           </table>
         </div>
 
-        {/* =================================================
-                    Footer
-                ================================================== */}
+        {/* Footer */}
         <div className="ledger-footer">
           <span className="ledger-pagination-text">
             Showing <b>{showingFrom}</b> to <b>{showingTo}</b> of{" "}
@@ -475,6 +465,7 @@ const Ledger = () => {
 
           <div className="ledger-pagination-buttons">
             <button
+              type="button"
               className="ledger-page-btn"
               onClick={handlePrevious}
               disabled={loading || currentPage <= 1}
@@ -483,6 +474,7 @@ const Ledger = () => {
             </button>
 
             <button
+              type="button"
               className="ledger-page-btn"
               onClick={handleNext}
               disabled={loading || currentPage >= totalPages}
