@@ -4,8 +4,10 @@ import {
   TrendingDown,
   Calendar,
   Tags,
-  X,
   ArrowLeft,
+  Edit3,
+  Trash2,
+  Filter,
 } from "lucide-react";
 
 import AddNewExpenses from "../../../components/adminDashboardForms/addNewExpenseForm/AddNewExpenses";
@@ -87,10 +89,11 @@ const Expenses = () => {
   const [selectedMonth] = useState(initialSelectedMonth.month);
 
   // =========================================================
-  // VIEW CATEGORIES TOGGLE STATE
+  // NAVIGATION / VIEW STATES
   // =========================================================
 
   const [showCategories, setShowCategories] = useState(false);
+  const [selectedCategoryName, setSelectedCategoryName] = useState(null);
 
   // =========================================================
   // MODAL STATES
@@ -241,14 +244,6 @@ const Expenses = () => {
 
       setRecoveryExpensesData(recoveryData);
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        error?.message ||
-        "Failed to load recovery expenses.";
-
-      window.alert(errorMessage);
-
       setRecoveryExpensesData([]);
     }
   }, []);
@@ -269,26 +264,12 @@ const Expenses = () => {
         ownerData = response.owners;
       } else if (Array.isArray(response?.owner)) {
         ownerData = response.owner;
-      } else if (Array.isArray(response?.data?.owners)) {
-        ownerData = response.data.owners;
-      } else if (Array.isArray(response?.data?.owner)) {
-        ownerData = response.data.owner;
-      } else if (Array.isArray(response?.data?.data)) {
-        ownerData = response.data.data;
       } else if (Array.isArray(response)) {
         ownerData = response;
       }
 
       setOwners(ownerData);
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        error?.message ||
-        "Failed to load owners.";
-
-      window.alert(errorMessage);
-
       setOwners([]);
     }
   }, []);
@@ -299,37 +280,12 @@ const Expenses = () => {
 
   useEffect(() => {
     fetchExpenses();
-  }, [fetchExpenses]);
-
-  useEffect(() => {
     fetchRecoveryExpenses();
-  }, [fetchRecoveryExpenses]);
-
-  useEffect(() => {
     fetchOwners();
-  }, [fetchOwners]);
+  }, [fetchExpenses, fetchRecoveryExpenses, fetchOwners]);
 
   // =========================================================
-  // FRONTEND PAGINATION
-  // =========================================================
-
-  const totalExpenses = allExpenses.length;
-
-  const totalPages = Math.max(Math.ceil(totalExpenses / pageSize), 1);
-
-  // =========================================================
-  // GET CURRENT PAGE EXPENSES
-  // =========================================================
-
-  const expenses = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-
-    return allExpenses.slice(startIndex, endIndex);
-  }, [allExpenses, currentPage]);
-
-  // =========================================================
-  // GET EXPENSE AMOUNT
+  // GET EXPENSE AMOUNT & DATE HELPERS
   // =========================================================
 
   const getAmount = (expense) => {
@@ -340,117 +296,50 @@ const Expenses = () => {
     );
   };
 
-  // =========================================================
-  // GET EXPENSE DATE
-  // =========================================================
-
   const getDate = (expense) => {
     return expense?.date || expense?.expenseDate || expense?.createdAt || "";
   };
 
-  // =========================================================
-  // GET DATE ONLY
-  // =========================================================
-
   const getDateOnly = (dateValue) => {
-    if (!dateValue) {
-      return "";
-    }
-
+    if (!dateValue) return "";
     const dateString = String(dateValue);
-
-    if (dateString.includes("T")) {
-      return dateString.split("T")[0];
-    }
-
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-      return dateString;
-    }
+    if (dateString.includes("T")) return dateString.split("T")[0];
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
 
     const date = new Date(dateValue);
-
-    if (Number.isNaN(date.getTime())) {
-      return "";
-    }
-
+    if (Number.isNaN(date.getTime())) return "";
     return date.toISOString().split("T")[0];
   };
 
-  // =========================================================
-  // CURRENT DATE
-  // =========================================================
-
   const today = new Date();
-
   const todayDate = [
     today.getFullYear(),
     String(today.getMonth() + 1).padStart(2, "0"),
     String(today.getDate()).padStart(2, "0"),
   ].join("-");
 
-  // =========================================================
-  // CHECK SELECTED MONTH
-  // =========================================================
-
   const isInSelectedMonth = (dateValue) => {
     const dateOnly = getDateOnly(dateValue);
-
-    if (!dateOnly) {
-      return false;
-    }
-
+    if (!dateOnly) return false;
     const [year, month] = dateOnly.split("-").map(Number);
-
     return year === selectedYear && month === selectedMonth;
   };
 
-  // =========================================================
-  // TODAY'S EXPENSES
-  // =========================================================
-
   const todayExpenses = allExpenses
-    .filter((expense) => {
-      return getDateOnly(getDate(expense)) === todayDate;
-    })
-    .reduce((total, expense) => {
-      return total + getAmount(expense);
-    }, 0);
-
-  // =========================================================
-  // SELECTED MONTH EXPENSES
-  // =========================================================
+    .filter((expense) => getDateOnly(getDate(expense)) === todayDate)
+    .reduce((total, expense) => total + getAmount(expense), 0);
 
   const monthExpenses = allExpenses
-    .filter((expense) => {
-      return isInSelectedMonth(getDate(expense));
-    })
-    .reduce((total, expense) => {
-      return total + getAmount(expense);
-    }, 0);
-
-  // =========================================================
-  // FILTER NORMAL EXPENSES BY SELECTED MONTH
-  // =========================================================
+    .filter((expense) => isInSelectedMonth(getDate(expense)))
+    .reduce((total, expense) => total + getAmount(expense), 0);
 
   const selectedMonthExpenses = useMemo(() => {
     return allExpenses
-      .filter((expense) => {
-        return isInSelectedMonth(getDate(expense));
-      })
-      .sort((a, b) => {
-        const dateA = new Date(getDate(a) || 0);
-        const dateB = new Date(getDate(b) || 0);
-
-        return dateB - dateA;
-      });
+      .filter((expense) => isInSelectedMonth(getDate(expense)))
+      .sort((a, b) => new Date(getDate(b) || 0) - new Date(getDate(a) || 0));
   }, [allExpenses, selectedYear, selectedMonth]);
 
-  // =========================================================
-  // PAGINATED SELECTED MONTH EXPENSES
-  // =========================================================
-
   const filteredTotalExpenses = selectedMonthExpenses.length;
-
   const filteredTotalPages = Math.max(
     Math.ceil(filteredTotalExpenses / pageSize),
     1,
@@ -459,13 +348,8 @@ const Expenses = () => {
   const selectedMonthCurrentExpenses = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-
     return selectedMonthExpenses.slice(startIndex, endIndex);
   }, [selectedMonthExpenses, currentPage]);
-
-  // =========================================================
-  // KEEP CURRENT PAGE VALID
-  // =========================================================
 
   useEffect(() => {
     setCurrentPage((previousPage) =>
@@ -473,34 +357,20 @@ const Expenses = () => {
     );
   }, [filteredTotalPages]);
 
-  // =========================================================
-  // RECOVERY EXPENSE TOTAL
-  // SELECTED MONTH ONLY
-  // =========================================================
-
   const selectedMonthRecoveryExpenses = useMemo(() => {
     return recoveryExpensesData
-      .filter((recovery) => {
-        return isInSelectedMonth(
+      .filter((recovery) =>
+        isInSelectedMonth(
           recovery?.date || recovery?.recoveryDate || recovery?.createdAt || "",
-        );
-      })
-      .reduce((total, recovery) => {
-        const amount =
-          Number(
-            recovery?.recoveryAmount ??
-              recovery?.amount ??
-              recovery?.totalAmount ??
-              0,
-          ) || 0;
-
-        return total + amount;
-      }, 0);
+        ),
+      )
+      .reduce(
+        (total, recovery) =>
+          total +
+          (Number(recovery?.recoveryAmount ?? recovery?.amount ?? 0) || 0),
+        0,
+      );
   }, [recoveryExpensesData, selectedYear, selectedMonth]);
-
-  // =========================================================
-  // CURRENCY FORMAT
-  // =========================================================
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-PK").format(Number(amount) || 0);
@@ -511,15 +381,11 @@ const Expenses = () => {
   // =========================================================
 
   const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((previousPage) => previousPage - 1);
-    }
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
   };
 
   const handleNextPage = () => {
-    if (currentPage < filteredTotalPages) {
-      setCurrentPage((previousPage) => previousPage + 1);
-    }
+    if (currentPage < filteredTotalPages) setCurrentPage((prev) => prev + 1);
   };
 
   const handlePageChange = (page) => {
@@ -529,7 +395,7 @@ const Expenses = () => {
   };
 
   // =========================================================
-  // ADD NORMAL EXPENSE
+  // CRUD HANDLERS
   // =========================================================
 
   const handleAddExpense = () => {
@@ -537,231 +403,159 @@ const Expenses = () => {
     setIsModalOpen(true);
   };
 
-  // =========================================================
-  // NORMAL EXPENSE SUCCESS
-  // =========================================================
-
   const handleExpenseSuccess = async () => {
     setIsModalOpen(false);
     setEditingExpense(null);
-
     await fetchExpenses();
   };
-
-  // =========================================================
-  // EDIT NORMAL EXPENSE
-  // =========================================================
-
-  const handleEdit = (expense) => {
-    setEditingExpense(expense);
-    setIsModalOpen(true);
-  };
-
-  // =========================================================
-  // DELETE NORMAL EXPENSE
-  // =========================================================
-
-  const handleDelete = async (expense) => {
-    const expenseId = expense?._id || expense?.id || expense?.expenseId;
-
-    if (!expenseId) {
-      window.alert("Expense ID is missing. Cannot delete this expense.");
-      return;
-    }
-
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this expense?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      setDeletingExpenseId(expenseId);
-
-      await deleteExpense(expenseId);
-
-      window.alert("Expense deleted successfully.");
-
-      await fetchExpenses();
-    } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        error?.message ||
-        "Failed to delete expense.";
-
-      window.alert(errorMessage);
-    } finally {
-      setDeletingExpenseId(null);
-    }
-  };
-
-  // =========================================================
-  // CREATE RECOVERY EXPENSE
-  // =========================================================
-
-  const handleRecoveryExpense = async (data) => {
-    try {
-      const recoveryExpenseData = {
-        date: data?.date,
-        category: data?.category,
-        recoveryAmount: Number(data?.recoveryAmount),
-        remarks: data?.remarks,
-        paymentMode: data?.paymentMode,
-      };
-
-      await createRecoveryExpense(recoveryExpenseData);
-
-      window.alert("Recovery expense created successfully.");
-
-      setIsRecoveryModalOpen(false);
-
-      await Promise.all([fetchExpenses(), fetchRecoveryExpenses()]);
-    } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        error?.message ||
-        "Failed to create recovery expense.";
-
-      window.alert(errorMessage);
-    }
-  };
-
-  // =========================================================
-  // CLOSE NORMAL EXPENSE MODAL
-  // =========================================================
 
   const handleCloseExpenseModal = () => {
     setIsModalOpen(false);
     setEditingExpense(null);
   };
 
-  // =========================================================
-  // ADD NEW DIESEL EXPENSE
-  // =========================================================
-
-  const handleAddDieselExpense = () => {
-    setIsDieselModalOpen(true);
+  const handleEdit = (expense) => {
+    setEditingExpense(expense);
+    setIsModalOpen(true);
   };
 
-  // =========================================================
-  // CLOSE DIESEL EXPENSE MODAL
-  // =========================================================
+  const handleDelete = async (expense) => {
+    const expenseId = expense?._id || expense?.id || expense?.expenseId;
+    if (!expenseId) {
+      window.alert("Expense ID is missing.");
+      return;
+    }
 
-  const handleCloseDieselModal = () => {
-    setIsDieselModalOpen(false);
+    if (!window.confirm("Are you sure you want to delete this expense?"))
+      return;
+
+    try {
+      setDeletingExpenseId(expenseId);
+      await deleteExpense(expenseId);
+      window.alert("Expense deleted successfully.");
+      await fetchExpenses();
+    } catch (error) {
+      window.alert("Failed to delete expense.");
+    } finally {
+      setDeletingExpenseId(null);
+    }
   };
 
-  // =========================================================
-  // CREATE DIESEL EXPENSE
-  // =========================================================
+  const handleRecoveryExpense = async (data) => {
+    try {
+      await createRecoveryExpense({
+        date: data?.date,
+        category: data?.category,
+        recoveryAmount: Number(data?.recoveryAmount),
+        remarks: data?.remarks,
+        paymentMode: data?.paymentMode,
+      });
+      window.alert("Recovery expense created successfully.");
+      setIsRecoveryModalOpen(false);
+      await Promise.all([fetchExpenses(), fetchRecoveryExpenses()]);
+    } catch (error) {
+      window.alert("Failed to create recovery expense.");
+    }
+  };
 
   const handleDieselExpense = async (data) => {
     try {
       setIsDieselSubmitting(true);
-
-      const dieselExpenseData = {
+      await createDieselExpense({
         date: data?.date,
         dieselQuantity: Number(data?.dieselQuantity),
         amount: Number(data?.amount),
         remarks: data?.remarks || "",
-      };
-
-      await createDieselExpense(dieselExpenseData);
-
+      });
       window.alert("Diesel expense created successfully.");
-
       setIsDieselModalOpen(false);
-
       await fetchExpenses();
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        error?.message ||
-        "Failed to create diesel expense.";
-
-      window.alert(errorMessage);
+      window.alert("Failed to create diesel expense.");
     } finally {
       setIsDieselSubmitting(false);
     }
   };
 
-  // =========================================================
-  // CREATE NEW OWNER
-  // =========================================================
+  const handleCloseDieselModal = () => {
+    setIsDieselModalOpen(false);
+  };
 
   const handleAddOwner = async (data) => {
     try {
-      const ownerData = {
-        ownerName: data?.ownerName?.trim(),
-      };
-
-      if (!ownerData.ownerName) {
+      const ownerName = data?.ownerName?.trim();
+      if (!ownerName) {
         window.alert("Please enter an owner name.");
         return;
       }
-
-      await createOwner(ownerData);
-
+      await createOwner({ ownerName });
       window.alert("Owner created successfully.");
-
       setIsAddOwnerModalOpen(false);
-
       await fetchOwners();
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        error?.message ||
-        "Failed to create owner.";
-
-      window.alert(errorMessage);
+      window.alert("Failed to create owner.");
     }
   };
-
-  // =========================================================
-  // CREATE OWNER EXPENSE
-  // =========================================================
 
   const handleOwnerExpense = async (data) => {
     try {
       setIsOwnerExpenseSubmitting(true);
-
-      const ownerExpenseData = {
+      await createOwnerExpense({
         date: data?.date,
         amount: Number(data?.amount),
         paymentMode: data?.paymentMode,
         owner: data?.owner,
         status: data?.status,
         remarks: data?.remarks || "",
-      };
-
-      await createOwnerExpense(ownerExpenseData);
-
+      });
       window.alert("Owner expense created successfully.");
-
       setIsOwnerExpenseModalOpen(false);
-
       await fetchExpenses();
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        error?.message ||
-        "Failed to create owner expense.";
-
-      window.alert(errorMessage);
+      window.alert("Failed to create owner expense.");
     } finally {
       setIsOwnerExpenseSubmitting(false);
     }
   };
 
   // =========================================================
-  // LOADING STATE
+  // CATEGORY CARD CLICK FILTERING LOGIC
+  // =========================================================
+
+  const filteredCategoryExpenses = useMemo(() => {
+    if (!selectedCategoryName) return [];
+    return selectedMonthExpenses.filter((expense) => {
+      let currentCatName = "Uncategorized";
+      const catField = expense?.category;
+
+      if (typeof catField === "string") {
+        currentCatName = catField.trim();
+      } else if (typeof catField === "object" && catField !== null) {
+        currentCatName =
+          catField?.name ||
+          catField?.title ||
+          catField?.categoryName ||
+          "Uncategorized";
+      } else if (expense?.categoryName) {
+        currentCatName = String(expense.categoryName).trim();
+      }
+
+      return (
+        currentCatName.toLowerCase() ===
+        String(selectedCategoryName).toLowerCase()
+      );
+    });
+  }, [selectedMonthExpenses, selectedCategoryName]);
+
+  const categoryTotalAmount = useMemo(() => {
+    return filteredCategoryExpenses.reduce(
+      (sum, item) => sum + getAmount(item),
+      0,
+    );
+  }, [filteredCategoryExpenses]);
+
+  // =========================================================
+  // STATES LOADING / ERROR
   // =========================================================
 
   if (isLoading) {
@@ -774,17 +568,12 @@ const Expenses = () => {
     );
   }
 
-  // =========================================================
-  // ERROR STATE
-  // =========================================================
-
   if (error) {
     return (
       <div className="exp-page-container">
         <div className="exp-content-wrapper">
           <div className="exp-error">
             <p>{error}</p>
-
             <button type="button" onClick={fetchExpenses}>
               Try Again
             </button>
@@ -795,15 +584,153 @@ const Expenses = () => {
   }
 
   // =========================================================
-  // MAIN UI
+  // MAIN UI RENDER
   // =========================================================
 
   return (
     <div className="exp-page-container">
       <div className="exp-content-wrapper">
-        {showCategories ? (
+        {/* ================= 1. CATEGORY DETAIL PAGE ================= */}
+        {selectedCategoryName ? (
           <div>
-            {/* CATEGORY VIEW TITLE */}
+            <div className="exp-title-row">
+              <div className="exp-title-section">
+                <h1 className="exp-page-title">
+                  {selectedCategoryName} Expenses
+                </h1>
+                <p className="exp-page-subtitle">
+                  Manage and view detailed operational costs for{" "}
+                  <strong>{selectedCategoryName}</strong>.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="exp-btn-view-categories"
+                onClick={() => setSelectedCategoryName(null)}
+              >
+                <ArrowLeft size={18} />
+                <span>Back to Categories</span>
+              </button>
+            </div>
+
+            <div className="exp-selected-month">
+              <Calendar size={16} />
+              <span>
+                Showing data for <strong>{selectedMonthLabel}</strong>
+              </span>
+            </div>
+
+            <div className="exp-stats-grid exp-category-stats">
+              <div className="exp-stat-card">
+                <div className="exp-stat-info">
+                  <span className="exp-stat-label">
+                    TOTAL {selectedCategoryName.toUpperCase()} SPENT
+                  </span>
+                  <h2 className="exp-stat-value">
+                    Rs. {formatCurrency(categoryTotalAmount)}
+                  </h2>
+                  <span className="exp-stat-sub">
+                    Total for {selectedMonthLabel}
+                  </span>
+                </div>
+              </div>
+
+              <div className="exp-stat-card">
+                <div className="exp-stat-info">
+                  <span className="exp-stat-label">TRANSACTIONS COUNT</span>
+                  <h2 className="exp-stat-value">
+                    {filteredCategoryExpenses.length}
+                  </h2>
+                  <span className="exp-stat-sub">Total entries logged</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="exp-category-transactions">
+              <div className="exp-category-transactions-header">
+                <h3 className="exp-category-transactions-title">
+                  {selectedMonthLabel} {selectedCategoryName} Transactions
+                </h3>
+                <Filter size={18} color="#64748b" />
+              </div>
+
+              <div className="exp-category-table-wrap">
+                <table className="exp-category-table">
+                  <thead>
+                    <tr className="exp-category-table-head">
+                      <th className="exp-category-table-cell">Date</th>
+                      <th className="exp-category-table-cell">Payment Mode</th>
+                      <th className="exp-category-table-cell">
+                        Remarks / Details
+                      </th>
+                      <th className="exp-category-table-cell">Amount (Rs.)</th>
+                      <th className="exp-category-table-cell">Status</th>
+                      <th className="exp-category-table-cell exp-category-table-cell-right">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCategoryExpenses.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" className="exp-category-empty">
+                          No expense transactions found for{" "}
+                          {selectedCategoryName} in {selectedMonthLabel}.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredCategoryExpenses.map((expense) => {
+                        const id = expense?._id || expense?.id;
+                        return (
+                          <tr key={id} className="exp-category-table-row">
+                            <td className="exp-category-table-cell">
+                              {getDateOnly(getDate(expense))}
+                            </td>
+                            <td className="exp-category-table-cell">
+                              {expense?.paymentMode || "Cash Account"}
+                            </td>
+                            <td className="exp-category-table-cell">
+                              {expense?.remarks || "-"}
+                            </td>
+                            <td className="exp-category-table-cell exp-amount-cell">
+                              Rs. {formatCurrency(getAmount(expense))}
+                            </td>
+                            <td className="exp-category-table-cell">
+                              <span className="exp-status-pill">
+                                {expense?.status || "Paid"}
+                              </span>
+                            </td>
+                            <td className="exp-category-table-cell exp-actions-cell">
+                              <div className="exp-row-actions">
+                                <button
+                                  type="button"
+                                  onClick={() => handleEdit(expense)}
+                                  className="exp-icon-button"
+                                >
+                                  <Edit3 size={16} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDelete(expense)}
+                                  className="exp-icon-button exp-icon-button-danger"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        ) : showCategories ? (
+          /* ================= 2. CATEGORY CARDS VIEW ================= */
+          <div>
             <div className="exp-title-row">
               <div className="exp-title-section">
                 <h1 className="exp-page-title">Expense Categories</h1>
@@ -822,7 +749,6 @@ const Expenses = () => {
               </button>
             </div>
 
-            {/* SELECTED MONTH INFO */}
             <div className="exp-selected-month">
               <Calendar size={16} />
               <span>
@@ -830,16 +756,17 @@ const Expenses = () => {
               </span>
             </div>
 
-            {/* EXPENSE CATEGORY CARDS COMPONENT */}
-            <ExpenseCategoryCards expenses={selectedMonthExpenses} />
+            <ExpenseCategoryCards
+              expenses={selectedMonthExpenses}
+              onSelectCategory={(catName) => setSelectedCategoryName(catName)}
+            />
           </div>
         ) : (
+          /* ================= 3. MAIN DASHBOARD VIEW ================= */
           <>
-            {/* TITLE */}
             <div className="exp-title-row">
               <div className="exp-title-section">
                 <h1 className="exp-page-title">Expenses</h1>
-
                 <p className="exp-page-subtitle">
                   Manage and track station operational costs.
                 </p>
@@ -857,10 +784,8 @@ const Expenses = () => {
               </div>
             </div>
 
-            {/* SELECTED MONTH INFO */}
             <div className="exp-selected-month">
               <Calendar size={16} />
-
               <span>
                 Viewing expense records for{" "}
                 <strong>{selectedMonthLabel}</strong>
@@ -876,14 +801,11 @@ const Expenses = () => {
                     <br />
                     EXPENSES
                   </span>
-
                   <h2 className="exp-stat-value">
                     Rs. {formatCurrency(todayExpenses)}
                   </h2>
-
                   <span className="exp-stat-sub">Total outgoings today</span>
                 </div>
-
                 <div className="exp-icon-box exp-icon-red">
                   <TrendingDown size={18} />
                 </div>
@@ -896,16 +818,13 @@ const Expenses = () => {
                     <br />
                     EXPENSES
                   </span>
-
                   <h2 className="exp-stat-value">
                     Rs. {formatCurrency(monthExpenses)}
                   </h2>
-
                   <span className="exp-stat-sub">
                     Total for {selectedMonthLabel}
                   </span>
                 </div>
-
                 <div className="exp-icon-box exp-icon-blue">
                   <Calendar size={18} />
                 </div>
@@ -914,16 +833,13 @@ const Expenses = () => {
               <div className="exp-stat-card">
                 <div className="exp-stat-info">
                   <span className="exp-stat-label">RECOVERY EXPENSES</span>
-
                   <h2 className="exp-stat-value">
                     Rs. {formatCurrency(selectedMonthRecoveryExpenses)}
                   </h2>
-
                   <span className="exp-stat-sub">
                     Total for {selectedMonthLabel}
                   </span>
                 </div>
-
                 <div className="exp-icon-box exp-icon-red">
                   <TrendingDown size={18} />
                 </div>
@@ -956,7 +872,7 @@ const Expenses = () => {
                 <button
                   type="button"
                   className="exp-btn-action exp-btn-dark"
-                  onClick={handleAddDieselExpense}
+                  onClick={() => setIsDieselModalOpen(true)}
                 >
                   <PlusCircle size={18} />
                   <span>Diesel Expense</span>
@@ -1041,7 +957,7 @@ const Expenses = () => {
         )}
       </div>
 
-      {/* ADD / EDIT NORMAL EXPENSE MODAL */}
+      {/* MODALS */}
       <AddNewExpenses
         isOpen={isModalOpen}
         onClose={handleCloseExpenseModal}
@@ -1049,14 +965,12 @@ const Expenses = () => {
         editingExpense={editingExpense}
       />
 
-      {/* RECOVERY EXPENSE MODAL */}
       <ExpenseRecoveryModal
         isOpen={isRecoveryModalOpen}
         onClose={() => setIsRecoveryModalOpen(false)}
         onSubmit={handleRecoveryExpense}
       />
 
-      {/* ADD DIESEL EXPENSE MODAL */}
       <AddDieselExpenseModal
         isOpen={isDieselModalOpen}
         onClose={handleCloseDieselModal}
@@ -1065,18 +979,14 @@ const Expenses = () => {
         isSubmitting={isDieselSubmitting}
       />
 
-      {/* OWNER EXPENSE MODAL */}
       <RecordOwnerExpenseModal
         isOpen={isOwnerExpenseModalOpen}
         onClose={() => setIsOwnerExpenseModalOpen(false)}
         onSubmit={handleOwnerExpense}
         owners={owners}
-        ownersLoading={false}
-        ownersError=""
         isSubmitting={isOwnerExpenseSubmitting}
       />
 
-      {/* ADD OWNER MODAL */}
       <AddNewOwnerModal
         isOpen={isAddOwnerModalOpen}
         onClose={() => setIsAddOwnerModalOpen(false)}

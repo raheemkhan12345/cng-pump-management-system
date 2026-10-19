@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Folder } from "lucide-react";
 import "./ExpenseCategoryCards.css";
 
-const ExpenseCategoryCards = ({ expenses = [] }) => {
+const ExpenseCategoryCards = ({ expenses = [], onSelectCategory }) => {
   const categoryTotals = useMemo(() => {
     if (!Array.isArray(expenses) || expenses.length === 0) {
       return [];
@@ -59,7 +59,12 @@ const ExpenseCategoryCards = ({ expenses = [] }) => {
   return (
     <div className="category-cards-grid">
       {categoryTotals.map(({ category, totalAmount }) => (
-        <div key={category} className="category-card">
+        <div
+          key={category}
+          className="category-card"
+          onClick={() => onSelectCategory && onSelectCategory(category)}
+          style={{ cursor: "pointer" }}
+        >
           <div className="category-card-header">
             <span className="category-card-title">{category}</span>
             <div className="category-card-icon">

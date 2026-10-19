@@ -1,39 +1,34 @@
-
 /* =========================================================
-   EXPENSES PAGE
+   EXPENSES PAGE — layout, components and responsive styles
 ========================================================= */
 
 .exp-page-container {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-
   min-height: 100vh;
   min-height: 100dvh;
-
   padding: 24px 30px;
   box-sizing: border-box;
-
+  overflow-x: hidden;
   background: #f8fafc;
   color: #1e293b;
-
-  overflow-x: hidden;
 }
 
-/* =========================================================
-   HEADER
-========================================================= */
+.exp-content-wrapper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0 auto;
+}
 
 .exp-header-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   gap: 16px;
-
   width: 100%;
   min-width: 0;
-
   margin-bottom: 20px;
 }
 
@@ -41,12 +36,9 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-
   gap: 10px;
-
   min-width: 0;
   max-width: 100%;
-
   color: #0f172a;
   font-size: 15px;
   font-weight: 600;
@@ -60,404 +52,62 @@
 .exp-location-text {
   min-width: 0;
   max-width: 100%;
-
   color: #64748b;
   font-weight: 500;
-
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-/* =========================================================
-   TITLE SECTION
-========================================================= */
 
 .exp-title-row {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-
   gap: 24px;
-
   width: 100%;
   min-width: 0;
-
   margin-bottom: 24px;
 }
 
 .exp-title-section {
   display: flex;
-  flex-direction: column;
-
-  min-width: 0;
   flex: 1;
-}
-
-.exp-selected-month {
-  margin-top: 4px;
-  font-size: 13px;
-  color: #64748b;
-
+  flex-direction: column;
+  min-width: 0;
 }
 
 .exp-page-title {
   min-width: 0;
-
   margin: 0 0 5px;
-
   color: #0f172a;
-
   font-size: 24px;
   font-weight: 700;
   line-height: 1.25;
-
   overflow-wrap: anywhere;
 }
 
 .exp-page-subtitle {
   min-width: 0;
-
   margin: 0;
-
   color: #64748b;
-
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
-
   overflow-wrap: anywhere;
 }
 
-/* =========================================================
-   ADD OWNERS BUTTON
-========================================================= */
-
-.exp-btn-add-owners {
-  display: inline-flex;
+.exp-selected-month {
+  display: flex;
   align-items: center;
-  justify-content: center;
-
   gap: 8px;
-
-  flex-shrink: 0;
-
-  min-height: 42px;
-
-  padding: 10px 20px;
-
-  box-sizing: border-box;
-
-  border: none;
-  border-radius: 8px;
-
-  background: #007a3d;
-  color: #ffffff;
-
-  font-family: inherit;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  white-space: nowrap;
-
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.exp-btn-add-owners:hover {
-  background: #006331;
-}
-
-.exp-btn-add-owners:focus-visible {
-  outline: 2px solid #007a3d;
-  outline-offset: 2px;
-}
-
-.exp-btn-add-owners:active {
-  transform: scale(0.98);
-}
-
-/* =========================================================
-   EXPENSE STATISTICS
-========================================================= */
-
-.exp-stats-grid {
-  display: grid;
-
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  gap: 20px;
-
-  width: 100%;
-  min-width: 0;
-
-  margin-bottom: 24px;
-
-  box-sizing: border-box;
-}
-
-.exp-stat-card {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-
-  gap: 16px;
-
-  width: 100%;
-  min-width: 0;
-  min-height: 120px;
-
-  padding: 20px;
-
-  box-sizing: border-box;
-
-  background: #ffffff;
-
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-
-  overflow: hidden;
-}
-
-.exp-stat-info {
-  display: flex;
-  flex-direction: column;
-
-  min-width: 0;
-  flex: 1;
-}
-
-.exp-stat-label {
-  min-width: 0;
-
-  margin: 0;
-
+  margin: 0 0 20px;
   color: #64748b;
-
-  font-size: 11px;
-  font-weight: 700;
-
-  letter-spacing: 0.5px;
-  line-height: 1.3;
-
-  text-transform: uppercase;
-
-  overflow-wrap: anywhere;
+  font-size: 13px;
 }
 
-.exp-stat-value {
-  min-width: 0;
-  max-width: 100%;
-
-  margin: 9px 0 4px;
-
-  color: #0f172a;
-
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.2;
-
-  overflow-wrap: anywhere;
-  word-break: break-word;
+.exp-selected-month strong {
+  color: #334155;
 }
-
-.exp-stat-sub {
-  min-width: 0;
-
-  margin: 0;
-
-  color: #94a3b8;
-
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.4;
-
-  overflow-wrap: anywhere;
-}
-
-/* =========================================================
-   STAT ICONS
-========================================================= */
-
-.exp-icon-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex: 0 0 36px;
-
-  width: 36px;
-  height: 36px;
-
-  border-radius: 8px;
-
-  box-sizing: border-box;
-}
-
-.exp-icon-red {
-  background: #fee2e2;
-  color: #ef4444;
-}
-
-.exp-icon-blue {
-  background: #e0f2fe;
-  color: #0284c7;
-}
-
-/* =========================================================
-   ACTION BUTTONS CONTAINER
-========================================================= */
-
-.exp-actions-container {
-  display: flex;
-  flex-direction: column;
-
-  gap: 16px;
-
-  width: 100%;
-  min-width: 0;
-
-  margin-bottom: 28px;
-}
-
-/* =========================================================
-   FIRST ROW - 3 BUTTONS
-========================================================= */
-
-.exp-action-row-1 {
-  display: grid;
-
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  gap: 16px;
-
-  width: 100%;
-  min-width: 0;
-}
-
-/* =========================================================
-   SECOND ROW - 2 BUTTONS
-========================================================= */
-
-.exp-action-row-2 {
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 16px;
-
-  width: 66.6667%;
-  min-width: 0;
-}
-
-/* =========================================================
-   COMMON ACTION BUTTON
-========================================================= */
-
-.exp-btn-action {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 10px;
-
-  width: 100%;
-  min-width: 0;
-
-  min-height: 48px;
-
-  padding: 0 16px;
-
-  box-sizing: border-box;
-
-  border-radius: 8px;
-
-  font-family: inherit;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  white-space: nowrap;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.exp-btn-action:focus-visible {
-  outline: 2px solid #007a3d;
-  outline-offset: 2px;
-}
-
-.exp-btn-action:active {
-  transform: scale(0.98);
-}
-
-/* =========================================================
-   GREEN BUTTON
-========================================================= */
-
-.exp-btn-green {
-  border: 1px solid #007a3d;
-
-  background: #007a3d;
-  color: #ffffff;
-}
-
-.exp-btn-green:hover {
-  background: #006331;
-  border-color: #006331;
-}
-
-/* =========================================================
-   DARK BUTTON
-========================================================= */
-
-.exp-btn-dark {
-  border: 1px solid #1e293b;
-
-  background: #1e293b;
-  color: #ffffff;
-}
-
-.exp-btn-dark:hover {
-  background: #0f172a;
-  border-color: #0f172a;
-}
-
-/* =========================================================
-   OUTLINE BUTTON
-========================================================= */
-
-.exp-btn-outline {
-  border: 1px solid #e2e8f0;
-
-  background: #ffffff;
-  color: #1e293b;
-}
-
-.exp-btn-outline:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-}
-
-/* =========================================================
-   TITLE ACTION BUTTONS
-   Add this block to the end of Expenses.css
-========================================================= */
 
 .exp-title-actions {
   display: flex;
@@ -469,22 +119,17 @@
   min-width: 0;
 }
 
-/* =========================================================
-   VIEW CATEGORIES BUTTON
-========================================================= */
-
+.exp-btn-add-owners,
 .exp-btn-view-categories {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  flex-shrink: 0;
   min-height: 42px;
   padding: 10px 20px;
   box-sizing: border-box;
-  border: 1px solid #444645;
   border-radius: 8px;
-  background: #ffffff;
-  color: #000;
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
@@ -497,129 +142,258 @@
     transform 0.2s ease;
 }
 
-.exp-btn-view-categories:hover {
-  background: #a8abaa;
-  border-color: #a8abaa;
-  color: #ffffff;
+.exp-btn-add-owners {
+  border: 1px solid #007a3d;
+  background: #007a3d;
+  color: #fff;
 }
 
-.exp-btn-view-categories:focus-visible {
+.exp-btn-add-owners:hover {
+  background: #006331;
+  border-color: #006331;
+}
+
+.exp-btn-view-categories {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #1e293b;
+}
+
+.exp-btn-view-categories:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.exp-btn-add-owners:focus-visible,
+.exp-btn-view-categories:focus-visible,
+.exp-btn-action:focus-visible,
+.exp-pagination-btn:focus-visible,
+.exp-pagination-page:focus-visible {
   outline: 2px solid #007a3d;
   outline-offset: 2px;
 }
 
-.exp-btn-view-categories:active {
+.exp-btn-add-owners:active,
+.exp-btn-view-categories:active,
+.exp-btn-action:active {
   transform: scale(0.98);
 }
 
-@media (max-width: 768px) {
-  .exp-title-actions {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .exp-title-actions .exp-btn-view-categories,
-  .exp-title-actions .exp-btn-add-owners {
-    width: 100%;
-  }
+.exp-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 24px;
+  box-sizing: border-box;
 }
 
-@media (max-width: 600px) {
-  .exp-btn-view-categories {
-    min-height: 42px;
-    padding: 10px 16px;
-    font-size: 13px;
-  }
+.exp-stat-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  min-height: 120px;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
 }
 
-@media (max-width: 360px) {
-  .exp-btn-view-categories {
-    min-height: 40px;
-    padding: 9px 12px;
-    font-size: 12px;
-  }
+.exp-stat-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
 }
 
-@media (hover: none) and (pointer: coarse) {
-  .exp-btn-view-categories {
-    min-height: 44px;
-  }
+.exp-stat-label {
+  min-width: 0;
+  margin: 0;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .exp-btn-view-categories {
-    transition: none;
-  }
+.exp-stat-value {
+  min-width: 0;
+  max-width: 100%;
+  margin: 9px 0 4px;
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
+.exp-stat-sub {
+  min-width: 0;
+  margin: 0;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
 
-/* =========================================================
-   LOADING / ERROR
-========================================================= */
+.exp-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  box-sizing: border-box;
+  border-radius: 8px;
+}
+
+.exp-icon-red {
+  background: #fee2e2;
+  color: #ef4444;
+}
+.exp-icon-blue {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.exp-actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 28px;
+}
+
+.exp-action-row-1,
+.exp-action-row-2 {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+.exp-action-row-1 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.exp-action-row-2 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.exp-btn-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.exp-btn-green {
+  border-color: #007a3d;
+  background: #007a3d;
+  color: #fff;
+}
+.exp-btn-green:hover {
+  border-color: #006331;
+  background: #006331;
+}
+.exp-btn-dark {
+  border-color: #1e293b;
+  background: #1e293b;
+  color: #fff;
+}
+.exp-btn-dark:hover {
+  border-color: #0f172a;
+  background: #0f172a;
+}
+.exp-btn-outline {
+  border-color: #e2e8f0;
+  background: #fff;
+  color: #1e293b;
+}
+.exp-btn-outline:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
 
 .exp-loading,
 .exp-error {
   width: 100%;
   min-width: 0;
-
   padding: 24px;
-
   box-sizing: border-box;
-
   text-align: center;
-
   border-radius: 10px;
-
   overflow-wrap: anywhere;
 }
 
 .exp-loading {
   color: #64748b;
-
-  background: #ffffff;
-
+  background: #fff;
   border: 1px solid #e2e8f0;
 }
-
 .exp-error {
   color: #dc2626;
-
   background: #fef2f2;
-
   border: 1px solid #fecaca;
 }
-
-/* =========================================================
-   PAGINATION
-========================================================= */
+.exp-error p {
+  margin: 0 0 12px;
+}
+.exp-error button {
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 7px;
+  background: #007a3d;
+  color: #fff;
+  cursor: pointer;
+}
 
 .exp-pagination {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   gap: 16px;
-
   width: 100%;
   min-width: 0;
-
   margin-top: 20px;
   padding: 14px 0;
-
   box-sizing: border-box;
 }
 
 .exp-pagination-info {
   min-width: 0;
-
   color: #64748b;
-
   font-size: 13px;
-
   overflow-wrap: anywhere;
 }
-
 .exp-pagination-info strong {
   color: #1e293b;
   font-weight: 600;
@@ -629,9 +403,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-
   gap: 6px;
-
   min-width: 0;
   max-width: 100%;
 }
@@ -639,9 +411,7 @@
 .exp-pagination-pages {
   display: flex;
   align-items: center;
-
   gap: 4px;
-
   min-width: 0;
 }
 
@@ -650,29 +420,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   min-width: 36px;
   height: 36px;
-
   padding: 0 10px;
-
   box-sizing: border-box;
-
   border: 1px solid #e2e8f0;
   border-radius: 7px;
-
-  background: #ffffff;
+  background: #fff;
   color: #475569;
-
   font-family: inherit;
-
   font-size: 13px;
   font-weight: 500;
-
   cursor: pointer;
-
   flex-shrink: 0;
-
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease,
@@ -687,498 +447,454 @@
 
 .exp-pagination-page.active {
   border-color: #007a3d;
-
   background: #007a3d;
-  color: #ffffff;
+  color: #fff;
 }
-
 .exp-pagination-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* =========================================================
-   LARGE DESKTOP
-   1440px+
-========================================================= */
+.exp-category-stats {
+  margin-bottom: 28px;
+}
+
+/* Category transaction table */
+.exp-category-transactions {
+  width: 100%;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.exp-category-transactions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.exp-category-transactions-header h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.exp-category-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+.exp-category-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.exp-category-table thead tr {
+  background: #1e293b;
+  color: #fff;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.exp-category-table th {
+  padding: 14px 20px;
+  white-space: nowrap;
+}
+.exp-category-table th:last-child {
+  text-align: right;
+}
+.exp-category-table-cell-right {
+  text-align: right;
+}
+.exp-category-table-head {
+  background: #1e293b;
+  color: #fff;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.exp-category-table-row {
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  font-size: 14px;
+}
+.exp-category-transactions-title {
+  margin: 0;
+  color: #1e293b;
+  font-size: 18px;
+  font-weight: 700;
+}
+.exp-category-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  font-size: 14px;
+}
+.exp-category-table tbody tr:last-child {
+  border-bottom: 0;
+}
+.exp-category-table td {
+  padding: 16px 20px;
+}
+.exp-category-table .exp-amount-cell {
+  color: #0f172a;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.exp-category-table .exp-actions-cell {
+  text-align: right;
+}
+.exp-category-table .exp-row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.exp-category-table .exp-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #475569;
+  cursor: pointer;
+}
+.exp-category-table .exp-icon-button:hover {
+  background: #f1f5f9;
+}
+.exp-category-table .exp-icon-button-danger {
+  color: #dc2626;
+}
+.exp-category-table .exp-status-pill {
+  display: inline-flex;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.exp-category-empty {
+  padding: 30px !important;
+  color: #64748b;
+  text-align: center;
+}
 
 @media (min-width: 1440px) {
   .exp-page-container {
     padding: 28px 32px;
   }
-
   .exp-stats-grid {
     gap: 24px;
   }
-
   .exp-stat-card {
     padding: 22px;
   }
-
   .exp-stat-value {
     font-size: 25px;
   }
 }
 
-/* =========================================================
-   DESKTOP
-   1201px - 1439px
-========================================================= */
-
-@media (max-width: 1439px) {
-  .exp-page-container {
-    padding: 24px 30px;
-  }
-}
-
-/* =========================================================
-   LAPTOP
-   1025px - 1200px
-========================================================= */
-
 @media (max-width: 1200px) {
   .exp-page-container {
     padding: 22px 24px;
   }
-
   .exp-stats-grid {
     gap: 16px;
   }
-
   .exp-stat-card {
     padding: 18px;
   }
-
   .exp-stat-value {
     font-size: 22px;
   }
-
   .exp-action-row-1,
   .exp-action-row-2 {
     gap: 14px;
   }
-
   .exp-btn-action {
     padding-left: 12px;
     padding-right: 12px;
   }
 }
 
-/* =========================================================
-   TABLET LANDSCAPE
-   769px - 1024px
-========================================================= */
-
 @media (max-width: 1024px) {
   .exp-page-container {
     padding: 20px;
   }
-
   .exp-header-bar {
     margin-bottom: 18px;
   }
-
-  /* Stats */
-
   .exp-stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-
     gap: 16px;
   }
-
   .exp-stat-card:last-child {
     grid-column: span 2;
   }
-
-  /* Actions */
-
   .exp-action-row-1 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
   .exp-action-row-2 {
-    width: 100%;
-
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-
-/* =========================================================
-   TABLET / LARGE MOBILE
-   601px - 768px
-========================================================= */
 
 @media (max-width: 768px) {
   .exp-page-container {
     padding: 16px;
   }
-
-  /* Header */
-
   .exp-header-bar {
     align-items: flex-start;
     flex-direction: column;
-
     gap: 8px;
-
     margin-bottom: 18px;
   }
-
   .exp-header-left {
     width: 100%;
     font-size: 14px;
   }
-
-  /* Title */
-
   .exp-title-row {
     flex-direction: column;
     align-items: stretch;
-
     gap: 16px;
-
     margin-bottom: 20px;
   }
-
   .exp-page-title {
     font-size: 22px;
   }
-
   .exp-page-subtitle {
     font-size: 13px;
   }
-
-  .exp-btn-add-owners {
+  .exp-title-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .exp-title-actions .exp-btn-view-categories,
+  .exp-title-actions .exp-btn-add-owners {
     width: 100%;
   }
-
-  /* Stats */
-
   .exp-stats-grid {
     grid-template-columns: 1fr;
-
     gap: 14px;
   }
-
   .exp-stat-card:last-child {
     grid-column: auto;
   }
-
   .exp-stat-card {
     min-height: 110px;
     padding: 18px;
   }
-
   .exp-stat-value {
     font-size: 22px;
   }
-
-  /* Actions */
-
   .exp-actions-container {
     gap: 12px;
     margin-bottom: 22px;
   }
-
   .exp-action-row-1,
   .exp-action-row-2 {
-    width: 100%;
-
     grid-template-columns: 1fr;
-
     gap: 12px;
   }
-
   .exp-btn-action {
     min-height: 46px;
     font-size: 13px;
   }
-
-  /* Pagination */
-
   .exp-pagination {
     align-items: stretch;
     flex-direction: column;
-
     gap: 14px;
   }
-
   .exp-pagination-info {
     width: 100%;
     text-align: center;
   }
-
   .exp-pagination-controls {
     width: 100%;
-
     justify-content: center;
-
     overflow-x: auto;
-
     padding-bottom: 2px;
-
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
   }
+  .exp-category-transactions-header {
+    padding: 14px 16px;
+  }
+  .exp-category-transactions-header h3 {
+    font-size: 16px;
+  }
 }
-
-/* =========================================================
-   MOBILE
-   481px - 600px
-========================================================= */
 
 @media (max-width: 600px) {
   .exp-page-container {
     padding: 14px;
   }
-
   .exp-header-left {
     gap: 8px;
     font-size: 13px;
   }
-
   .exp-title-row {
     gap: 14px;
   }
-
   .exp-page-title {
     font-size: 21px;
   }
-
   .exp-page-subtitle {
     font-size: 12px;
   }
-
   .exp-stat-card {
     min-height: 105px;
     padding: 17px;
   }
-
   .exp-stat-value {
     font-size: 21px;
   }
-
-  .exp-btn-add-owners {
-    width: 100%;
-
+  .exp-btn-add-owners,
+  .exp-btn-view-categories {
     min-height: 42px;
-
     padding: 10px 16px;
-
     font-size: 13px;
   }
-
   .exp-btn-action {
     min-height: 45px;
   }
-
   .exp-pagination-controls {
     justify-content: flex-start;
   }
 }
-
-/* =========================================================
-   SMALL MOBILE
-   361px - 480px
-========================================================= */
 
 @media (max-width: 480px) {
   .exp-page-container {
     padding: 12px;
   }
-
   .exp-header-left {
     gap: 7px;
     font-size: 12px;
   }
-
   .exp-page-title {
     font-size: 20px;
   }
-
   .exp-page-subtitle {
     font-size: 12px;
     line-height: 1.45;
   }
-
-  .exp-btn-add-owners {
-    width: 100%;
-
-    min-height: 42px;
-
-    padding: 10px 16px;
-
-    font-size: 13px;
-  }
-
-  /* Stats */
-
   .exp-stat-card {
     min-height: 100px;
-
     padding: 16px;
-
     border-radius: 10px;
   }
-
   .exp-stat-label {
     font-size: 10px;
   }
-
   .exp-stat-value {
     margin-top: 8px;
     font-size: 20px;
   }
-
   .exp-stat-sub {
     font-size: 11px;
   }
-
   .exp-icon-box {
     width: 34px;
     height: 34px;
-
     flex-basis: 34px;
   }
-
-  /* Action Buttons */
-
   .exp-btn-action {
     min-height: 44px;
-
     padding: 0 12px;
-
     font-size: 12px;
-
     gap: 8px;
   }
-
-  /* Loading / Error */
-
   .exp-loading,
   .exp-error {
     padding: 20px 14px;
     font-size: 13px;
   }
-
-  /* Pagination */
-
   .exp-pagination {
     margin-top: 14px;
   }
-
   .exp-pagination-controls {
     justify-content: flex-start;
     width: 100%;
   }
-
   .exp-pagination-btn,
   .exp-pagination-page {
     min-width: 34px;
     height: 34px;
-
     padding: 0 8px;
-
     font-size: 12px;
   }
+  .exp-category-table th,
+  .exp-category-table td {
+    padding: 12px 14px;
+  }
 }
-
-/* =========================================================
-   VERY SMALL MOBILE
-   <=360px
-========================================================= */
 
 @media (max-width: 360px) {
   .exp-page-container {
     padding: 10px;
   }
-
   .exp-header-left {
     font-size: 11px;
   }
-
   .exp-page-title {
     font-size: 19px;
   }
-
   .exp-page-subtitle {
     font-size: 11px;
   }
-
   .exp-title-row {
     gap: 12px;
   }
-
-  /* Stats */
-
   .exp-stat-card {
     gap: 10px;
-
     min-height: 95px;
-
     padding: 14px;
   }
-
   .exp-stat-label {
     font-size: 9px;
   }
-
   .exp-stat-value {
     font-size: 18px;
   }
-
   .exp-stat-sub {
     font-size: 10px;
   }
-
   .exp-icon-box {
     width: 32px;
     height: 32px;
-
     flex-basis: 32px;
   }
-
-  /* Buttons */
-
-  .exp-btn-add-owners {
+  .exp-btn-add-owners,
+  .exp-btn-view-categories {
     min-height: 40px;
-
     padding: 9px 12px;
-
     font-size: 12px;
   }
-
   .exp-btn-action {
     min-height: 42px;
-
     padding: 0 10px;
-
     font-size: 11px;
-
     gap: 6px;
   }
-
-  /* Pagination */
-
   .exp-pagination-controls {
     gap: 4px;
   }
-
   .exp-pagination-btn,
   .exp-pagination-page {
     min-width: 32px;
     height: 32px;
-
     padding: 0 7px;
   }
 }
 
-/* =========================================================
-   TOUCH DEVICES
-========================================================= */
-
 @media (hover: none) and (pointer: coarse) {
   .exp-btn-add-owners,
+  .exp-btn-view-categories,
   .exp-btn-action,
   .exp-pagination-btn,
   .exp-pagination-page {
@@ -1186,12 +902,9 @@
   }
 }
 
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
 @media (prefers-reduced-motion: reduce) {
   .exp-btn-add-owners,
+  .exp-btn-view-categories,
   .exp-btn-action,
   .exp-pagination-btn,
   .exp-pagination-page {
