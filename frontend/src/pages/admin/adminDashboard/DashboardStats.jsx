@@ -48,7 +48,7 @@ const DashboardStats = ({ dashboardData = {} }) => {
       subtext: `${formatCurrency(dashboardData.dieselPurchased?.liters)} liters`,
       variant: "card-pink",
       subtextLarge: true,
-      path: "/admin/diesel-expense-history",
+      // path: "/admin/diesel-expense-history",
     },
 
     {

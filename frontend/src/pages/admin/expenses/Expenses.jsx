@@ -24,6 +24,7 @@ import {
   deleteExpense,
   createRecoveryExpense,
   getRecoveryExpenses,
+  getDieselExpenses,
   createDieselExpense,
   createOwner,
   getOwners,
@@ -122,6 +123,12 @@ const Expenses = () => {
   // =========================================================
 
   const [recoveryExpensesData, setRecoveryExpensesData] = useState([]);
+
+  // =========================================================
+  // DIESEL EXPENSE DATA
+  // =========================================================
+
+  const [dieselExpensesData, setDieselExpensesData] = useState([]);
 
   // =========================================================
   // OWNER DATA
@@ -249,6 +256,44 @@ const Expenses = () => {
   }, []);
 
   // =========================================================
+  // GET ALL DIESEL EXPENSES
+  // =========================================================
+
+  const fetchDieselExpenses = useCallback(async () => {
+    try {
+      const response = await getDieselExpenses();
+
+      let dieselData = [];
+
+      if (Array.isArray(response)) {
+        dieselData = response;
+      } else if (Array.isArray(response?.data)) {
+        dieselData = response.data;
+      } else if (Array.isArray(response?.data?.data)) {
+        dieselData = response.data.data;
+      } else if (Array.isArray(response?.dieselExpenses)) {
+        dieselData = response.dieselExpenses;
+      } else if (Array.isArray(response?.expenses)) {
+        dieselData = response.expenses;
+      } else if (Array.isArray(response?.result)) {
+        dieselData = response.result;
+      } else if (Array.isArray(response?.records)) {
+        dieselData = response.records;
+      } else if (Array.isArray(response?.data?.dieselExpenses)) {
+        dieselData = response.data.dieselExpenses;
+      } else if (Array.isArray(response?.data?.expenses)) {
+        dieselData = response.data.expenses;
+      }
+
+      setDieselExpensesData(dieselData);
+    } catch (error) {
+      // Keep the regular expense dashboard available if diesel loading fails.
+      console.error("Failed to load diesel expenses:", error);
+      setDieselExpensesData([]);
+    }
+  }, []);
+
+  // =========================================================
   // GET ALL OWNERS
   // =========================================================
 
@@ -281,8 +326,9 @@ const Expenses = () => {
   useEffect(() => {
     fetchExpenses();
     fetchRecoveryExpenses();
+    fetchDieselExpenses();
     fetchOwners();
-  }, [fetchExpenses, fetchRecoveryExpenses, fetchOwners]);
+  }, [fetchExpenses, fetchRecoveryExpenses, fetchDieselExpenses, fetchOwners]);
 
   // =========================================================
   // GET EXPENSE AMOUNT & DATE HELPERS
@@ -297,7 +343,26 @@ const Expenses = () => {
   };
 
   const getDate = (expense) => {
-    return expense?.date || expense?.expenseDate || expense?.createdAt || "";
+    return (
+      expense?.date ||
+      expense?.expenseDate ||
+      expense?.dieselDate ||
+      expense?.createdAt ||
+      ""
+    );
+  };
+
+  const getDieselAmount = (expense) => {
+    return (
+      Number(
+        expense?.amount ??
+          expense?.totalAmount ??
+          expense?.expenseAmount ??
+          expense?.dieselAmount ??
+          expense?.total ??
+          0,
+      ) || 0
+    );
   };
 
   const getDateOnly = (dateValue) => {
@@ -325,13 +390,27 @@ const Expenses = () => {
     return year === selectedYear && month === selectedMonth;
   };
 
-  const todayExpenses = allExpenses
+  // Regular expenses + diesel expenses for today's total.
+  const todayRegularExpenses = allExpenses
     .filter((expense) => getDateOnly(getDate(expense)) === todayDate)
     .reduce((total, expense) => total + getAmount(expense), 0);
 
-  const monthExpenses = allExpenses
+  const todayDieselExpenses = dieselExpensesData
+    .filter((expense) => getDateOnly(getDate(expense)) === todayDate)
+    .reduce((total, expense) => total + getDieselAmount(expense), 0);
+
+  const todayExpenses = todayRegularExpenses + todayDieselExpenses;
+
+  // Regular expenses + diesel expenses for the selected month's total.
+  const monthRegularExpenses = allExpenses
     .filter((expense) => isInSelectedMonth(getDate(expense)))
     .reduce((total, expense) => total + getAmount(expense), 0);
+
+  const monthDieselExpenses = dieselExpensesData
+    .filter((expense) => isInSelectedMonth(getDate(expense)))
+    .reduce((total, expense) => total + getDieselAmount(expense), 0);
+
+  const monthExpenses = monthRegularExpenses + monthDieselExpenses;
 
   const selectedMonthExpenses = useMemo(() => {
     return allExpenses
@@ -469,7 +548,7 @@ const Expenses = () => {
       });
       window.alert("Diesel expense created successfully.");
       setIsDieselModalOpen(false);
-      await fetchExpenses();
+      await Promise.all([fetchExpenses(), fetchDieselExpenses()]);
     } catch (error) {
       window.alert("Failed to create diesel expense.");
     } finally {
@@ -869,14 +948,14 @@ const Expenses = () => {
               </div>
 
               <div className="exp-action-row-2">
-                <button
+                {/* <button
                   type="button"
                   className="exp-btn-action exp-btn-dark"
                   onClick={() => setIsDieselModalOpen(true)}
                 >
                   <PlusCircle size={18} />
                   <span>Diesel Expense</span>
-                </button>
+                </button> */}
 
                 <button
                   type="button"
