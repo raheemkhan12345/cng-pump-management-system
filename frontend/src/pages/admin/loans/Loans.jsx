@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Plus,
@@ -47,14 +47,14 @@ const normalizeLoanType = (loanType) => {
 };
 
 const formatLoanType = (loanType) => {
-  const normalizedType = normalizeLoanType(loanType);
-
   const labels = {
     loan_given: "Loan Given",
     loan_received: "Loan Received",
     loan_return: "Loan Return",
     loan_recovery: "Loan Recovery",
   };
+
+  const normalizedType = normalizeLoanType(loanType);
 
   return labels[normalizedType] || normalizedType || "-";
 };
@@ -64,56 +64,64 @@ const formatLoanType = (loanType) => {
 // =========================================================
 
 const getSelectedDashboardMonth = () => {
+  const currentDate = new Date();
+
+  const defaultMonth = {
+    year: currentDate.getFullYear(),
+    month: currentDate.getMonth() + 1,
+  };
+
   try {
     const savedMonth = sessionStorage.getItem(DASHBOARD_MONTH_KEY);
 
-    if (savedMonth) {
-      const parsed = JSON.parse(savedMonth);
+    if (!savedMonth) {
+      return defaultMonth;
+    }
 
-      if (
-        parsed &&
-        Number.isInteger(parsed.year) &&
-        Number.isInteger(parsed.month) &&
-        parsed.month >= 1 &&
-        parsed.month <= 12
-      ) {
-        return parsed;
-      }
+    const parsed = JSON.parse(savedMonth);
+
+    const year = Number(parsed?.year);
+    const month = Number(parsed?.month);
+
+    if (
+      Number.isInteger(year) &&
+      Number.isInteger(month) &&
+      month >= 1 &&
+      month <= 12
+    ) {
+      return { year, month };
     }
   } catch (error) {
     console.error("Failed to read selected dashboard month:", error);
   }
 
-  const currentDate = new Date();
-
-  return {
-    year: currentDate.getFullYear(),
-    month: currentDate.getMonth() + 1,
-  };
+  return defaultMonth;
 };
 
 const isDateInSelectedMonth = (date, selectedYear, selectedMonth) => {
   if (!date) return false;
 
-  const dateString = String(date).split("T")[0];
-  const dateParts = dateString.split("-");
+  // Use the calendar date returned by the API.
+  // Avoid timezone shifts caused by parsing ISO timestamps.
+  const dateString = String(date).slice(0, 10);
+  const parts = dateString.split("-");
 
-  if (dateParts.length === 3) {
-    const year = Number(dateParts[0]);
-    const month = Number(dateParts[1]);
+  if (parts.length !== 3) return false;
 
-    if (Number.isInteger(year) && Number.isInteger(month)) {
-      return year === selectedYear && month === selectedMonth;
-    }
+  const year = Number(parts[0]);
+  const month = Number(parts[1]);
+  const day = Number(parts[2]);
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    !Number.isInteger(day)
+  ) {
+    return false;
   }
 
-  const parsedDate = new Date(date);
-
-  if (Number.isNaN(parsedDate.getTime())) return false;
-
   return (
-    parsedDate.getFullYear() === selectedYear &&
-    parsedDate.getMonth() + 1 === selectedMonth
+    year === selectedYear && month === selectedMonth && day >= 1 && day <= 31
   );
 };
 
@@ -140,24 +148,26 @@ const getErrorMessage = (error, fallback) =>
 // =========================================================
 
 const Loans = () => {
-  const initialSelectedMonth = getSelectedDashboardMonth();
-
-  const [selectedYear, setSelectedYear] = useState(initialSelectedMonth.year);
-
-  const [selectedMonth, setSelectedMonth] = useState(
-    initialSelectedMonth.month,
+  const [selectedMonthData, setSelectedMonthData] = useState(
+    getSelectedDashboardMonth,
   );
 
+  const selectedYear = selectedMonthData.year;
+  const selectedMonth = selectedMonthData.month;
+
   const [currentPage, setCurrentPage] = useState(1);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const [selectedLoan, setSelectedLoan] = useState(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Keep ALL fetched loan records here.
+  // Selected-month filtering is performed separately below.
   const [loanTransactions, setLoanTransactions] = useState([]);
-  const [loanStats, setLoanStats] = useState(EMPTY_LOAN_STATS);
 
   // =========================================================
   // PAYMENT TYPE HELPERS
@@ -167,10 +177,14 @@ const Loans = () => {
     paymentMode === "bank" ? "bank transfer" : "cash";
 
   const convertPaymentTypeToFrontend = (paymentType) => {
+    const method = String(paymentType || "")
+      .trim()
+      .toLowerCase();
+
     if (
-      paymentType === "bank transfer" ||
-      paymentType === "bank_transfer" ||
-      paymentType === "bank"
+      method === "bank transfer" ||
+      method === "bank_transfer" ||
+      method === "bank"
     ) {
       return "bank";
     }
@@ -185,7 +199,7 @@ const Loans = () => {
   const formatDateForTable = (date) => {
     if (!date) return "-";
 
-    const rawDate = String(date).split("T")[0];
+    const rawDate = String(date).slice(0, 10);
     const dateParts = rawDate.split("-");
 
     if (dateParts.length === 3) {
@@ -196,93 +210,39 @@ const Loans = () => {
   };
 
   // =========================================================
-  // FETCH LOANS
+  // FETCH ALL LOANS
   // =========================================================
 
   const fetchLoans = useCallback(async () => {
     try {
       setIsLoading(true);
 
-      const savedMonth = getSelectedDashboardMonth();
-
-      const currentSelectedYear = savedMonth.year;
-      const currentSelectedMonth = savedMonth.month;
-
-      setSelectedYear(currentSelectedYear);
-      setSelectedMonth(currentSelectedMonth);
-
       const response = await getAllLoans();
 
       const apiData = response?.data ?? response ?? {};
 
-      const loansArray = Array.isArray(apiData?.loans)
-        ? apiData.loans
-        : Array.isArray(apiData)
-          ? apiData
-          : Array.isArray(apiData?.data)
-            ? apiData.data
-            : [];
+      let loansArray = [];
 
-      // Filter transactions for the selected dashboard month.
-      const selectedMonthLoans = loansArray.filter((loan) =>
-        isDateInSelectedMonth(
-          loan?.date,
-          currentSelectedYear,
-          currentSelectedMonth,
-        ),
-      );
+      if (Array.isArray(apiData)) {
+        loansArray = apiData;
+      } else if (Array.isArray(apiData?.loans)) {
+        loansArray = apiData.loans;
+      } else if (Array.isArray(apiData?.data)) {
+        loansArray = apiData.data;
+      } else if (Array.isArray(apiData?.data?.loans)) {
+        loansArray = apiData.data.loans;
+      }
 
-      // =====================================================
-      // MONTHLY STATISTICS
-      // =====================================================
-
-      // Loan Given transaction total for the selected month.
-      let selectedMonthLoanGiven = 0;
-
-      selectedMonthLoans.forEach((loan) => {
-        const amount = Number(loan?.amount) || 0;
-        const loanType = normalizeLoanType(loan?.loanType);
-
-        if (loanType === "loan_given") {
-          selectedMonthLoanGiven += amount;
-        }
-      });
-
-      // Use the backend summary for received and outstanding totals.
-      // The backend already adjusts Loan Return against Loan Received.
-      const summary = apiData?.summary || {};
-
-      const backendTotalLoanReceived = Number(summary?.totalLoanReceived ?? 0);
-
-      const backendTotalLoansGiven = Number(summary?.totalLoanGiven ?? 0);
-
-      const backendActiveLoanStaff = Number(summary?.activeLoanStaff ?? 0);
-
-      setLoanStats({
-        thisMonthLoan: selectedMonthLoanGiven,
-        totalLoansGiven: backendTotalLoansGiven,
-        thisMonthRecovery: backendTotalLoanReceived,
-        activeLoanStaff: backendActiveLoanStaff,
-      });
-
-      // =====================================================
-      // FORMAT TABLE TRANSACTIONS
-      // =====================================================
-
-      const formattedLoans = selectedMonthLoans.map((loan, index) => {
-        const loanId = loan?._id || loan?.id || `loan-${index}-${Date.now()}`;
-
-        const formattedDate = formatDateForTable(loan?.date);
+      // Normalize every record. Do not filter by month here.
+      const formattedLoans = loansArray.map((loan, index) => {
+        const loanId =
+          loan?._id || loan?.id || `loan-${index}-${String(loan?.date || "")}`;
 
         const rawLoanType = normalizeLoanType(loan?.loanType);
 
         const personName =
           loan?.name || loan?.personName || loan?.staffName || "-";
 
-        // Display transaction amount returned by the backend.
-        const amount = Number(loan?.amount) || 0;
-
-        // Use the backend's balance fields only.
         const rawBalance =
           loan?.remainingBalance ?? loan?.remainingBal ?? loan?.balance;
 
@@ -291,27 +251,27 @@ const Loans = () => {
             ? 0
             : Number(rawBalance) || 0;
 
-        const status =
-          loan?.status || (remainingBalance <= 0 ? "paid" : "active");
-
-        const paymentMode = convertPaymentTypeToFrontend(
-          loan?.paymentType ?? loan?.paymentMode,
-        );
-
         return {
           id: loanId,
-          date: formattedDate,
+          rawDate: loan?.date || "",
+          date: formatDateForTable(loan?.date),
           staffName: personName,
-          type: formatLoanType(rawLoanType),
-          amount,
-          remainingBal: remainingBalance,
-          status,
-          loanType: rawLoanType,
           personName,
-          paymentMode,
+          type: formatLoanType(rawLoanType),
+          loanType: rawLoanType,
+          amount: Number(loan?.amount) || 0,
+          remainingBal: remainingBalance,
+          status: String(
+            loan?.status || (remainingBalance <= 0 ? "paid" : "active"),
+          ).toLowerCase(),
+          paymentMode: convertPaymentTypeToFrontend(
+            loan?.paymentType ?? loan?.paymentMode,
+          ),
           transactions: Array.isArray(loan?.transactions)
             ? loan.transactions
             : [],
+          againstLoan: loan?.againstLoan || null,
+          allocations: Array.isArray(loan?.allocations) ? loan.allocations : [],
         };
       });
 
@@ -321,7 +281,10 @@ const Loans = () => {
       console.error("Failed to fetch loans:", error);
 
       setLoanTransactions([]);
-      setLoanStats(EMPTY_LOAN_STATS);
+
+      window.alert(
+        getErrorMessage(error, "Failed to load loans. Please try again."),
+      );
     } finally {
       setIsLoading(false);
     }
@@ -336,53 +299,103 @@ const Loans = () => {
   }, [fetchLoans]);
 
   // =========================================================
-  // SYNC SELECTED DASHBOARD MONTH
+  // SYNC MONTH FROM DASHBOARD SESSION STORAGE
   // =========================================================
 
   useEffect(() => {
-    const handleWindowFocus = () => {
+    const syncSelectedMonth = () => {
       const savedMonth = getSelectedDashboardMonth();
 
-      if (
-        savedMonth.year !== selectedYear ||
-        savedMonth.month !== selectedMonth
-      ) {
-        setSelectedYear(savedMonth.year);
-        setSelectedMonth(savedMonth.month);
-      }
+      setSelectedMonthData((previous) => {
+        if (
+          previous.year === savedMonth.year &&
+          previous.month === savedMonth.month
+        ) {
+          return previous;
+        }
+
+        return savedMonth;
+      });
     };
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        handleWindowFocus();
-      }
-    };
-
-    window.addEventListener("focus", handleWindowFocus);
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    // Session storage changes made in the same tab do not trigger
+    // the standard "storage" event. Focus and visibility also help
+    // synchronize when navigating between dashboard pages.
+    window.addEventListener("focus", syncSelectedMonth);
+    window.addEventListener("storage", syncSelectedMonth);
+    document.addEventListener("visibilitychange", syncSelectedMonth);
 
     return () => {
-      window.removeEventListener("focus", handleWindowFocus);
-
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", syncSelectedMonth);
+      window.removeEventListener("storage", syncSelectedMonth);
+      document.removeEventListener("visibilitychange", syncSelectedMonth);
     };
-  }, [selectedYear, selectedMonth]);
+  }, []);
 
   // =========================================================
-  // REFETCH WHEN MONTH CHANGES
+  // FILTER TRANSACTIONS FOR THE SELECTED MONTH
+  // =========================================================
+
+  const filteredLoanTransactions = useMemo(() => {
+    return loanTransactions.filter((loan) =>
+      isDateInSelectedMonth(loan.rawDate, selectedYear, selectedMonth),
+    );
+  }, [loanTransactions, selectedYear, selectedMonth]);
+
+  // =========================================================
+  // MONTHLY STATISTICS
+  // =========================================================
+
+  const loanStats = useMemo(() => {
+    let thisMonthLoan = 0;
+    let loanReceived = 0;
+    let loanReturned = 0;
+    let totalLoansGiven = 0;
+
+    const activeStaff = new Set();
+
+    filteredLoanTransactions.forEach((loan) => {
+      const amount = Number(loan.amount) || 0;
+      const remainingBalance = Number(loan.remainingBal) || 0;
+
+      if (loan.loanType === "loan_given") {
+        thisMonthLoan += amount;
+
+        // Outstanding amount comes from the backend's balance field.
+        totalLoansGiven += Math.max(remainingBalance, 0);
+      }
+
+      if (loan.loanType === "loan_received") {
+        loanReceived += amount;
+      }
+
+      if (loan.loanType === "loan_return") {
+        loanReturned += amount;
+      }
+
+      // Count people who have a positive outstanding balance.
+      if (remainingBalance > 0 && loan.personName !== "-") {
+        activeStaff.add(loan.personName.trim().toLowerCase());
+      }
+    });
+
+    return {
+      thisMonthLoan,
+      totalLoansGiven,
+      // Calculate the selected month's net received amount.
+      // This is based only on records from the selected month.
+      thisMonthRecovery: loanReceived - loanReturned,
+      activeLoanStaff: activeStaff.size,
+    };
+  }, [filteredLoanTransactions]);
+
+  // =========================================================
+  // RESET PAGE WHEN MONTH CHANGES
   // =========================================================
 
   useEffect(() => {
-    const savedMonth = getSelectedDashboardMonth();
-
-    if (
-      savedMonth.year === selectedYear &&
-      savedMonth.month === selectedMonth
-    ) {
-      fetchLoans();
-    }
-  }, [selectedYear, selectedMonth, fetchLoans]);
+    setCurrentPage(1);
+  }, [selectedYear, selectedMonth]);
 
   // =========================================================
   // LOAN STATUS
@@ -435,7 +448,6 @@ const Loans = () => {
       };
 
       await createLoan(payload);
-
       await fetchLoans();
 
       setIsModalOpen(false);
@@ -464,29 +476,16 @@ const Loans = () => {
       return;
     }
 
-    let editDate = new Date().toISOString().split("T")[0];
+    let editDate = new Date().toISOString().slice(0, 10);
 
-    if (loan?.date && loan.date !== "-") {
-      const dateParts = loan.date.split("-");
-
-      if (dateParts.length === 3) {
-        editDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-      }
+    if (loan?.rawDate) {
+      editDate = String(loan.rawDate).slice(0, 10);
     }
 
     const selectedLoanData = {
       id: loan.id,
       date: editDate,
-      loanType: normalizeLoanType(
-        loan.loanType ||
-          (loan.type === "Loan Received"
-            ? "loan_received"
-            : loan.type === "Loan Return"
-              ? "loan_return"
-              : loan.type === "Loan Recovery"
-                ? "loan_recovery"
-                : "loan_given"),
-      ),
+      loanType: normalizeLoanType(loan.loanType),
       personName: loan.personName || loan.staffName || "",
       amount: loan.amount ?? "",
       paymentMode: convertPaymentTypeToFrontend(loan.paymentMode),
@@ -519,11 +518,10 @@ const Loans = () => {
       updatedLoanData?.amount === undefined ||
       !Number.isFinite(amount) ||
       amount <= 0 ||
-      !updatedLoanData?.loanType ||
       !updatedLoanData?.paymentMode
     ) {
       window.alert(
-        "Please enter a valid date, person name, loan type, payment method, and amount.",
+        "Please enter a valid date, person name, payment method, and amount.",
       );
       return;
     }
@@ -533,7 +531,11 @@ const Loans = () => {
 
       const payload = {
         date: updatedLoanData.date,
-        loanType: normalizeLoanType(updatedLoanData.loanType),
+
+        // Preserve the existing loan type because the edit modal
+        // no longer allows changing it.
+        loanType: normalizeLoanType(selectedLoan.loanType),
+
         name: personName,
         amount,
         paymentType: convertPaymentModeToApi(updatedLoanData.paymentMode),
@@ -591,7 +593,6 @@ const Loans = () => {
       setIsSubmitting(true);
 
       await deleteLoan(loan.id);
-
       await fetchLoans();
 
       window.alert("Loan deleted successfully.");
@@ -617,7 +618,7 @@ const Loans = () => {
   // PAGINATION
   // =========================================================
 
-  const totalResults = loanTransactions.length;
+  const totalResults = filteredLoanTransactions.length;
 
   const totalPages = Math.ceil(totalResults / ITEMS_PER_PAGE);
 
@@ -625,7 +626,10 @@ const Loans = () => {
 
   const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalResults);
 
-  const currentTransactions = loanTransactions.slice(startIndex, endIndex);
+  const currentTransactions = filteredLoanTransactions.slice(
+    startIndex,
+    endIndex,
+  );
 
   const pageNumbers = Array.from(
     { length: totalPages },
@@ -712,25 +716,15 @@ const Loans = () => {
             <Landmark size={18} className="loan-icon-gray" />
           </div>
 
-          <span className="loan-stat-label">{selectedMonthLabel} Loan</span>
-
-          <h2 className="loan-stat-value">
-            Rs. {formatCurrency(loanStats.thisMonthLoan)}
-          </h2>
-        </div>
-
-        <div className="loan-stat-card">
-          <div className="loan-icon-box loan-icon-bg-gray">
-            <Landmark size={18} className="loan-icon-gray" />
-          </div>
-
-          <span className="loan-stat-label">Total Loans Given</span>
+          <span className="loan-stat-label">
+            {selectedMonthLabel} Loans Given
+          </span>
 
           <h2 className="loan-stat-value">
             Rs. {formatCurrency(loanStats.totalLoansGiven)}
           </h2>
 
-          <span className="loan-stat-sub">Current outstanding</span>
+          <span className="loan-stat-sub">Outstanding balance</span>
         </div>
 
         <div className="loan-stat-card">
@@ -752,7 +746,9 @@ const Loans = () => {
             <Users size={18} className="loan-icon-gray" />
           </div>
 
-          <span className="loan-stat-label">Active Loan</span>
+          <span className="loan-stat-label">
+            {selectedMonthLabel} Active Loans
+          </span>
 
           <h2 className="loan-stat-value">
             {loanStats.activeLoanStaff}{" "}

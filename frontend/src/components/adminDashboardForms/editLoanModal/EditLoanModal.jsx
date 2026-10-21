@@ -15,7 +15,6 @@ const EditLoanModal = ({
   // =========================================================
 
   const getDefaultFormData = (data = {}) => {
-    // Handle null or undefined initialData
     const loan = data ?? {};
 
     return {
@@ -23,7 +22,6 @@ const EditLoanModal = ({
         ? String(loan.date).split("T")[0]
         : new Date().toISOString().split("T")[0],
 
-      loanType: loan.loanType === "loan_recover" ? "loan_recovery" : loan.loanType || "loan_given",
       personName: loan.personName || loan.name || loan.fullName || "",
 
       amount: loan.amount ?? "",
@@ -37,16 +35,6 @@ const EditLoanModal = ({
           : "cash",
     };
   };
-  // =========================================================
-  // TRANSACTION LABELS
-  // =========================================================
-
-  const transactionLabels = {
-    loan_given: "Loan Given",
-    loan_received: "Loan Received",
-    loan_return: "Loan Return",
-    loan_recover: "Loan Recovery",
-  };
 
   // =========================================================
   // FORM STATE
@@ -55,9 +43,6 @@ const EditLoanModal = ({
   const [formData, setFormData] = useState(() =>
     getDefaultFormData(initialData),
   );
-
-  const selectedTransactionLabel =
-    transactionLabels[formData.loanType] || "Loan";
 
   // =========================================================
   // LOAD SELECTED LOAN DATA
@@ -108,7 +93,6 @@ const EditLoanModal = ({
     if (
       !formData.date ||
       !personName ||
-      !formData.loanType ||
       !Number.isFinite(amount) ||
       amount <= 0 ||
       !formData.paymentMode
@@ -153,7 +137,7 @@ const EditLoanModal = ({
         {/* HEADER */}
 
         <div className="elm-header">
-          <h2>Edit {selectedTransactionLabel}</h2>
+          <h2>Edit Loan</h2>
 
           <button
             type="button"
@@ -188,26 +172,6 @@ const EditLoanModal = ({
                   disabled={isSubmitting}
                 />
               </div>
-            </div>
-
-            {/* LOAN TYPE */}
-
-            <div className="elm-form-group">
-              <label htmlFor="edit-loan-type">LOAN TYPE</label>
-
-              <select
-                id="edit-loan-type"
-                name="loanType"
-                value={formData.loanType}
-                onChange={handleChange}
-                required
-                disabled={isSubmitting}
-              >
-                <option value="loan_given">Loan Given</option>
-                <option value="loan_received">Loan Received</option>
-                <option value="loan_return">Loan Return</option>
-                <option value="loan_recovery">Loan Recovery</option>
-              </select>
             </div>
 
             {/* NAME */}
@@ -320,9 +284,7 @@ const EditLoanModal = ({
             >
               <Save size={16} />
 
-              {isSubmitting
-                ? "Updating..."
-                : `Update ${selectedTransactionLabel}`}
+              {isSubmitting ? "Updating..." : "Update Loan"}
             </button>
           </div>
         </form>
