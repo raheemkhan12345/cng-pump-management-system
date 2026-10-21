@@ -17,10 +17,24 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
   });
 
   // =========================================================
+  // TRANSACTION LABELS
+  // =========================================================
+
+  const transactionLabels = {
+    loan_given: "Loan Given",
+    loan_received: "Loan Received",
+    loan_return: "Loan Return",
+    loan_recover: "Loan Recovery",
+  };
+
+  // =========================================================
   // FORM STATE
   // =========================================================
 
   const [formData, setFormData] = useState(getDefaultFormData());
+
+  const selectedTransactionLabel =
+    transactionLabels[formData.loanType] || "Loan";
 
   // =========================================================
   // HANDLE INPUT CHANGE
@@ -42,12 +56,26 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!formData.date || !formData.personName.trim() || !formData.amount) {
+    const trimmedName = formData.personName.trim();
+    const amount = Number(formData.amount);
+
+    if (
+      !formData.date ||
+      !trimmedName ||
+      !formData.loanType ||
+      !Number.isFinite(amount) ||
+      amount <= 0 ||
+      !formData.paymentMode
+    ) {
       return;
     }
 
     if (onSave) {
-      onSave(formData);
+      onSave({
+        ...formData,
+        personName: trimmedName,
+        amount,
+      });
     }
   };
 
@@ -67,7 +95,10 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
     if (isSubmitting) return;
 
     resetForm();
-    onClose();
+
+    if (onClose) {
+      onClose();
+    }
   };
 
   // =========================================================
@@ -88,7 +119,7 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
         ===================================================== */}
 
         <div className="modal-header">
-          <h2>Record New Loan</h2>
+          <h2>Record {selectedTransactionLabel}</h2>
 
           <button
             type="button"
@@ -107,17 +138,16 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
 
         <form onSubmit={handleSubmit} className="modal-body">
           <div className="form-grid">
-            {/* =================================================
-                DATE
-            ================================================= */}
+            {/* DATE */}
 
             <div className="form-group">
-              <label>DATE</label>
+              <label htmlFor="loan-date">DATE</label>
 
               <div className="input-with-icon">
                 <Calendar size={18} className="input-icon" />
 
                 <input
+                  id="loan-date"
                   type="date"
                   name="date"
                   value={formData.date}
@@ -128,17 +158,17 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
               </div>
             </div>
 
-            {/* =================================================
-                LOAN TYPE
-            ================================================= */}
+            {/* LOAN TYPE */}
 
             <div className="form-group">
-              <label>LOAN TYPE</label>
+              <label htmlFor="loan-type">LOAN TYPE</label>
 
               <select
+                id="loan-type"
                 name="loanType"
                 value={formData.loanType}
                 onChange={handleChange}
+                required
                 disabled={isSubmitting}
               >
                 <option value="loan_given">Loan Given</option>
@@ -148,17 +178,16 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
               </select>
             </div>
 
-            {/* =================================================
-                PERSON / COMPANY
-            ================================================= */}
+            {/* PERSON / COMPANY */}
 
             <div className="form-group">
-              <label>NAME</label>
+              <label htmlFor="loan-person-name">NAME</label>
 
               <div className="input-with-icon">
                 <User size={18} className="input-icon" />
 
                 <input
+                  id="loan-person-name"
                   type="text"
                   name="personName"
                   placeholder="Enter name ..."
@@ -170,32 +199,30 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
               </div>
             </div>
 
-            {/* =================================================
-                AMOUNT
-            ================================================= */}
+            {/* AMOUNT */}
 
             <div className="form-group">
-              <label>AMOUNT (PKR)</label>
+              <label htmlFor="loan-amount">AMOUNT (PKR)</label>
 
               <div className="amount-input-box">
                 <span className="currency-prefix">Rs.</span>
 
                 <input
+                  id="loan-amount"
                   type="number"
                   name="amount"
                   placeholder="0.00"
                   value={formData.amount}
                   onChange={handleChange}
                   min="1"
+                  step="any"
                   required
                   disabled={isSubmitting}
                 />
               </div>
             </div>
 
-            {/* =================================================
-                PAYMENT MODE / POOL
-            ================================================= */}
+            {/* PAYMENT MODE / POOL */}
 
             <div className="form-group full-width">
               <label>PAYMENT MODE / POOL</label>
@@ -215,6 +242,7 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
                     }))
                   }
                   disabled={isSubmitting}
+                  aria-pressed={formData.paymentMode === "cash"}
                 >
                   <Wallet size={20} />
 
@@ -238,6 +266,7 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
                     }))
                   }
                   disabled={isSubmitting}
+                  aria-pressed={formData.paymentMode === "bank"}
                 >
                   <Landmark size={20} />
 
@@ -250,9 +279,7 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
             </div>
           </div>
 
-          {/* =====================================================
-              FOOTER ACTIONS
-          ===================================================== */}
+          {/* FOOTER ACTIONS */}
 
           <div className="modal-footer">
             <button
@@ -271,7 +298,9 @@ const RecordLoanModal = ({ isOpen, onClose, onSave, isSubmitting }) => {
             >
               <Save size={16} />
 
-              {isSubmitting ? "Recording..." : "Record Loan"}
+              {isSubmitting
+                ? "Recording..."
+                : `Record ${selectedTransactionLabel}`}
             </button>
           </div>
         </form>

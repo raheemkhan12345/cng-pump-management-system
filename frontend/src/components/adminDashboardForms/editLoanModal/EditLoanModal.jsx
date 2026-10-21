@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Calendar, User, Wallet, Landmark, Save } from "lucide-react";
 
 import "./EditLoanModal.css";
@@ -10,21 +10,64 @@ const EditLoanModal = ({
   isSubmitting,
   initialData,
 }) => {
-  const [formData, setFormData] = useState(() => ({
-    date: initialData?.date || new Date().toISOString().split("T")[0],
+  // =========================================================
+  // DEFAULT FORM
+  // =========================================================
 
-    loanType: initialData?.loanType || "loan_given",
+  const getDefaultFormData = (data = {}) => {
+    // Handle null or undefined initialData
+    const loan = data ?? {};
 
-    personName: initialData?.personName || "",
+    return {
+      date: loan.date
+        ? String(loan.date).split("T")[0]
+        : new Date().toISOString().split("T")[0],
 
-    amount: initialData?.amount ?? "",
+      loanType: loan.loanType === "loan_recover" ? "loan_recovery" : loan.loanType || "loan_given",
+      personName: loan.personName || loan.name || loan.fullName || "",
 
-    paymentMode: initialData?.paymentMode === "bank transfer" ? "bank" : "cash",
-  }));
+      amount: loan.amount ?? "",
+
+      paymentMode:
+        loan.paymentMode === "bank transfer" ||
+        loan.paymentMode === "bank" ||
+        loan.paymentType === "bank transfer" ||
+        loan.paymentType === "bank"
+          ? "bank"
+          : "cash",
+    };
+  };
+  // =========================================================
+  // TRANSACTION LABELS
+  // =========================================================
+
+  const transactionLabels = {
+    loan_given: "Loan Given",
+    loan_received: "Loan Received",
+    loan_return: "Loan Return",
+    loan_recover: "Loan Recovery",
+  };
+
+  // =========================================================
+  // FORM STATE
+  // =========================================================
+
+  const [formData, setFormData] = useState(() =>
+    getDefaultFormData(initialData),
+  );
+
+  const selectedTransactionLabel =
+    transactionLabels[formData.loanType] || "Loan";
 
   // =========================================================
   // LOAD SELECTED LOAN DATA
   // =========================================================
+
+  useEffect(() => {
+    if (isOpen && initialData) {
+      setFormData(getDefaultFormData(initialData));
+    }
+  }, [isOpen, initialData]);
 
   // =========================================================
   // HANDLE INPUT CHANGE
@@ -44,9 +87,7 @@ const EditLoanModal = ({
   // =========================================================
 
   const handlePaymentModeChange = (paymentMode) => {
-    if (isSubmitting) {
-      return;
-    }
+    if (isSubmitting) return;
 
     setFormData((previousData) => ({
       ...previousData,
@@ -61,39 +102,25 @@ const EditLoanModal = ({
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // -------------------------------------------------------
-    // VALIDATION
-    // -------------------------------------------------------
+    const personName = formData.personName.trim();
+    const amount = Number(formData.amount);
 
-    if (!formData.date) {
+    if (
+      !formData.date ||
+      !personName ||
+      !formData.loanType ||
+      !Number.isFinite(amount) ||
+      amount <= 0 ||
+      !formData.paymentMode
+    ) {
       return;
     }
-
-    if (!formData.personName.trim()) {
-      return;
-    }
-
-    if (!formData.amount || Number(formData.amount) <= 0) {
-      return;
-    }
-
-    if (!formData.loanType) {
-      return;
-    }
-
-    if (!formData.paymentMode) {
-      return;
-    }
-
-    // -------------------------------------------------------
-    // SEND DATA TO PARENT
-    // -------------------------------------------------------
 
     if (onSave) {
       onSave({
         ...formData,
-        personName: formData.personName.trim(),
-        amount: Number(formData.amount),
+        personName,
+        amount,
       });
     }
   };
@@ -103,20 +130,18 @@ const EditLoanModal = ({
   // =========================================================
 
   const handleClose = () => {
-    if (isSubmitting) {
-      return;
-    }
+    if (isSubmitting) return;
 
-    onClose();
+    if (onClose) {
+      onClose();
+    }
   };
 
   // =========================================================
   // MODAL STATE
   // =========================================================
 
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
 
   // =========================================================
   // RENDER
@@ -125,12 +150,10 @@ const EditLoanModal = ({
   return (
     <div className="elm-overlay">
       <div className="elm-container">
-        {/* ===================================================
-            HEADER
-        =================================================== */}
+        {/* HEADER */}
 
         <div className="elm-header">
-          <h2>Edit Loan Record</h2>
+          <h2>Edit {selectedTransactionLabel}</h2>
 
           <button
             type="button"
@@ -143,15 +166,11 @@ const EditLoanModal = ({
           </button>
         </div>
 
-        {/* ===================================================
-            FORM
-        =================================================== */}
+        {/* FORM */}
 
         <form onSubmit={handleSubmit} className="elm-body">
           <div className="elm-form-grid">
-            {/* =================================================
-                DATE
-            ================================================= */}
+            {/* DATE */}
 
             <div className="elm-form-group">
               <label htmlFor="edit-loan-date">DATE</label>
@@ -171,9 +190,7 @@ const EditLoanModal = ({
               </div>
             </div>
 
-            {/* =================================================
-                LOAN TYPE
-            ================================================= */}
+            {/* LOAN TYPE */}
 
             <div className="elm-form-group">
               <label htmlFor="edit-loan-type">LOAN TYPE</label>
@@ -183,19 +200,17 @@ const EditLoanModal = ({
                 name="loanType"
                 value={formData.loanType}
                 onChange={handleChange}
+                required
                 disabled={isSubmitting}
               >
                 <option value="loan_given">Loan Given</option>
-
                 <option value="loan_received">Loan Received</option>
                 <option value="loan_return">Loan Return</option>
-                <option value="loan_recover">Loan Recovery</option>
+                <option value="loan_recovery">Loan Recovery</option>
               </select>
             </div>
 
-            {/* =================================================
-                NAME
-            ================================================= */}
+            {/* NAME */}
 
             <div className="elm-form-group">
               <label htmlFor="edit-loan-name">NAME</label>
@@ -216,9 +231,7 @@ const EditLoanModal = ({
               </div>
             </div>
 
-            {/* =================================================
-                AMOUNT
-            ================================================= */}
+            {/* AMOUNT */}
 
             <div className="elm-form-group">
               <label htmlFor="edit-loan-amount">AMOUNT (PKR)</label>
@@ -234,24 +247,20 @@ const EditLoanModal = ({
                   value={formData.amount}
                   onChange={handleChange}
                   min="1"
-                  step="1"
+                  step="any"
                   required
                   disabled={isSubmitting}
                 />
               </div>
             </div>
 
-            {/* =================================================
-                PAYMENT MODE
-            ================================================= */}
+            {/* PAYMENT MODE / POOL */}
 
             <div className="elm-form-group elm-full-width">
               <label>PAYMENT MODE / POOL</label>
 
               <div className="elm-payment-options">
-                {/* =================================================
-                    CASH
-                ================================================= */}
+                {/* CASH */}
 
                 <button
                   type="button"
@@ -266,14 +275,11 @@ const EditLoanModal = ({
 
                   <div>
                     <strong>Cash Account</strong>
-
                     <p>Hand Pool</p>
                   </div>
                 </button>
 
-                {/* =================================================
-                    BANK
-                ================================================= */}
+                {/* BANK */}
 
                 <button
                   type="button"
@@ -288,7 +294,6 @@ const EditLoanModal = ({
 
                   <div>
                     <strong>Bank Account</strong>
-
                     <p>Reserve Pool</p>
                   </div>
                 </button>
@@ -296,13 +301,9 @@ const EditLoanModal = ({
             </div>
           </div>
 
-          {/* ===================================================
-              FOOTER
-          =================================================== */}
+          {/* FOOTER */}
 
           <div className="elm-footer">
-            {/* CANCEL */}
-
             <button
               type="button"
               className="elm-btn-cancel"
@@ -312,8 +313,6 @@ const EditLoanModal = ({
               Cancel
             </button>
 
-            {/* UPDATE */}
-
             <button
               type="submit"
               className="elm-btn-submit"
@@ -321,7 +320,9 @@ const EditLoanModal = ({
             >
               <Save size={16} />
 
-              {isSubmitting ? "Updating..." : "Update Loan"}
+              {isSubmitting
+                ? "Updating..."
+                : `Update ${selectedTransactionLabel}`}
             </button>
           </div>
         </form>

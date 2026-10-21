@@ -34,7 +34,35 @@ const EMPTY_LOAN_STATS = {
   activeLoanStaff: 0,
 };
 
-// GET SELECTED DASHBOARD MONTH
+// =========================================================
+// LOAN TYPE HELPERS
+// =========================================================
+
+const normalizeLoanType = (loanType) => {
+  if (loanType === "loan_recover") {
+    return "loan_recovery";
+  }
+
+  return loanType || "loan_given";
+};
+
+const formatLoanType = (loanType) => {
+  const normalizedType = normalizeLoanType(loanType);
+
+  const labels = {
+    loan_given: "Loan Given",
+    loan_received: "Loan Received",
+    loan_return: "Loan Return",
+    loan_recovery: "Loan Recovery",
+  };
+
+  return labels[normalizedType] || normalizedType || "-";
+};
+
+// =========================================================
+// DASHBOARD MONTH HELPERS
+// =========================================================
+
 const getSelectedDashboardMonth = () => {
   try {
     const savedMonth = sessionStorage.getItem(DASHBOARD_MONTH_KEY);
@@ -64,7 +92,6 @@ const getSelectedDashboardMonth = () => {
   };
 };
 
-// CHECK WHETHER DATE BELONGS TO SELECTED MONTH
 const isDateInSelectedMonth = (date, selectedYear, selectedMonth) => {
   if (!date) return false;
 
@@ -90,14 +117,16 @@ const isDateInSelectedMonth = (date, selectedYear, selectedMonth) => {
   );
 };
 
-// GET SELECTED MONTH LABEL
 const getSelectedMonthLabel = (year, month) =>
   new Intl.DateTimeFormat("en-US", {
     month: "long",
     year: "numeric",
   }).format(new Date(year, month - 1, 1));
 
-// GET ERROR MESSAGE
+// =========================================================
+// ERROR HELPER
+// =========================================================
+
 const getErrorMessage = (error, fallback) =>
   error?.response?.data?.message ||
   error?.response?.data?.error ||
@@ -106,8 +135,11 @@ const getErrorMessage = (error, fallback) =>
   error?.message ||
   fallback;
 
+// =========================================================
+// LOANS COMPONENT
+// =========================================================
+
 const Loans = () => {
-  // SELECTED DASHBOARD MONTH
   const initialSelectedMonth = getSelectedDashboardMonth();
 
   const [selectedYear, setSelectedYear] = useState(initialSelectedMonth.year);
@@ -116,7 +148,6 @@ const Loans = () => {
     initialSelectedMonth.month,
   );
 
-  // STATE
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -128,7 +159,10 @@ const Loans = () => {
   const [loanTransactions, setLoanTransactions] = useState([]);
   const [loanStats, setLoanStats] = useState(EMPTY_LOAN_STATS);
 
+  // =========================================================
   // PAYMENT TYPE HELPERS
+  // =========================================================
+
   const convertPaymentModeToApi = (paymentMode) =>
     paymentMode === "bank" ? "bank transfer" : "cash";
 
@@ -144,7 +178,10 @@ const Loans = () => {
     return "cash";
   };
 
-  // FORMAT DATE FOR TABLE
+  // =========================================================
+  // DATE FORMATTER
+  // =========================================================
+
   const formatDateForTable = (date) => {
     if (!date) return "-";
 
@@ -158,7 +195,10 @@ const Loans = () => {
     return rawDate;
   };
 
-  // GET ALL LOANS
+  // =========================================================
+  // FETCH LOANS
+  // =========================================================
+
   const fetchLoans = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -173,10 +213,8 @@ const Loans = () => {
 
       const response = await getAllLoans();
 
-      // EXTRACT API DATA
       const apiData = response?.data ?? response ?? {};
 
-      // EXTRACT LOANS ARRAY
       const loansArray = Array.isArray(apiData?.loans)
         ? apiData.loans
         : Array.isArray(apiData)
@@ -185,7 +223,7 @@ const Loans = () => {
             ? apiData.data
             : [];
 
-      // FILTER LOANS BY SELECTED MONTH
+      // Filter transactions for the selected dashboard month.
       const selectedMonthLoans = loansArray.filter((loan) =>
         isDateInSelectedMonth(
           loan?.date,
@@ -194,105 +232,81 @@ const Loans = () => {
         ),
       );
 
-      // CALCULATE SELECTED MONTH STATISTICS
+      // =====================================================
+      // MONTHLY STATISTICS
+      // =====================================================
+
+      // Loan Given transaction total for the selected month.
       let selectedMonthLoanGiven = 0;
-      let selectedMonthLoanReceived = 0;
 
       selectedMonthLoans.forEach((loan) => {
         const amount = Number(loan?.amount) || 0;
+        const loanType = normalizeLoanType(loan?.loanType);
 
-        if (loan?.loanType === "loan_given") {
+        if (loanType === "loan_given") {
           selectedMonthLoanGiven += amount;
         }
-
-        if (loan?.loanType === "loan_received") {
-          selectedMonthLoanReceived += amount;
-        }
       });
 
-      // BACKEND SUMMARY
+      // Use the backend summary for received and outstanding totals.
+      // The backend already adjusts Loan Return against Loan Received.
       const summary = apiData?.summary || {};
 
-      // ACTIVE LOAN STAFF
-      const activeStaffNames = new Set();
+      const backendTotalLoanReceived = Number(summary?.totalLoanReceived ?? 0);
 
-      selectedMonthLoans.forEach((loan) => {
-        const remainingBalance = Number(
-          loan?.remainingBalance ??
-            loan?.remainingBal ??
-            loan?.balance ??
-            loan?.amount ??
-            0,
-        );
+      const backendTotalLoansGiven = Number(summary?.totalLoanGiven ?? 0);
 
-        const personName =
-          loan?.name || loan?.personName || loan?.staffName || "";
+      const backendActiveLoanStaff = Number(summary?.activeLoanStaff ?? 0);
 
-        if (remainingBalance > 0 && String(personName).trim()) {
-          activeStaffNames.add(String(personName).trim().toLowerCase());
-        }
-      });
-
-      // TOTAL LOANS GIVEN
-      const backendTotalLoansGiven = Number(summary?.totalLoanGiven) || 0;
-
-      const totalLoansGiven =
-        backendTotalLoansGiven > 0
-          ? backendTotalLoansGiven
-          : selectedMonthLoanGiven;
-
-      // UPDATE LOAN STATISTICS
       setLoanStats({
         thisMonthLoan: selectedMonthLoanGiven,
-        totalLoansGiven,
-        thisMonthRecovery: selectedMonthLoanReceived,
-        activeLoanStaff:
-          activeStaffNames.size || Number(summary?.activeLoanStaff) || 0,
+        totalLoansGiven: backendTotalLoansGiven,
+        thisMonthRecovery: backendTotalLoanReceived,
+        activeLoanStaff: backendActiveLoanStaff,
       });
 
-      // FORMAT LOAN TRANSACTIONS
+      // =====================================================
+      // FORMAT TABLE TRANSACTIONS
+      // =====================================================
+
       const formattedLoans = selectedMonthLoans.map((loan, index) => {
         const loanId = loan?._id || loan?.id || `loan-${index}-${Date.now()}`;
 
         const formattedDate = formatDateForTable(loan?.date);
 
-        let formattedLoanType = "-";
-
-        if (loan?.loanType === "loan_given") {
-          formattedLoanType = "Loan Given";
-        } else if (loan?.loanType === "loan_received") {
-          formattedLoanType = "Loan Received";
-        } else if (loan?.loanType) {
-          formattedLoanType = loan.loanType;
-        }
+        const rawLoanType = normalizeLoanType(loan?.loanType);
 
         const personName =
           loan?.name || loan?.personName || loan?.staffName || "-";
 
+        // Display transaction amount returned by the backend.
         const amount = Number(loan?.amount) || 0;
 
-        const remainingBalance = Number(
-          loan?.remainingBalance ??
-            loan?.remainingBal ??
-            loan?.balance ??
-            amount,
-        );
+        // Use the backend's balance fields only.
+        const rawBalance =
+          loan?.remainingBalance ?? loan?.remainingBal ?? loan?.balance;
+
+        const remainingBalance =
+          rawBalance === null || rawBalance === undefined || rawBalance === ""
+            ? 0
+            : Number(rawBalance) || 0;
 
         const status =
           loan?.status || (remainingBalance <= 0 ? "paid" : "active");
 
-        const paymentMode = convertPaymentTypeToFrontend(loan?.paymentType);
+        const paymentMode = convertPaymentTypeToFrontend(
+          loan?.paymentType ?? loan?.paymentMode,
+        );
 
         return {
           id: loanId,
           date: formattedDate,
           staffName: personName,
-          type: formattedLoanType,
+          type: formatLoanType(rawLoanType),
           amount,
           remainingBal: remainingBalance,
           status,
-          loanType:
-            loan?.loanType === "loan_received" ? "loan_received" : "loan_given",
+          loanType: rawLoanType,
           personName,
           paymentMode,
           transactions: Array.isArray(loan?.transactions)
@@ -313,12 +327,18 @@ const Loans = () => {
     }
   }, []);
 
-  // FETCH LOANS ON PAGE LOAD
+  // =========================================================
+  // INITIAL FETCH
+  // =========================================================
+
   useEffect(() => {
     fetchLoans();
   }, [fetchLoans]);
 
-  // SYNC WHEN DASHBOARD MONTH CHANGES
+  // =========================================================
+  // SYNC SELECTED DASHBOARD MONTH
+  // =========================================================
+
   useEffect(() => {
     const handleWindowFocus = () => {
       const savedMonth = getSelectedDashboardMonth();
@@ -349,7 +369,10 @@ const Loans = () => {
     };
   }, [selectedYear, selectedMonth]);
 
-  // REFETCH WHEN SELECTED MONTH CHANGES
+  // =========================================================
+  // REFETCH WHEN MONTH CHANGES
+  // =========================================================
+
   useEffect(() => {
     const savedMonth = getSelectedDashboardMonth();
 
@@ -361,7 +384,10 @@ const Loans = () => {
     }
   }, [selectedYear, selectedMonth, fetchLoans]);
 
+  // =========================================================
   // LOAN STATUS
+  // =========================================================
+
   const getLoanStatus = (loan) => {
     if (loan?.status === "paid") return "Paid";
 
@@ -370,20 +396,30 @@ const Loans = () => {
     return Number(loan?.remainingBal) <= 0 ? "Paid" : "Active";
   };
 
-  // CREATE NEW LOAN
+  // =========================================================
+  // CREATE LOAN
+  // =========================================================
+
   const handleSaveLoan = async (newLoanData) => {
     if (isSubmitting) return;
 
+    const personName = newLoanData?.personName?.trim();
+    const amount = Number(newLoanData?.amount);
+
     if (
       !newLoanData?.date ||
-      !newLoanData?.personName?.trim() ||
+      !personName ||
       newLoanData?.amount === "" ||
       newLoanData?.amount === null ||
       newLoanData?.amount === undefined ||
-      !Number.isFinite(Number(newLoanData.amount)) ||
-      Number(newLoanData.amount) <= 0
+      !Number.isFinite(amount) ||
+      amount <= 0 ||
+      !newLoanData?.loanType ||
+      !newLoanData?.paymentMode
     ) {
-      window.alert("Please enter a valid date, person name, and loan amount.");
+      window.alert(
+        "Please enter a valid date, person name, loan type, payment method, and amount.",
+      );
       return;
     }
 
@@ -392,12 +428,9 @@ const Loans = () => {
 
       const payload = {
         date: newLoanData.date,
-        loanType:
-          newLoanData.loanType === "loan_given"
-            ? "loan_given"
-            : "loan_received",
-        name: newLoanData.personName.trim(),
-        amount: Number(newLoanData.amount),
+        loanType: normalizeLoanType(newLoanData.loanType),
+        name: personName,
+        amount,
         paymentType: convertPaymentModeToApi(newLoanData.paymentMode),
       };
 
@@ -419,7 +452,10 @@ const Loans = () => {
     }
   };
 
+  // =========================================================
   // OPEN EDIT MODAL
+  // =========================================================
+
   const handleEdit = (loan) => {
     if (isSubmitting) return;
 
@@ -441,24 +477,29 @@ const Loans = () => {
     const selectedLoanData = {
       id: loan.id,
       date: editDate,
-      loanType:
+      loanType: normalizeLoanType(
         loan.loanType ||
-        (loan.type === "Loan Received" ? "loan_received" : "loan_given"),
+          (loan.type === "Loan Received"
+            ? "loan_received"
+            : loan.type === "Loan Return"
+              ? "loan_return"
+              : loan.type === "Loan Recovery"
+                ? "loan_recovery"
+                : "loan_given"),
+      ),
       personName: loan.personName || loan.staffName || "",
       amount: loan.amount ?? "",
-      paymentMode:
-        loan.paymentMode === "bank transfer" ||
-        loan.paymentMode === "bank_transfer" ||
-        loan.paymentMode === "bank"
-          ? "bank"
-          : "cash",
+      paymentMode: convertPaymentTypeToFrontend(loan.paymentMode),
     };
 
     setSelectedLoan(selectedLoanData);
     setIsEditModalOpen(true);
   };
 
+  // =========================================================
   // UPDATE LOAN
+  // =========================================================
+
   const handleUpdateLoan = async (updatedLoanData) => {
     if (isSubmitting) return;
 
@@ -467,14 +508,17 @@ const Loans = () => {
       return;
     }
 
+    const personName = updatedLoanData?.personName?.trim();
+    const amount = Number(updatedLoanData?.amount);
+
     if (
       !updatedLoanData?.date ||
-      !updatedLoanData?.personName?.trim() ||
+      !personName ||
       updatedLoanData?.amount === "" ||
       updatedLoanData?.amount === null ||
       updatedLoanData?.amount === undefined ||
-      !Number.isFinite(Number(updatedLoanData.amount)) ||
-      Number(updatedLoanData.amount) <= 0 ||
+      !Number.isFinite(amount) ||
+      amount <= 0 ||
       !updatedLoanData?.loanType ||
       !updatedLoanData?.paymentMode
     ) {
@@ -489,12 +533,9 @@ const Loans = () => {
 
       const payload = {
         date: updatedLoanData.date,
-        loanType:
-          updatedLoanData.loanType === "loan_given"
-            ? "loan_given"
-            : "loan_received",
-        name: updatedLoanData.personName.trim(),
-        amount: Number(updatedLoanData.amount),
+        loanType: normalizeLoanType(updatedLoanData.loanType),
+        name: personName,
+        amount,
         paymentType: convertPaymentModeToApi(updatedLoanData.paymentMode),
       };
 
@@ -517,7 +558,10 @@ const Loans = () => {
     }
   };
 
+  // =========================================================
   // CLOSE EDIT MODAL
+  // =========================================================
+
   const handleCloseEditModal = () => {
     if (isSubmitting) return;
 
@@ -525,7 +569,10 @@ const Loans = () => {
     setSelectedLoan(null);
   };
 
+  // =========================================================
   // DELETE LOAN
+  // =========================================================
+
   const handleDelete = async (loan) => {
     if (isSubmitting) return;
 
@@ -559,11 +606,17 @@ const Loans = () => {
     }
   };
 
+  // =========================================================
   // CURRENCY FORMATTER
+  // =========================================================
+
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("en-PK").format(Number(amount) || 0);
 
+  // =========================================================
   // PAGINATION
+  // =========================================================
+
   const totalResults = loanTransactions.length;
 
   const totalPages = Math.ceil(totalResults / ITEMS_PER_PAGE);
@@ -574,52 +627,57 @@ const Loans = () => {
 
   const currentTransactions = loanTransactions.slice(startIndex, endIndex);
 
-  // PAGE NUMBERS
   const pageNumbers = Array.from(
     { length: totalPages },
     (_, index) => index + 1,
   );
 
-  // PREVIOUS PAGE
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage((previousPage) => previousPage - 1);
     }
   };
 
-  // NEXT PAGE
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage((previousPage) => previousPage + 1);
     }
   };
 
-  // PAGE CHANGE
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
-  // OPEN CREATE MODAL
+  // =========================================================
+  // OPEN / CLOSE CREATE MODAL
+  // =========================================================
+
   const handleOpenModal = () => {
     if (isSubmitting) return;
 
     setIsModalOpen(true);
   };
 
-  // CLOSE CREATE MODAL
   const handleCloseModal = () => {
     if (isSubmitting) return;
 
     setIsModalOpen(false);
   };
 
+  // =========================================================
   // SELECTED MONTH LABEL
+  // =========================================================
+
   const selectedMonthLabel = getSelectedMonthLabel(selectedYear, selectedMonth);
 
+  // =========================================================
   // RENDER
+  // =========================================================
+
   return (
     <div className="loan-page-container">
       {/* HEADER */}
+
       <div className="loan-header-section">
         <div>
           <h1 className="loan-page-title">Loans</h1>
@@ -647,6 +705,7 @@ const Loans = () => {
       </div>
 
       {/* STATISTICS */}
+
       <div className="loan-stats-grid">
         <div className="loan-stat-card">
           <div className="loan-icon-box loan-icon-bg-gray">
@@ -703,6 +762,7 @@ const Loans = () => {
       </div>
 
       {/* TRANSACTIONS */}
+
       <div className="loan-table-card">
         <div className="loan-table-header">
           <h3 className="loan-table-title">
@@ -719,6 +779,7 @@ const Loans = () => {
         </div>
 
         {/* TABLE */}
+
         <div className="loan-table-wrapper">
           <table className="loan-table">
             <thead>
@@ -754,7 +815,7 @@ const Loans = () => {
 
                       <td
                         className={
-                          item.type === "Loan Received"
+                          item.loanType === "loan_received"
                             ? "loan-text-green loan-font-bold"
                             : "loan-font-bold"
                         }
@@ -779,7 +840,6 @@ const Loans = () => {
                       </td>
 
                       <td className="loan-actions-cell">
-                        {/* EDIT */}
                         <button
                           type="button"
                           className="loan-action-btn loan-edit-btn"
@@ -795,7 +855,6 @@ const Loans = () => {
                           <Pencil size={11} />
                         </button>
 
-                        {/* DELETE */}
                         <button
                           type="button"
                           className="loan-action-btn loan-delete-btn"
@@ -822,6 +881,7 @@ const Loans = () => {
         </div>
 
         {/* PAGINATION */}
+
         {totalResults > 0 && (
           <div className="loan-table-footer">
             <span className="loan-pagination-info">
@@ -868,6 +928,7 @@ const Loans = () => {
       </div>
 
       {/* CREATE LOAN MODAL */}
+
       <RecordLoanModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -876,6 +937,7 @@ const Loans = () => {
       />
 
       {/* EDIT LOAN MODAL */}
+
       <EditLoanModal
         key={selectedLoan?.id || "new"}
         isOpen={isEditModalOpen}
