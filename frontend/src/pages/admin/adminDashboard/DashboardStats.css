@@ -1,63 +1,51 @@
 /* ==========================================
    STATS GRID
-   Large Desktop → 4 columns
 ========================================== */
 
 .stats-grid {
   display: grid;
-
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-
-  gap: 16px;
-
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
   width: 100%;
   max-width: 100%;
-
   box-sizing: border-box;
-
-  min-width: 0;
+  align-items: stretch;
 }
 
 /* ==========================================
-   CARD CONTAINER
+   BASE STAT CARD
 ========================================== */
 
 .stat-card {
   width: 100%;
   min-width: 0;
-
+  min-height: 100px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-
-  padding: 16px 18px;
-
-  min-height: 120px;
-
-  border-radius: 12px;
-
+  justify-content: flex-start;
+  padding: 12px 14px;
+  border-radius: 8px;
   box-sizing: border-box;
-
   position: relative;
-
-  overflow: hidden;
-
+  overflow-wrap: anywhere;
   cursor: pointer;
-
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
 
-.stat-card:hover {
-  transform: translateY(-2px);
+/* ==========================================
+   HOVER AND KEYBOARD ACCESSIBILITY
+========================================== */
 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+.stat-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
 }
 
 .stat-card:focus-visible {
   outline: 2px solid #2563eb;
-
   outline-offset: 2px;
 }
 
@@ -86,7 +74,7 @@
 ========================================== */
 
 .accent-border-red {
-  border-left: 5px solid #ef4444;
+  border-left: 3px solid #ef4444;
 }
 
 /* ==========================================
@@ -95,13 +83,13 @@
 
 .card-header {
   width: 100%;
-  min-width: 0;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  gap: 10px;
+  gap: 8px;
+  border-bottom: none;
+  padding: 0;
+  flex-shrink: 0;
 }
 
 /* ==========================================
@@ -110,18 +98,12 @@
 
 .card-label {
   min-width: 0;
-
-  font-size: 11px;
+  font-size: 9.5px;
   font-weight: 700;
-
-  letter-spacing: 0.5px;
-
+  letter-spacing: 0.3px;
   color: #4b5563;
-
   text-transform: uppercase;
-
   line-height: 1.3;
-
   overflow-wrap: anywhere;
 }
 
@@ -131,9 +113,7 @@
 
 .card-icon {
   flex-shrink: 0;
-
-  font-size: 16px;
-
+  font-size: 14px;
   color: #374151;
 }
 
@@ -143,10 +123,8 @@
 
 .card-body {
   width: 100%;
-
-  margin-top: 8px;
-
   min-width: 0;
+  margin-top: 8px;
 }
 
 /* ==========================================
@@ -154,20 +132,12 @@
 ========================================== */
 
 .card-amount {
-  max-width: 100%;
-
-  font-size: 22px;
-
+  font-size: 19px;
   font-weight: 800;
-
   color: #111827;
-
   margin: 0;
-
-  line-height: 1.2;
-
+  line-height: 1.25;
   overflow-wrap: anywhere;
-
   word-break: break-word;
 }
 
@@ -176,43 +146,45 @@
 ========================================== */
 
 .card-subtext {
-  max-width: 100%;
-
-  font-size: 12px;
-
+  font-size: 10px;
   color: #4b5563;
-
-  margin: 4px 0 0 0;
-
+  margin: 4px 0 0;
   font-weight: 500;
-
-  line-height: 1.3;
-
+  line-height: 1.35;
   overflow-wrap: anywhere;
 }
 
 /* ==========================================
-   SPECIAL SUBTEXT VARIATIONS
+   SECONDARY INFO: KG
+   Used by Total Sale and Daily Sale cards
 ========================================== */
 
-.bold-subtext {
-  font-size: 16px;
-
-  font-weight: 700;
-
-  color: #111827;
-
-  line-height: 1.3;
+.stat-secondary-info {
+  width: 100%;
+  min-width: 0;
+  margin-top: 10px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(17, 24, 39, 0.12);
+  box-sizing: border-box;
 }
 
-.large-subtext {
-  font-size: 18px;
+.stat-secondary-label {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 500;
+  color: #4b5563;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
 
+.stat-secondary-value {
+  margin: 3px 0 0;
+  font-size: 14px;
   font-weight: 700;
-
   color: #111827;
-
-  line-height: 1.3;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* ==========================================
@@ -223,382 +195,89 @@
   color: #dc2626 !important;
 }
 
-/* =========================================================
-   LARGE DESKTOP
-   1440px+
-========================================================= */
-
-@media (min-width: 1440px) {
-  .stats-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-
-    gap: 18px;
-  }
-
-  .stat-card {
-    padding: 18px 20px;
-
-    min-height: 125px;
-
-    border-radius: 13px;
-  }
-
-  .card-label {
-    font-size: 11.5px;
-  }
-
-  .card-icon {
-    font-size: 17px;
-  }
-
-  .card-amount {
-    font-size: 23px;
-  }
-
-  .card-subtext {
-    font-size: 12px;
-  }
-
-  .bold-subtext {
-    font-size: 16px;
-  }
-
-  .large-subtext {
-    font-size: 18px;
-  }
-}
-
-/* =========================================================
-   DESKTOP / LAPTOP
-   1201px - 1439px
-========================================================= */
-
-@media (min-width: 1201px) and (max-width: 1439px) {
-  .stats-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-
-    gap: 16px;
-  }
-
-  .stat-card {
-    padding: 16px 18px;
-
-    min-height: 120px;
-  }
-}
-
-/* =========================================================
-   LAPTOP / SMALL DESKTOP
-   1025px - 1200px
-========================================================= */
-
-@media (min-width: 1025px) and (max-width: 1200px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-
-    gap: 14px;
-  }
-
-  .stat-card {
-    min-height: 115px;
-
-    padding: 15px 17px;
-  }
-
-  .card-amount {
-    font-size: 21px;
-  }
-}
-
-/* =========================================================
+/* ==========================================
    TABLET
-   769px - 1024px
-========================================================= */
+========================================== */
 
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (max-width: 1024px) {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-
-    gap: 14px;
-  }
-
-  .stat-card {
-    min-height: 110px;
-
-    padding: 14px 16px;
-
-    border-radius: 11px;
-  }
-
-  .card-label {
-    font-size: 10.5px;
-
-    letter-spacing: 0.4px;
-  }
-
-  .card-icon {
-    font-size: 15px;
-  }
-
-  .card-body {
-    margin-top: 7px;
-  }
-
-  .card-amount {
-    font-size: 20px;
-  }
-
-  .card-subtext {
-    font-size: 11.5px;
-  }
-
-  .bold-subtext {
-    font-size: 15px;
-  }
-
-  .large-subtext {
-    font-size: 17px;
-  }
-}
-
-/* =========================================================
-   TABLET / LARGE MOBILE
-   601px - 768px
-========================================================= */
-
-@media (min-width: 601px) and (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-
     gap: 12px;
   }
 
   .stat-card {
-    min-height: 108px;
-
-    padding: 14px 15px;
-
-    border-radius: 10px;
-  }
-
-  .card-header {
-    gap: 8px;
-  }
-
-  .card-label {
-    font-size: 10px;
-
-    letter-spacing: 0.35px;
-  }
-
-  .card-icon {
-    font-size: 15px;
-  }
-
-  .card-body {
-    margin-top: 7px;
+    padding: 12px;
   }
 
   .card-amount {
-    font-size: 19px;
-  }
-
-  .card-subtext {
-    font-size: 11px;
-  }
-
-  .bold-subtext {
-    font-size: 14.5px;
-  }
-
-  .large-subtext {
-    font-size: 16px;
+    font-size: 18px;
   }
 }
 
-/* =========================================================
+/* ==========================================
    MOBILE
-   481px - 600px
-========================================================= */
+========================================== */
 
-@media (min-width: 481px) and (max-width: 600px) {
+@media (max-width: 580px) {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-
     gap: 10px;
   }
 
   .stat-card {
     min-height: 105px;
-
-    padding: 13px 14px;
-
-    border-radius: 10px;
-  }
-
-  .card-header {
-    gap: 7px;
+    padding: 11px;
   }
 
   .card-label {
-    font-size: 9.5px;
-
-    letter-spacing: 0.3px;
+    font-size: 9px;
   }
 
   .card-icon {
-    font-size: 14px;
-  }
-
-  .card-body {
-    margin-top: 6px;
+    font-size: 12px;
   }
 
   .card-amount {
-    font-size: 18px;
-  }
-
-  .card-subtext {
-    font-size: 10.5px;
-  }
-
-  .bold-subtext {
-    font-size: 14px;
-  }
-
-  .large-subtext {
-    font-size: 15px;
-  }
-}
-
-/* =========================================================
-   SMALL MOBILE
-   361px - 480px
-========================================================= */
-
-@media (min-width: 361px) and (max-width: 480px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-
-    gap: 10px;
-  }
-
-  .stat-card {
-    min-height: 100px;
-
-    padding: 13px 14px;
-
-    border-radius: 10px;
-  }
-
-  .card-header {
-    gap: 8px;
-  }
-
-  .card-label {
-    font-size: 10px;
-
-    letter-spacing: 0.35px;
-  }
-
-  .card-icon {
-    font-size: 15px;
-  }
-
-  .card-body {
-    margin-top: 6px;
-  }
-
-  .card-amount {
-    font-size: 20px;
-  }
-
-  .card-subtext {
-    font-size: 11px;
-  }
-
-  .bold-subtext {
-    font-size: 15px;
-  }
-
-  .large-subtext {
     font-size: 16px;
   }
+
+  .card-subtext {
+    font-size: 9px;
+  }
+
+  .stat-secondary-info {
+    margin-top: 8px;
+    padding-top: 6px;
+  }
+
+  .stat-secondary-label {
+    font-size: 9px;
+  }
+
+  .stat-secondary-value {
+    font-size: 12px;
+  }
 }
 
-/* =========================================================
-   VERY SMALL MOBILE
-   <= 360px
-========================================================= */
+/* ==========================================
+   SMALL MOBILE
+========================================== */
 
 @media (max-width: 360px) {
   .stats-grid {
     grid-template-columns: 1fr;
-
-    gap: 9px;
   }
 
   .stat-card {
-    min-height: 96px;
-
-    padding: 12px 13px;
-
-    border-radius: 9px;
-  }
-
-  .card-header {
-    gap: 7px;
-  }
-
-  .card-label {
-    font-size: 9.5px;
-
-    letter-spacing: 0.25px;
-  }
-
-  .card-icon {
-    font-size: 14px;
-  }
-
-  .card-body {
-    margin-top: 6px;
+    min-height: auto;
+    padding: 12px;
   }
 
   .card-amount {
     font-size: 18px;
   }
 
-  .card-subtext {
-    font-size: 10.5px;
-  }
-
-  .bold-subtext {
-    font-size: 14px;
-  }
-
-  .large-subtext {
-    font-size: 15px;
-  }
-}
-
-/* =========================================================
-   TOUCH DEVICES
-========================================================= */
-
-@media (hover: none) and (pointer: coarse) {
-  .stat-card:hover {
-    transform: none;
-
-    box-shadow: none;
-  }
-}
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-  .stat-card {
-    transition: none;
+  .stat-secondary-value {
+    font-size: 13px;
   }
 }

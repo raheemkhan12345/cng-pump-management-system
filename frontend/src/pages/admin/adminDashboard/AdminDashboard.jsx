@@ -1,17 +1,81 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { Calendar, Lock } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { FaChevronDown } from "react-icons/fa6";
 
 import DashboardStats from "./DashboardStats";
 import RecentTransactions from "./RecentTransactions";
 
 import { getDashboard } from "../../../services/adminApis/dashboardApi";
+import { getCashBank } from "../../../services/adminApis/cashBankApi";
 
 import "./AdminDashboard.css";
 
 // STORAGE KEY
 const DASHBOARD_MONTH_KEY = "cng_dashboard_selected_month";
+
+// EXTRACT DASHBOARD DATA
+const extractDashboardData = (response) => {
+  if (
+    response?.dashboard &&
+    typeof response.dashboard === "object" &&
+    !Array.isArray(response.dashboard)
+  ) {
+    return response.dashboard;
+  }
+
+  if (
+    response?.data &&
+    typeof response.data === "object" &&
+    !Array.isArray(response.data)
+  ) {
+    return response.data;
+  }
+
+  if (
+    response?.dashboardData &&
+    typeof response.dashboardData === "object" &&
+    !Array.isArray(response.dashboardData)
+  ) {
+    return response.dashboardData;
+  }
+
+  return response && typeof response === "object" && !Array.isArray(response)
+    ? response
+    : {};
+};
+
+// EXTRACT CASH & BANK BALANCES
+const extractCashBankBalances = (response) => {
+  const apiData = response?.data ?? response ?? {};
+  const balanceData = apiData?.balance ?? {};
+
+  const cashInHand =
+    Number(
+      balanceData?.cashInHand ??
+        apiData?.cashInHand ??
+        apiData?.totalCash ??
+        apiData?.cashBalance ??
+        apiData?.cash ??
+        apiData?.totalCashBalance ??
+        0,
+    ) || 0;
+
+  const cashInBank =
+    Number(
+      balanceData?.bankBalance ??
+        apiData?.bankBalance ??
+        apiData?.totalBank ??
+        apiData?.bank ??
+        apiData?.totalBankBalance ??
+        0,
+    ) || 0;
+
+  return {
+    cashInHand,
+    cashInBank,
+  };
+};
 
 const AdminDashboard = () => {
   // CURRENT DATE
@@ -51,6 +115,7 @@ const AdminDashboard = () => {
 
   // STATES
   const [selectedYear, setSelectedYear] = useState(initialSelectedMonth.year);
+
   const [selectedMonth, setSelectedMonth] = useState(
     initialSelectedMonth.month,
   );
@@ -76,58 +141,44 @@ const AdminDashboard = () => {
     });
   }
 
-  // GET DASHBOARD DATA
+  // FETCH DASHBOARD AND CASH & BANK DATA
   const fetchDashboard = useCallback(async (year, month) => {
     try {
       setIsLoading(true);
       setError("");
 
-      const response = await getDashboard(year, month);
+      // Fetch both APIs together
+      const [dashboardResponse, cashBankResponse] = await Promise.all([
+        getDashboard(year, month),
+        getCashBank(),
+      ]);
 
       // EXTRACT DASHBOARD DATA
-      let dashboard = {};
+      const dashboard = extractDashboardData(dashboardResponse);
 
-      if (
-        response?.dashboard &&
-        typeof response.dashboard === "object" &&
-        !Array.isArray(response.dashboard)
-      ) {
-        dashboard = response.dashboard;
-      } else if (
-        response?.data &&
-        typeof response.data === "object" &&
-        !Array.isArray(response.data)
-      ) {
-        dashboard = response.data;
-      } else if (
-        response?.dashboardData &&
-        typeof response.dashboardData === "object" &&
-        !Array.isArray(response.dashboardData)
-      ) {
-        dashboard = response.dashboardData;
-      } else if (
-        response &&
-        typeof response === "object" &&
-        !Array.isArray(response)
-      ) {
-        dashboard = response;
-      }
+      // EXTRACT CASH & BANK BALANCES
+      const cashBankBalances = extractCashBankBalances(cashBankResponse);
 
       // EXTRACT RECENT TRANSACTIONS
       let transactions = [];
 
-      if (Array.isArray(response?.recentTransactions)) {
-        transactions = response.recentTransactions;
+      if (Array.isArray(dashboardResponse?.recentTransactions)) {
+        transactions = dashboardResponse.recentTransactions;
       } else if (Array.isArray(dashboard?.recentTransactions)) {
         transactions = dashboard.recentTransactions;
       } else if (Array.isArray(dashboard?.transactions)) {
         transactions = dashboard.transactions;
-      } else if (Array.isArray(response?.transactions)) {
-        transactions = response.transactions;
+      } else if (Array.isArray(dashboardResponse?.transactions)) {
+        transactions = dashboardResponse.transactions;
       }
 
-      // UPDATE DATA
-      setDashboardData(dashboard);
+      // COMBINE DASHBOARD DATA WITH CASH & BANK BALANCES
+      setDashboardData({
+        ...dashboard,
+        cashInHand: cashBankBalances.cashInHand,
+        cashInBank: cashBankBalances.cashInBank,
+      });
+
       setRecentTransactions(transactions);
     } catch (error) {
       console.error("Dashboard Error:", error);
@@ -159,28 +210,14 @@ const AdminDashboard = () => {
     setSelectedYear(year);
     setSelectedMonth(month);
 
-    // SAVE SELECTED MONTH
     try {
       sessionStorage.setItem(
         DASHBOARD_MONTH_KEY,
-        JSON.stringify({
-          year,
-          month,
-        }),
+        JSON.stringify({ year, month }),
       );
     } catch (error) {
       console.error("Failed to save selected dashboard month:", error);
     }
-  };
-
-  // HANDLE CLOSED MONTH CLICK
-  const handleClosedMonthClick = () => {
-    // Implement your closed month logic or modal trigger here
-    console.log(
-      "Closed Month button clicked for:",
-      selectedYear,
-      selectedMonth,
-    );
   };
 
   // RETRY
@@ -242,18 +279,6 @@ const AdminDashboard = () => {
             <FaChevronDown className="dropdown-icon" size={11} />
           </div>
         </div>
-
-        {/* CLOSED MONTH BUTTON */}
-        {/* <button
-          type="button"
-          className="btn-closed-month"
-          onClick={handleClosedMonthClick}
-        >
-          <div className="icon-circle-closed">
-            <Lock size={13} />
-          </div>
-          <span>Closed Month</span>
-        </button> */}
       </div>
 
       {/* DASHBOARD STATS */}
