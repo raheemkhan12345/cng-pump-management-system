@@ -6,6 +6,7 @@ import {
   FaWallet,
   FaLandmark,
   FaCalendarDay,
+  FaScaleBalanced,
 } from "react-icons/fa6";
 
 import { getAllSales } from "../../../services/adminApis/salesApi";
@@ -76,6 +77,11 @@ const DashboardStats = ({ dashboardData = {} }) => {
     fetchDailyStats();
   }, [fetchDailyStats]);
 
+  // Calculate combined cash and bank balance
+  const totalCashAndBank =
+    (Number(dashboardData.cashInHand) || 0) +
+    (Number(dashboardData.cashInBank) || 0);
+
   const statsData = [
     {
       id: 1,
@@ -96,7 +102,7 @@ const DashboardStats = ({ dashboardData = {} }) => {
       secondaryValue: `${formatCurrency(dailyStats.dailyKg)} KG`,
       secondaryLabel: "Today's CNG Volume",
       icon: FaCalendarDay,
-      variant: "card-teal",
+      variant: "card-teal daily-sale-card",
       path: "/admin/sales-report",
     },
     {
@@ -115,6 +121,15 @@ const DashboardStats = ({ dashboardData = {} }) => {
       subtext: "Available bank balance",
       icon: FaLandmark,
       variant: "card-teal",
+      path: "/admin/cash-bank",
+    },
+    {
+      id: 8,
+      label: "TOTAL CASH & BANK",
+      value: `Rs. ${formatCurrency(totalCashAndBank)}`,
+      subtext: "Combined cash and bank balance",
+      icon: FaScaleBalanced,
+      variant: "card-teal total-cash-bank-card",
       path: "/admin/cash-bank",
     },
     {
