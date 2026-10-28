@@ -13,17 +13,22 @@
   padding: 0 24px;
   box-sizing: border-box;
 
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
+  /* Yahan white color ko transparent banaya hai (0.8 opacity) */
+  background: rgba(255, 255, 255, 0.85);
+  
+  /* Glass blur effect ke liye */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
-  /* Changed from sticky to relative so it scrolls with the page */
-  position: relative;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+
+  position: sticky;
+  top: 0;
   z-index: 100;
 
   overflow: hidden;
   flex-shrink: 0;
 }
-
 /* =========================================================
    NAVBAR LEFT
 ========================================================= */
