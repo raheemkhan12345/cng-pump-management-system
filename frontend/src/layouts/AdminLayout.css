@@ -46,6 +46,8 @@
   /* ADD THIS to prevent child elements from hiding/collapsing on initial render */
   isolation: isolate; 
 }
+
+
 /* =========================================================
    CONTENT AREA
 ========================================================= */
