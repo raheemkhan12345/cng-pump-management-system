@@ -13,10 +13,8 @@
   padding: 0 24px;
   box-sizing: border-box;
 
-  /* Yahan white color ko transparent banaya hai (0.8 opacity) */
   background: rgba(255, 255, 255, 0.85);
   
-  /* Glass blur effect ke liye */
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 
