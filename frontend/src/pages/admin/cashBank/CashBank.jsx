@@ -439,7 +439,7 @@ const CashBank = () => {
     return (
       <div className="cb-container">
         <div className="cb-content-wrapper">
-          <div className="cb-loading">Loading Cash & Bank data...</div>
+          <div className="dashboard-loading">Loading Cash & Bank data...</div>
         </div>
       </div>
     );
@@ -453,7 +453,7 @@ const CashBank = () => {
     return (
       <div className="cb-container">
         <div className="cb-content-wrapper">
-          <div className="cb-error">
+          <div className="dashboard-error">
             <p>{error}</p>
 
             <button type="button" onClick={() => fetchCashBankData()}>

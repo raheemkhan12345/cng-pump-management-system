@@ -287,7 +287,6 @@ const Expenses = () => {
 
       setDieselExpensesData(dieselData);
     } catch (error) {
-      // Keep the regular expense dashboard available if diesel loading fails.
       console.error("Failed to load diesel expenses:", error);
       setDieselExpensesData([]);
     }
@@ -390,7 +389,6 @@ const Expenses = () => {
     return year === selectedYear && month === selectedMonth;
   };
 
-  // Regular expenses + diesel expenses for today's total.
   const todayRegularExpenses = allExpenses
     .filter((expense) => getDateOnly(getDate(expense)) === todayDate)
     .reduce((total, expense) => total + getAmount(expense), 0);
@@ -401,7 +399,6 @@ const Expenses = () => {
 
   const todayExpenses = todayRegularExpenses + todayDieselExpenses;
 
-  // Regular expenses + diesel expenses for the selected month's total.
   const monthRegularExpenses = allExpenses
     .filter((expense) => isInSelectedMonth(getDate(expense)))
     .reduce((total, expense) => total + getAmount(expense), 0);
@@ -641,7 +638,7 @@ const Expenses = () => {
     return (
       <div className="exp-page-container">
         <div className="exp-content-wrapper">
-          <div className="exp-loading">Loading expenses...</div>
+          <div className="dashboard-loading">Loading expenses...</div>
         </div>
       </div>
     );
@@ -651,7 +648,7 @@ const Expenses = () => {
     return (
       <div className="exp-page-container">
         <div className="exp-content-wrapper">
-          <div className="exp-error">
+          <div className="dashboard-error">
             <p>{error}</p>
             <button type="button" onClick={fetchExpenses}>
               Try Again
@@ -954,7 +951,7 @@ const Expenses = () => {
                   onClick={() => setIsDieselModalOpen(true)}
                 >
                   <PlusCircle size={18} />
-                  <span>Diesel Expense</span>
+                  <span>Add Diesel Expense</span>
                 </button> */}
 
                 <button
@@ -963,12 +960,12 @@ const Expenses = () => {
                   onClick={() => setIsOwnerExpenseModalOpen(true)}
                 >
                   <PlusCircle size={18} />
-                  <span>Add Owner Expense</span>
+                  <span>Record Owner Expense</span>
                 </button>
 
                 <button
                   type="button"
-                  className="exp-btn-view-categories"
+                  className="exp-btn-action exp-btn-light"
                   onClick={() => setShowCategories(true)}
                 >
                   <Tags size={18} />
@@ -977,61 +974,20 @@ const Expenses = () => {
               </div>
             </div>
 
-            {/* RECENT NORMAL EXPENSES */}
+            {/* RECENT EXPENSES TABLE */}
             <RecentExpenses
               expenses={selectedMonthCurrentExpenses}
+              allExpensesCount={filteredTotalExpenses}
+              currentPage={currentPage}
+              pageSize={pageSize}
+              totalPages={filteredTotalPages}
+              onPageChange={handlePageChange}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
               onEdit={handleEdit}
               onDelete={handleDelete}
               deletingExpenseId={deletingExpenseId}
             />
-
-            {/* PAGINATION */}
-            {filteredTotalExpenses > 0 && (
-              <div className="exp-pagination">
-                <div className="exp-pagination-info">
-                  Showing <strong>{selectedMonthCurrentExpenses.length}</strong>{" "}
-                  of <strong>{filteredTotalExpenses}</strong> expenses
-                </div>
-
-                <div className="exp-pagination-controls">
-                  <button
-                    type="button"
-                    className="exp-pagination-btn"
-                    onClick={handlePreviousPage}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </button>
-
-                  <div className="exp-pagination-pages">
-                    {Array.from(
-                      { length: filteredTotalPages },
-                      (_, index) => index + 1,
-                    ).map((page) => (
-                      <button
-                        type="button"
-                        key={page}
-                        className={`exp-pagination-page ${
-                          currentPage === page ? "active" : ""
-                        }`}
-                        onClick={() => handlePageChange(page)}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    type="button"
-                    className="exp-pagination-btn"
-                    onClick={handleNextPage}
-                    disabled={currentPage === filteredTotalPages}
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
           </>
         )}
       </div>
@@ -1041,7 +997,7 @@ const Expenses = () => {
         isOpen={isModalOpen}
         onClose={handleCloseExpenseModal}
         onSuccess={handleExpenseSuccess}
-        editingExpense={editingExpense}
+        initialData={editingExpense}
       />
 
       <ExpenseRecoveryModal
@@ -1054,7 +1010,6 @@ const Expenses = () => {
         isOpen={isDieselModalOpen}
         onClose={handleCloseDieselModal}
         onSubmit={handleDieselExpense}
-        editingExpense={null}
         isSubmitting={isDieselSubmitting}
       />
 
