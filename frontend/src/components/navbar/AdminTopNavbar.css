@@ -16,11 +16,12 @@
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
 
-  position: sticky;
-  top: 0;
+  /* Changed from sticky to relative so it scrolls with the page */
+  position: relative;
   z-index: 100;
 
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 /* =========================================================

@@ -1,13 +1,14 @@
+/* =========================================================
+   LAYOUT WRAPPER
+========================================================= */
+
 .layout-wrapper {
   display: flex;
-
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-
   background-color: #f8fafc;
-
-  overflow-x: hidden;
+  position: relative;
 }
 
 /* =========================================================
@@ -22,42 +23,37 @@
   width: 250px;
   height: 100vh;
   height: 100dvh;
-  z-index: 1000; /* Increased to stay strictly above everything */
-  flex-shrink: 0; /* Prevents resizing/collapsing on refresh */
+  z-index: 1000;
+  flex-shrink: 0;
   transition: transform 0.3s ease-in-out;
   transform: translateX(0);
 }
+
 /* =========================================================
    MAIN AREA
 ========================================================= */
 
 .layout-main {
   flex: 1;
-
   width: calc(100% - 250px);
   min-width: 0;
-
+  min-height: 100vh;
   margin-left: 250px;
 
   display: flex;
   flex-direction: column;
-
-  transition:
-    margin-left 0.3s ease-in-out,
-    width 0.3s ease-in-out;
+  
+  /* ADD THIS to prevent child elements from hiding/collapsing on initial render */
+  isolation: isolate; 
 }
-
 /* =========================================================
-   CONTENT
+   CONTENT AREA
 ========================================================= */
 
 .layout-content {
   flex: 1;
-
   width: 100%;
-
   padding: 24px;
-
   box-sizing: border-box;
 }
 
@@ -68,15 +64,14 @@
 .content-container {
   width: 100%;
   max-width: 1400px;
-
   margin: 0 auto;
-
   box-sizing: border-box;
 }
 
 /* =========================================================
-   SIDEBAR OVERLAY
+   SIDEBAR OVERLAY (MOBILE)
 ========================================================= */
+
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -86,12 +81,11 @@
   background-color: rgba(15, 23, 42, 0.4);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  z-index: 999; /* Just below the sidebar */
+  z-index: 999;
 }
 
 /* =========================================================
-   LARGE DESKTOP
-   1440px+
+   MEDIA QUERIES
 ========================================================= */
 
 @media (min-width: 1440px) {
@@ -101,7 +95,6 @@
 
   .layout-main {
     width: calc(100% - 250px);
-
     margin-left: 250px;
   }
 
@@ -114,11 +107,6 @@
   }
 }
 
-/* =========================================================
-   LAPTOP
-   1025px - 1439px
-========================================================= */
-
 @media (max-width: 1439px) {
   .sidebar-container {
     width: 250px;
@@ -126,7 +114,6 @@
 
   .layout-main {
     width: calc(100% - 250px);
-
     margin-left: 250px;
   }
 
@@ -139,11 +126,6 @@
   }
 }
 
-/* =========================================================
-   TABLET
-   769px - 1024px
-========================================================= */
-
 @media (max-width: 1024px) {
   .sidebar-container {
     width: 250px;
@@ -151,7 +133,6 @@
 
   .layout-main {
     width: calc(100% - 250px);
-
     margin-left: 250px;
   }
 
@@ -164,16 +145,10 @@
   }
 }
 
-/* =========================================================
-   MOBILE / TABLET
-   0px - 768px
-========================================================= */
-
 @media (max-width: 768px) {
   .sidebar-container {
     width: 270px;
     max-width: 85vw;
-
     transform: translateX(-100%);
   }
 
@@ -184,20 +159,17 @@
   .layout-main {
     width: 100%;
     max-width: 100%;
-
     margin-left: 0;
   }
 
   .layout-content {
     width: 100%;
-
     padding: 16px;
   }
 
   .content-container {
     width: 100%;
     max-width: 100%;
-
     margin: 0;
   }
 
@@ -205,11 +177,6 @@
     display: block;
   }
 }
-
-/* =========================================================
-   MOBILE
-   481px - 767px
-========================================================= */
 
 @media (max-width: 767px) {
   .layout-content {
@@ -222,11 +189,6 @@
   }
 }
 
-/* =========================================================
-   SMALL MOBILE
-   0px - 480px
-========================================================= */
-
 @media (max-width: 480px) {
   .sidebar-container {
     width: 250px;
@@ -238,11 +200,6 @@
   }
 }
 
-/* =========================================================
-   EXTRA SMALL MOBILE
-   0px - 360px
-========================================================= */
-
 @media (max-width: 360px) {
   .sidebar-container {
     width: 240px;
@@ -253,10 +210,6 @@
     padding: 10px;
   }
 }
-
-/* =========================================================
-   REDUCE MOTION
-========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   .sidebar-container,

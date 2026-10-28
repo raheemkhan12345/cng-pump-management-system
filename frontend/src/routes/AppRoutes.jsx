@@ -7,7 +7,7 @@ import RoleRoute from "./RoleRoute";
 
 // Layouts
 import SuperAdminLayout from "../layouts/SuperAdminLayout";
-import AdminLayout from "../layouts/adminLayout";
+import AdminLayout from "../layouts/AdminLayout";
 
 // Super Admin Pages
 import SuperAdminDashboard from "../pages/superAdmin/superAdminDashboard/SuperAdminDashboard";
