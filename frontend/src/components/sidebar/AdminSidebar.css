@@ -13,9 +13,8 @@
   padding: 20px 14px;
   box-sizing: border-box;
 
-  position: relative;
-  z-index: 100;
-
+  /* Removed position: relative and z-index here, 
+     letting AdminLayout's .sidebar-container handle the stacking context */
   overflow: hidden;
 }
 

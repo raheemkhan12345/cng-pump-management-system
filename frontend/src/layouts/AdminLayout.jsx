@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import AdminSidebar from '../components/sidebar/AdminSidebar';
@@ -8,7 +9,7 @@ const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+    setIsSidebarOpen((prev) => !prev);
   };
 
   const closeSidebar = () => {
@@ -17,9 +18,13 @@ const AdminLayout = () => {
 
   return (
     <div className="layout-wrapper">
-      {/* Mobile Overlay */}
+
+      {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
-        <div className="sidebar-overlay" onClick={closeSidebar}></div>
+        <div
+          className="sidebar-overlay"
+          onClick={closeSidebar}
+        ></div>
       )}
 
       {/* Sidebar Container */}
@@ -29,12 +34,15 @@ const AdminLayout = () => {
 
       {/* Main Area */}
       <div className="layout-main">
+
         <AdminTopNavbar onToggleSidebar={toggleSidebar} />
+
         <main className="layout-content">
           <div className="content-container">
             <Outlet />
           </div>
         </main>
+
       </div>
     </div>
   );

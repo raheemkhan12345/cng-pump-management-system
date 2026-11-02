@@ -1,20 +1,101 @@
-import { useState } from "react";
-import { X, Calendar, Banknote, Building2, CheckCircle2 } from "lucide-react";
+
+import { useEffect, useState } from "react";
+import {
+  X,
+  Calendar,
+  Banknote,
+  Building2,
+  CheckCircle2,
+} from "lucide-react";
+
+import { getExpenseCategories } from "../../../services/adminApis/expenseApi";
 
 import "./ExpenseRecoveryModal.css";
 
 const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
+  // =========================================================
+  // FORM STATE
+  // =========================================================
+
   const [formData, setFormData] = useState({
     date: "",
-    category: "68a123456789abcdef123456",
+    category: "",
     recoveryAmount: "",
     remarks: "",
     paymentMode: "Cash Account",
   });
 
-  if (!isOpen) {
-    return null;
-  }
+  // =========================================================
+  // CATEGORY STATE
+  // =========================================================
+
+  const [categories, setCategories] = useState([]);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
+
+  // =========================================================
+  // CATEGORY HELPERS
+  // =========================================================
+
+  const getCategoryId = (item) => {
+    if (!item) return "";
+
+    if (typeof item === "string") {
+      return item;
+    }
+
+    return item?._id || item?.id || item?.categoryId || "";
+  };
+
+  const getCategoryName = (item) => {
+    if (!item) return "";
+
+    if (typeof item === "string") {
+      return item;
+    }
+
+    return (
+      item?.name ||
+      item?.title ||
+      item?.categoryName ||
+      item?.label ||
+      ""
+    );
+  };
+
+  // =========================================================
+  // FETCH EXPENSE CATEGORIES
+  // =========================================================
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchCategories = async () => {
+      try {
+        setIsCategoriesLoading(true);
+
+        const response = await getExpenseCategories();
+
+        const categoryData = Array.isArray(response?.expenseCategories)
+          ? response.expenseCategories
+          : Array.isArray(response?.categories)
+            ? response.categories
+            : Array.isArray(response?.data)
+              ? response.data
+              : Array.isArray(response)
+                ? response
+                : [];
+
+        setCategories(categoryData);
+      } catch (error) {
+        console.error("Failed to fetch expense categories:", error);
+        setCategories([]);
+      } finally {
+        setIsCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, [isOpen]);
 
   // =========================================================
   // HANDLE INPUT CHANGE
@@ -48,10 +129,17 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
     e.preventDefault();
 
     if (!formData.date) {
+      window.alert("Please select a date.");
       return;
     }
 
-    if (!formData.recoveryAmount) {
+    if (!formData.category) {
+      window.alert("Please select an expense category.");
+      return;
+    }
+
+    if (!formData.recoveryAmount || Number(formData.recoveryAmount) <= 0) {
+      window.alert("Please enter a valid recovery amount.");
       return;
     }
 
@@ -63,16 +151,39 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
       paymentMode: formData.paymentMode,
     };
 
-    console.log("Recovery Expense Payload:", recoveryExpenseData);
-
     if (onSubmit) {
       onSubmit(recoveryExpenseData);
     }
   };
 
+  // =========================================================
+  // CLOSE MODAL
+  // =========================================================
+
+  const handleClose = () => {
+    setFormData({
+      date: "",
+      category: "",
+      recoveryAmount: "",
+      remarks: "",
+      paymentMode: "Cash Account",
+    });
+
+    onClose();
+  };
+
+  // =========================================================
+  // MODAL
+  // =========================================================
+
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <div className="erm-overlay">
       <div className="erm-modal-container">
+
         {/* =====================================================
             HEADER
         ====================================================== */}
@@ -83,7 +194,7 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
           <button
             type="button"
             className="erm-close-btn"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Close"
           >
             <X size={20} />
@@ -95,12 +206,14 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
         ====================================================== */}
 
         <form onSubmit={handleSubmit} className="erm-form">
+
           {/* ===================================================
               DATE & CATEGORY
           ==================================================== */}
 
           <div className="erm-grid-2">
-            {/* Date */}
+
+            {/* DATE */}
 
             <div className="erm-field">
               <label className="erm-label">Date</label>
@@ -119,18 +232,42 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
               </div>
             </div>
 
-            {/* Expense Category */}
+            {/* EXPENSE CATEGORY */}
 
             <div className="erm-field">
               <label className="erm-label">Expense Category</label>
 
-              <input
-                type="text"
-                value="Recovery Expense"
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
                 className="erm-input"
-                readOnly
-              />
+                disabled={isCategoriesLoading}
+                required
+              >
+                <option value="" disabled>
+                  {isCategoriesLoading
+                    ? "Loading categories..."
+                    : "Select a category..."}
+                </option>
+
+                {categories.map((item) => {
+                  const categoryId = getCategoryId(item);
+                  const categoryName = getCategoryName(item);
+
+                  if (!categoryId) {
+                    return null;
+                  }
+
+                  return (
+                    <option key={categoryId} value={categoryId}>
+                      {categoryName}
+                    </option>
+                  );
+                })}
+              </select>
             </div>
+
           </div>
 
           {/* ===================================================
@@ -182,7 +319,8 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
             <label className="erm-label">Payment Mode / Pool</label>
 
             <div className="erm-payment-grid">
-              {/* Cash Account */}
+
+              {/* CASH ACCOUNT */}
 
               <div
                 className={`erm-payment-card ${
@@ -193,6 +331,7 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
                     handlePaymentModeSelect("Cash Account");
                   }
                 }}
@@ -204,7 +343,6 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
 
                   <div className="erm-pm-text">
                     <span className="erm-pm-title">Cash Account</span>
-
                     <span className="erm-pm-sub">Hand Pool</span>
                   </div>
                 </div>
@@ -214,7 +352,7 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
                 )}
               </div>
 
-              {/* Bank Account */}
+              {/* BANK ACCOUNT */}
 
               <div
                 className={`erm-payment-card ${
@@ -225,6 +363,7 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
                     handlePaymentModeSelect("Bank Account");
                   }
                 }}
@@ -236,7 +375,6 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
 
                   <div className="erm-pm-text">
                     <span className="erm-pm-title">Bank Account</span>
-
                     <span className="erm-pm-sub">Reserve Pool</span>
                   </div>
                 </div>
@@ -245,6 +383,7 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
                   <CheckCircle2 size={20} className="erm-check-icon" />
                 )}
               </div>
+
             </div>
           </div>
 
@@ -253,16 +392,27 @@ const ExpenseRecoveryModal = ({ isOpen, onClose, onSubmit }) => {
           ==================================================== */}
 
           <div className="erm-footer">
-            <button type="button" className="erm-btn-cancel" onClick={onClose}>
+
+            <button
+              type="button"
+              className="erm-btn-cancel"
+              onClick={handleClose}
+            >
               Cancel
             </button>
 
-            <button type="submit" className="erm-btn-submit">
+            <button
+              type="submit"
+              className="erm-btn-submit"
+              disabled={isCategoriesLoading || categories.length === 0}
+            >
               <CheckCircle2 size={18} />
 
               <span>Record Recovery</span>
             </button>
+
           </div>
+
         </form>
       </div>
     </div>

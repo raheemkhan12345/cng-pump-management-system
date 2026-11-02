@@ -1,3 +1,4 @@
+
 /* ==========================================
    STATS GRID
 ========================================== */
@@ -5,7 +6,7 @@
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -23,7 +24,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: 12px 14px;
+  padding: 8px 12px;
   border-radius: 8px;
   box-sizing: border-box;
   position: relative;
@@ -36,7 +37,7 @@
 }
 
 /* ==========================================
-   HOVER AND KEYBOARD ACCESSIBILITY
+   HOVER AND ACCESSIBILITY
 ========================================== */
 
 .stat-card:hover {
@@ -50,7 +51,7 @@
 }
 
 /* ==========================================
-   CARD BACKGROUND VARIANTS
+   CARD COLORS
 ========================================== */
 
 .card-green {
@@ -86,9 +87,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  border-bottom: none;
+  gap: 6px;
   padding: 0;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
   flex-shrink: 0;
 }
 
@@ -98,12 +100,12 @@
 
 .card-label {
   min-width: 0;
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   color: #4b5563;
   text-transform: uppercase;
-  line-height: 1.3;
+  line-height: 1.2;
   overflow-wrap: anywhere;
 }
 
@@ -113,8 +115,16 @@
 
 .card-icon {
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: 13px;
   color: #374151;
+}
+
+/* ==========================================
+   CARD DIVIDER - REMOVED
+========================================== */
+
+.card-divider {
+  display: none;
 }
 
 /* ==========================================
@@ -124,7 +134,8 @@
 .card-body {
   width: 100%;
   min-width: 0;
-  margin-top: 8px;
+  margin: 2px 0 0 !important;
+  padding: 0;
 }
 
 /* ==========================================
@@ -132,11 +143,12 @@
 ========================================== */
 
 .card-amount {
-  font-size: 19px;
+  font-size: 17px;
   font-weight: 800;
   color: #111827;
   margin: 0;
-  line-height: 1.25;
+  padding: 0;
+  line-height: 1.2;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
@@ -146,49 +158,50 @@
 ========================================== */
 
 .card-subtext {
-  font-size: 10px;
+  font-size: 9px;
   color: #4b5563;
-  margin: 4px 0 0;
+  margin: 2px 0 0;
+  padding: 0;
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.2;
   overflow-wrap: anywhere;
 }
 
 /* ==========================================
    SECONDARY INFO: KG
-   Used by Total Sale and Daily Sale cards
 ========================================== */
 
 .stat-secondary-info {
   width: 100%;
   min-width: 0;
-  margin-top: 10px;
-  padding-top: 7px;
-  border-top: 1px solid rgba(17, 24, 39, 0.12);
+  margin: 5px 0 0;
+  padding: 0;
+  border: none;
   box-sizing: border-box;
 }
 
 .stat-secondary-label {
   display: block;
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 500;
   color: #4b5563;
-  line-height: 1.35;
+  line-height: 1.2;
   overflow-wrap: anywhere;
 }
 
 .stat-secondary-value {
-  margin: 3px 0 0;
-  font-size: 14px;
+  margin: 2px 0 0;
+  padding: 0;
+  font-size: 12px;
   font-weight: 700;
   color: #111827;
-  line-height: 1.25;
+  line-height: 1.2;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
 /* ==========================================
-   COLOR VARIANTS
+   RED TEXT
 ========================================== */
 
 .text-red {
@@ -202,15 +215,16 @@
 @media (max-width: 1024px) {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 9px;
   }
 
   .stat-card {
-    padding: 12px;
+    min-height: 95px;
+    padding: 8px 10px;
   }
 
   .card-amount {
-    font-size: 18px;
+    font-size: 16px;
   }
 }
 
@@ -221,41 +235,50 @@
 @media (max-width: 580px) {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+    gap: 8px;
   }
 
   .stat-card {
-    min-height: 105px;
-    padding: 11px;
+    min-height: 90px;
+    padding: 7px 8px;
   }
 
   .card-label {
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .card-icon {
-    font-size: 12px;
+    font-size: 11px;
+  }
+
+  .card-header {
+    margin-bottom: 0 !important;
+  }
+
+  .card-body {
+    margin-top: 2px !important;
   }
 
   .card-amount {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .card-subtext {
-    font-size: 9px;
+    font-size: 8px;
+    margin-top: 2px;
   }
 
   .stat-secondary-info {
-    margin-top: 8px;
-    padding-top: 6px;
+    margin-top: 4px;
+    padding: 0;
   }
 
   .stat-secondary-label {
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .stat-secondary-value {
-    font-size: 12px;
+    font-size: 10px;
   }
 }
 
@@ -265,19 +288,32 @@
 
 @media (max-width: 360px) {
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .stat-card {
-    min-height: auto;
-    padding: 12px;
+    min-height: 85px;
+    padding: 6px 7px;
+  }
+
+  .card-label {
+    font-size: 7px;
   }
 
   .card-amount {
-    font-size: 18px;
+    font-size: 12px;
+  }
+
+  .card-subtext {
+    font-size: 7px;
+  }
+
+  .stat-secondary-label {
+    font-size: 7px;
   }
 
   .stat-secondary-value {
-    font-size: 13px;
+    font-size: 9px;
   }
 }

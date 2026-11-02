@@ -106,6 +106,15 @@ const DashboardStats = ({ dashboardData = {} }) => {
       path: "/admin/sales-report",
     },
     {
+      id: 7,
+      label: "TOTAL EXPENSES",
+      value: `Rs. ${formatCurrency(dashboardData.totalExpenses)}`,
+      subtext: "Across all accounts",
+      icon: FaLandmark,
+      variant: "card-pink",
+      path: "/admin/expenses",
+    },
+    {
       id: 3,
       label: "CASH IN HAND",
       value: `Rs. ${formatCurrency(dashboardData.cashInHand)}`,
@@ -152,15 +161,7 @@ const DashboardStats = ({ dashboardData = {} }) => {
       iconVariant: "text-red",
       path: "/admin/loans",
     },
-    {
-      id: 7,
-      label: "TOTAL EXPENSES",
-      value: `Rs. ${formatCurrency(dashboardData.totalExpenses)}`,
-      subtext: "Across all accounts",
-      icon: FaLandmark,
-      variant: "card-pink",
-      path: "/admin/expenses",
-    },
+    
   ];
 
   const handleCardClick = (path) => {

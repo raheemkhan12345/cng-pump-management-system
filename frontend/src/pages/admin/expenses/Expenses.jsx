@@ -848,7 +848,7 @@ const Expenses = () => {
                 </p>
               </div>
 
-              <div className="exp-title-actions">
+              {/* <div className="exp-title-actions">
                 <button
                   type="button"
                   className="exp-btn-add-owners"
@@ -857,7 +857,7 @@ const Expenses = () => {
                   <PlusCircle size={18} />
                   <span>Add Owners</span>
                 </button>
-              </div>
+              </div> */}
             </div>
 
             <div className="exp-selected-month">
@@ -954,14 +954,14 @@ const Expenses = () => {
                   <span>Add Diesel Expense</span>
                 </button> */}
 
-                <button
+                {/* <button
                   type="button"
                   className="exp-btn-action exp-btn-dark"
                   onClick={() => setIsOwnerExpenseModalOpen(true)}
                 >
                   <PlusCircle size={18} />
                   <span>Record Owner Expense</span>
-                </button>
+                </button> */}
 
                 <button
                   type="button"
